@@ -1,0 +1,58 @@
+# spring:
+#   datasource:
+#     # url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?user=postgres.kohlwwnfdtwlmfanaxgo&password=1933356Kasar@625
+#     url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?user=postgres.nzdfurdfnrlhgqhhdogd&password=Kasar@625
+
+#     # username: Vbyss_owner
+#     # password: iIwFD18SEeGp
+#     driver-class-name: org.postgresql.Driver
+#     hikari:
+#       minimum-idle: 5
+#       maximum-pool-size: 20
+#       pool-name: HikariCP
+
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#       show-sql: true
+#       properties:
+#         hibernate:
+#           format_sql: true
+#           dialect: org.hibernate.dialect.PostgreSQLDialect
+
+# server:
+#   port: 8080
+
+
+# ----new config 
+spring:
+  datasource:
+    url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?user=postgres.nzdfurdfnrlhgqhhdogd&password=Kasar@625
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      pool-name: HikariCP
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  mail: # Added email configuration (example for Gmail)
+    host: smtp.gmail.com
+    port: 587
+    username: devlomentpurpose@gmail.com # Replace with your Gmail address
+    # password: 13579@devwithved # Replace with your Gmail app-specific password
+    password: eurs pbeq taog rqpo 
+    properties: 
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  port: 8080
