@@ -47,4 +47,16 @@ public class DeathUserController {
         Iterable<DeathUser> users = deathUserService.getAllUsers();
         return new ResponseEntity<>(users, HttpStatus.OK); // 200 OK
     }
+    
+    // here i am adding the two get request methods for checking the size of the files and benificary
+    @GetMapping("/filesize/{id}")
+    public int getFileSize(@PathVariable String id) {
+        return deathUserService.getFileSize(id);
+    }
+   @GetMapping("/beneficiarysize/{id}")
+    public int getBeneficiarySize(@PathVariable String id) {
+        return deathUserService.getSizeOfBeneficiary(id);
+    }
+    
+    
 }
