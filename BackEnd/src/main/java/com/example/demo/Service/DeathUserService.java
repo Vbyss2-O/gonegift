@@ -53,5 +53,22 @@ public class DeathUserService {
     public DeathUser findUserBySecretId(String secretId) {
         return deathUserRepository.findBySecretKey(secretId);
     }
+    //------------------------
+    public int getFileSize(String id) {
+       DeathUser user = deathUserRepository.findById(id).orElse(null);
+       if (user != null) {
+           return user.getFiles().size();
+       } else {
+           throw new RuntimeException("User not found with ID: " + id);
+       }
+    }
+    public int getSizeOfBeneficiary(String id) {
+        DeathUser user = deathUserRepository.findById(id).orElse(null);
+        if (user != null) {
+            return user.getBeneficiaries().size();
+        } else {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+    }
 }
 

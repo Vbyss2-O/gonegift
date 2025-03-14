@@ -21,6 +21,11 @@ const Dashboard = () => {
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [countFile, setCountFile] = useState(null); 
+  const [countBenificiary, setCountBenificiary] = useState(null);
+
+ 
+
   useEffect(() => {
     const fetchUserData = async () => {
       try {
@@ -60,6 +65,28 @@ const Dashboard = () => {
     };
     fetchUserData();
   }, [navigate]);
+
+  useEffect(() => {
+    if (userData) { 
+      fetch(`http://localhost:8080/api/deathusers/filesize/${userData.userIdX}`)
+        .then((response) => response.text()) 
+        .then((data) => {
+          setCountFile(parseInt(data, 10)); 
+        })
+        .catch((error) => console.error("Error fetching file count:", error));
+    }
+  }, [userData]); 
+  
+  useEffect(() => {
+    if (userData) { 
+      fetch(`http://localhost:8080/api/deathusers/beneficiarysize/${userData.userIdX}`) 
+        .then((response) => response.text()) 
+        .then((data) => {
+          setCountBenificiary(parseInt(data, 10)); 
+        })
+        .catch((error) => console.error("Error fetching beneficiary count:", error));
+    }
+  }, [userData]);
 
   const handleLogout = async () => {
     try {
@@ -144,7 +171,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-info">
               <h3>Total Files</h3>
-              <p>0</p>
+              <p>{countFile}</p>
             </div>
           </div>
           <div className="stat-card">
@@ -153,7 +180,7 @@ const Dashboard = () => {
             </div>
             <div className="stat-info">
               <h3>Beneficiaries</h3>
-              <p>0</p>
+              <p>{countBenificiary}</p>
             </div>
           </div>
           <div className="stat-card">
