@@ -2,6 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./DeathDashboard.css";
+import { 
+  FiUpload, 
+  FiMail, 
+  FiUsers, 
+  FiFileText, 
+  FiGift, 
+  FiSettings, 
+  FiLogOut, 
+  FiGrid, 
+  FiBox, 
+  FiTrendingUp,
+} from 'react-icons/fi';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -19,13 +31,12 @@ const Dashboard = () => {
           return;
         }
 
-        // Fetch user data from death_user
         const { data: existingUser, error: fetchError } = await supabase
           .from("death_user")
           .select("first_name, lastname, user_role")
           .eq("user_idx", user.id)
-          .limit(1) // Ensure single row is returned
-          .maybeSingle(); // Avoid error if no rows exist
+          .limit(1)
+          .maybeSingle();
 
         if (fetchError || !existingUser) {
           console.error("Error fetching user data:", fetchError || "User not found in death_user table");
@@ -61,38 +72,126 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return (
+    <div className="loading-screen">
+      <div className="loader"></div>
+      <p>Loading your dashboard...</p>
+    </div>
+  );
+
+  const generalMenuItems = [
+    { icon: <FiUpload size={24} />, text: "Upload File", path: "/upload-file" },
+    { icon: <FiMail size={24} />, text: "Create Delivery", path: "/create-delivery" },
+    { icon: <FiUsers size={24} />, text: "Beneficiary", path: "/beneficiaries" },
+    { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
+    { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
+  ];
+
+  const adminMenuItems = [
+    ...generalMenuItems,
+    { icon: <FiSettings size={24} />, text: "Admin Tools", path: "/admin" },
+  ];
+
+  const menuItems = userRole === "admin" ? adminMenuItems : generalMenuItems;
 
   return (
-    <div className="dashboard">
-      <h1>Welcome, {userData?.firstName + " " + userData?.lastname || userData?.email}!</h1>
-      
-      <section className="quick-actions">
-        {userRole === "general" && (
-          <>
-            <button onClick={() => navigate("/upload-file")}>Upload File</button>
-            <button onClick={() => navigate("/create-delivery")}>Create Delivery</button>
-            <button onClick={() => navigate("/beneficiaries")}>Beneficiary</button>
-            <button onClick={() => navigate("/letter")}>Letter</button>
-            <button onClick={() => navigate("/beneficiary-claim")}>Claim as Beneficiary</button>
-          </>
-        )}
-        {userRole === "admin" && (
-          <>
-            <button onClick={() => navigate("/upload-file")}>Upload File</button>
-            <button onClick={() => navigate("/create-delivery")}>Create Delivery</button>
-            <button onClick={() => navigate("/beneficiaries")}>Beneficiary</button>
-            <button onClick={() => navigate("/letter")}>Letter</button>
-            <button onClick={() => navigate("/beneficiary-claim")}>Claim as Beneficiary</button>
-            <button onClick={() => navigate("/admin")}>Admin Tools</button>
-          </>
-        )}
-        <button onClick={handleLogout} className="logout-btn">Logout</button>
-      </section>
+    <div className="dashboard-container">
+      <aside className="sidebar">
+        <div className="sidebar-header">
+          <FiGrid size={24} />
+          <h2>GoneGift</h2>
+        </div>
+        
+        <nav className="sidebar-menu">
+          {menuItems.map((item, index) => (
+            <button
+              key={index}
+              className="menu-item"
+              onClick={() => navigate(item.path)}
+            >
+              {item.icon}
+              <span>{item.text}</span>
+            </button>
+          ))}
+        </nav>
 
-      <section className="assets-overview">
-        <p>To be continued...</p>
-      </section>
+        <button className="logout-button" onClick={handleLogout}>
+          <FiLogOut size={20} />
+          <span>Logout</span>
+        </button>
+      </aside>
+
+      <main className="main-content">
+        <header className="main-header">
+          <div className="user-welcome">
+            <h1>Welcome back, {userData?.firstName}!</h1>
+            <p>{new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}</p>
+          </div>
+          <div className="user-profile">
+            <span>{userData?.firstName?.[0]}{userData?.lastname?.[0]}</span>
+          </div>
+        </header>
+
+        <div className="stats-grid">
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FiBox size={24} />
+            </div>
+            <div className="stat-info">
+              <h3>Total Files</h3>
+              <p>0</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FiUsers size={24} />
+            </div>
+            <div className="stat-info">
+              <h3>Beneficiaries</h3>
+              <p>0</p>
+            </div>
+          </div>
+          <div className="stat-card">
+            <div className="stat-icon">
+              <FiTrendingUp size={24} />
+            </div>
+            <div className="stat-info">
+              <h3>Pending Deliveries</h3>
+              <p>0</p>
+            </div>
+          </div>
+         
+        </div>
+
+        <div className="dashboard-grid">
+          {menuItems.map((item, index) => (
+            <div 
+              key={index} 
+              className="dashboard-card" 
+              onClick={() => navigate(item.path)}
+            >
+              <div className="card-icon">{item.icon}</div>
+              <h3>{item.text}</h3>
+            </div>
+          ))}
+        </div>
+
+        <div className="recent-activity">
+          <br />
+          <br />
+          <br />
+
+          <center><h2>Recent Activity</h2></center>
+          <div className="activity-list">
+            <center><p>No recent activity</p></center>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
