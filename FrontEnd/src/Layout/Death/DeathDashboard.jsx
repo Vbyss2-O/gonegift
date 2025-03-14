@@ -169,7 +169,7 @@ const Dashboard = () => {
             <div className="stat-icon">
               <FiBox size={24} />
             </div>
-            <div className="stat-info">
+            <div className="stat-info" onClick={() => navigate("/allFiles")}>
               <h3>Total Files</h3>
               <p>{countFile}</p>
             </div>
@@ -178,7 +178,7 @@ const Dashboard = () => {
             <div className="stat-icon">
               <FiUsers size={24} />
             </div>
-            <div className="stat-info">
+            <div className="stat-info" onClick={() => navigate("/allBenificiarys")}>
               <h3>Beneficiaries</h3>
               <p>{countBenificiary}</p>
             </div>

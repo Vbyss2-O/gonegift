@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Repo.DeathUserRepository;
+import com.example.demo.model.DeathProject.Beneficiary;
+import com.example.demo.model.DeathProject.DeathFiles;
 import com.example.demo.model.DeathProject.DeathUser;
 
 import java.util.List;
@@ -66,6 +68,24 @@ public class DeathUserService {
         DeathUser user = deathUserRepository.findById(id).orElse(null);
         if (user != null) {
             return user.getBeneficiaries().size();
+        } else {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+    }
+
+    // list of all 
+    public List<Beneficiary> getBeneficiaryList(String id) {
+        DeathUser user = deathUserRepository.findById(id).orElse(null);
+        if (user != null) {
+            return user.getBeneficiaries();
+        } else {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+    }
+    public List<DeathFiles> getFileList(String id) {
+        DeathUser user = deathUserRepository.findById(id).orElse(null);
+        if (user!= null) {
+            return user.getFiles();
         } else {
             throw new RuntimeException("User not found with ID: " + id);
         }

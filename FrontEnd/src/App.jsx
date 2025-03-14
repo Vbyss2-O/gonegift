@@ -9,6 +9,8 @@ import ProtectedRoute from "./Layout/Auth/ProtectedRoute";
 import AdminDashboard from "./Layout/Death/AdminDashboard";
 import DeathReportForm from "./Layout/Death/DeathReportForm";
 import UserDetailsForm from "./Layout/Death/DeathUserDetail";
+import BeneficiaryList from "./Layout/Death/BeneficiaryList";
+import FileList from "./Layout/Death/FileList";
 
 function App() {
   return (
@@ -46,9 +48,37 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route path="/beneficiary-claim" element={<DeathReportForm />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/primaryinfo" element={<UserDetailsForm/>} />
+
+      <Route path="/beneficiary-claim" element={
+        <ProtectedRoute redirectTo="/login">
+        <DeathReportForm />
+        </ProtectedRoute>
+      } />
+
+      <Route path="/admin" element={
+        <ProtectedRoute redirectTo="/login">
+        <AdminDashboard />
+        </ProtectedRoute>
+        } />
+
+      <Route path="/primaryinfo" element={
+        <ProtectedRoute redirectTo="/login">
+        <UserDetailsForm/>
+        </ProtectedRoute>
+        } />
+
+       <Route path="/allBenificiarys" element={
+        <ProtectedRoute redirectTo="/login">
+        <BeneficiaryList/>
+         </ProtectedRoute>
+        } />
+
+        <Route path="/allFiles" element={
+        <ProtectedRoute redirectTo="/login">
+        <FileList/>
+        </ProtectedRoute>
+        } />
+
 
 
       

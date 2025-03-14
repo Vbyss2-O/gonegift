@@ -1,12 +1,15 @@
 package com.example.demo.Controller.DeathControllers;
 
 import com.example.demo.Service.DeathUserService;
+import com.example.demo.model.DeathProject.Beneficiary;
+import com.example.demo.model.DeathProject.DeathFiles;
 import com.example.demo.model.DeathProject.DeathUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -56,6 +59,16 @@ public class DeathUserController {
    @GetMapping("/beneficiarysize/{id}")
     public int getBeneficiarySize(@PathVariable String id) {
         return deathUserService.getSizeOfBeneficiary(id);
+    }
+
+    //below two get controller is for the showing the list of proper benificaries and files 
+    @GetMapping("listOfBeneficiary/{id}")
+    public List<Beneficiary> getBeneficiaryList(@PathVariable String id) {
+        return deathUserService.getBeneficiaryList(id);
+    }
+    @GetMapping("listOfFiles/{id}")
+    public List<DeathFiles> getFileList(@PathVariable String id) {
+        return deathUserService.getFileList(id);
     }
     
     
