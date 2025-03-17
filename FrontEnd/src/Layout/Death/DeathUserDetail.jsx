@@ -44,11 +44,16 @@ const UserDetailsForm = () => {
         firstName,
         lastname,
         lastActivityDate: new Date().toISOString(),
-        inactivityThresholdDays: 30,
+        inactivityThresholdDays: 0,
         relativeId: null,
         secretKey: uuidv4(),
         userRole: "general", // Default role for new users
         isdeceased: false,
+        attemptCount: 0,
+        nextBuddyDate: null,
+        lastInteraction: null,
+        buddyStatus: "CHILLING",
+
       };
 
       console.log("Submitting user details:", userDetails); // Debug log

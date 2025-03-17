@@ -11,6 +11,7 @@ import DeathReportForm from "./Layout/Death/DeathReportForm";
 import UserDetailsForm from "./Layout/Death/DeathUserDetail";
 import BeneficiaryList from "./Layout/Death/BeneficiaryList";
 import FileList from "./Layout/Death/FileList";
+import LifeBuddyDashboard from "./Layout/LifeBuddyDashboard";
 
 function App() {
   return (
@@ -76,6 +77,12 @@ function App() {
         <Route path="/allFiles" element={
         <ProtectedRoute redirectTo="/login">
         <FileList/>
+        </ProtectedRoute>
+        } />
+
+        <Route path="/lifebuddy" element={
+        <ProtectedRoute redirectTo="/login">
+        <LifeBuddyDashboard/>
         </ProtectedRoute>
         } />
 
