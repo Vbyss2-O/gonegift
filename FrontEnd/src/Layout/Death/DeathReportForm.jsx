@@ -146,7 +146,7 @@ const DeathReportForm = () => {
           />
         </div>
         <div style={styles.inputGroup}>
-          <label>Details (Optional)</label>
+          <label>Details</label>
           <textarea
             value={reportDetails}
             onChange={(e) => setReportDetails(e.target.value)}

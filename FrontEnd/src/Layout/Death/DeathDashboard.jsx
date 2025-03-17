@@ -14,6 +14,7 @@ import {
   FiBox, 
   FiTrendingUp,
 } from 'react-icons/fi';
+import { FaRobot } from "react-icons/fa";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -112,6 +113,8 @@ const Dashboard = () => {
     { icon: <FiUsers size={24} />, text: "Beneficiary", path: "/beneficiaries" },
     { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
     { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
+    { icon: <FaRobot size={24} />, text: "Visite Budddy", path: "/lifebuddy" },
+
   ];
 
   const adminMenuItems = [
@@ -160,7 +163,6 @@ const Dashboard = () => {
             })}</p>
           </div>
           <div className="user-profile">
-            <span>{userData?.firstName?.[0]}{userData?.lastname?.[0]}</span>
           </div>
         </header>
 

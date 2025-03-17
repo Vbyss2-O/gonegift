@@ -186,4 +186,47 @@ public class DeathReportService {
             }
         }
     }
+    @Transactional
+    public void triggerUser(DeathUser user){
+        if (user == null) {
+            throw new RuntimeException("null user founded");
+        }
+        user.setIsdeceased(true);
+        deathUserRepository.save(user);
+
+        // Fetch beneficiaries (handle null case)
+        List<Beneficiary> beneficiaries = user.getBeneficiaries();
+        if (beneficiaries == null || beneficiaries.isEmpty()) {
+            throw new RuntimeException("No beneficiaries found for user: " + user.getUserIdX());
+        }
+
+        // Fetch files (handle null case)
+        List<String> fileUrls = (user.getFiles() != null)
+            ? user.getFiles().stream()
+                .map(f -> (f.getLetterFileUrl() != null) ? f.getLetterFileUrl() : f.getMediaFileUrl())
+                .filter(url -> url != null) // Ensure no null values
+                .collect(Collectors.toList())
+            : List.of();
+
+        String fileList = fileUrls.isEmpty() ? "No files available" : String.join("\n", fileUrls);
+
+        // Send email to all beneficiaries
+        for (Beneficiary beneficiary : beneficiaries) {
+            try {
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom("devlomentpurpose@gmai.com"); // Replace with your actual sender email
+                message.setTo(beneficiary.getEmail());
+                message.setSubject("Data Transfer for User " + user.getUserIdX());
+                message.setText(
+                    "Dear Beneficiary,\n\n" +
+                    "The user with ID " + user.getUserIdX() + " has been confirmed deceased. Here is their data:\n\n" +
+                    fileList + "\n\n" +
+                    "Regards,\nGoneGift Team"
+                );
+                mailSender.send(message);
+            } catch (Exception e) {
+                System.err.println("Failed to send email to " + beneficiary.getEmail() + ": " + e.getMessage());
+            }
+        }
+    }
 }

@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
@@ -41,9 +43,19 @@ public class DeathUser {
     private String relativeId; // Adjust type if needed
     private String secretKey;
     private String userRole;
-    //colum should not be null
+    //colum should not be null  
     @Column(nullable = false)
     private boolean isdeceased; 
+
+    @Enumerated(EnumType.STRING)
+    // @Column(nullable = false)
+    private BuddyStatus buddyStatus = BuddyStatus.CHILLING; 
+
+    
+    private Integer attemptCount;
+
+    private LocalDateTime nextBuddyDate;
+    private LocalDateTime lastInteraction;
     
 
     // corrected the mapping for beneficiaries
@@ -55,7 +67,5 @@ public class DeathUser {
     @OneToMany(mappedBy = "usery" , fetch = FetchType.EAGER)
     @JsonManagedReference 
     private List<DeathFiles> files;
-
-    
-
 }
+
