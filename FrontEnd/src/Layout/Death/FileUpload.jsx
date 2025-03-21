@@ -12,23 +12,25 @@ const FileUpload = () => {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchCurrentUser = async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) {
-      console.error("Error fetching user data:", error);
-      return;
-    }
-    if (user) {
-      console.log("Fetched current user:", user);
-      setCurrentUser(user);
-    } else {
-      console.log("No authenticated user found.");
-    }
-  };
-
   useEffect(() => {
     fetchCurrentUser();
   }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      if (user) {
+        console.log("Fetched current user:", user);
+        setCurrentUser(user);
+      } else {
+        console.log("No authenticated user found.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setMessage("Error fetching user data");
+    }
+  };
 
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -52,99 +54,43 @@ const FileUpload = () => {
   };
 
   const handleSubmit = async () => {
-    if (!currentUser) {
-      setMessage("You must be logged in to upload a file.");
-      return;
-    }
-
-    if (!file) {
-      setMessage("Please select a valid file to upload.");
+    if (!file || !currentUser) {
+      setMessage('Please select a file and ensure you are logged in.');
       return;
     }
 
     setLoading(true);
     setMessage(null);
 
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('idOfUser', currentUser.id);
+
     try {
-      // Determine bucket based on file type
-      const bucket =
-        file.type.startsWith("image/") || file.type.startsWith("video/")
-          ? "media"
-          : "letters";
-
-      const uniqueFileName = `${currentUser.id}_${Date.now()}_${file.name}`;
-      const filePath = `${currentUser.id}/${uniqueFileName}`;
-
-      // Get the user's JWT token for authenticated requests
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        throw new Error("Unable to get user session: " + (sessionError?.message || "No session"));
-      }
-
-      console.log("Uploading file as user:", currentUser.id, "to bucket:", bucket);
-
-      // Upload file to Supabase Storage with authenticated token
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-        });
-
-      if (uploadError) {
-        console.error("Supabase upload error details:", uploadError);
-        throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
-      }
-
-      console.log("File uploaded successfully:", uploadData);
-
-      // Get public URL for the uploaded file
-      const { data: publicUrlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
-      const fileUrl = publicUrlData.publicUrl;
-      console.log("Public URL:", fileUrl);
-
-      // Prepare metadata for backend
-      const fileMetadata = {
-        idOfUser: currentUser.id,
-        letterFileUrl: bucket === "letters" ? fileUrl : null,
-        mediaFileUrl: bucket === "media" ? fileUrl : null,
-        usery: {
-          userIdX: currentUser.id,
-        },
-      };
-
-      console.log("Sending metadata to backend:", fileMetadata);
-
-      // Send metadata to backend
-      const response = await axios.post(
-        "http://localhost:8080/api/filemetadata",
-        fileMetadata,
+      const response = await axios.post('http://localhost:8080/api/files/upload', 
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+            'Content-Type': 'multipart/form-data',
+          }
         }
       );
 
-      if (response.status === 200 || response.status === 201) {
-        setMessage("File uploaded successfully!");
+      if (response.data) {
+        setMessage('File uploaded successfully! URL: ' + 
+          (response.data.letterFileUrl || response.data.mediaFileUrl));
         setFile(null);
-      } else {
-        throw new Error("Failed to save file metadata.");
       }
     } catch (error) {
-      console.error("Upload error:", error);
-      setMessage(error.message || "Failed to upload file");
+      console.error('Error uploading file:', error);
+      setMessage(`Error uploading file: ${error.response?.data || error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   if (!currentUser) {
-    return <div>Loading user information...</div>;
+    return <div>Please log in to upload files.</div>;
   }
 
   return (
@@ -154,10 +100,11 @@ const FileUpload = () => {
         type="file"
         onChange={handleFileChange}
         accept="image/*,video/*,application/pdf"
+        disabled={loading}
       />
       <button
         onClick={handleSubmit}
-        disabled={loading}
+        disabled={loading || !file}
         style={{
           marginTop: "10px",
           padding: "10px 20px",
@@ -166,8 +113,8 @@ const FileUpload = () => {
           color: "#fff",
           border: "none",
           borderRadius: "4px",
-          cursor: loading ? "not-allowed" : "pointer",
-          opacity: loading ? 0.7 : 1,
+          cursor: loading || !file ? "not-allowed" : "pointer",
+          opacity: loading || !file ? 0.7 : 1,
         }}
       >
         {loading ? "Uploading..." : "Upload File"}

@@ -1,100 +1,125 @@
 package com.example.demo.Controller.DeathControllers;
 
-
-import java.util.List;
-import java.util.Optional;
+import com.example.demo.Service.DeathUserService;
+import com.example.demo.Service.FileMeataDataService;
+import com.example.demo.Service.SupabaseService;
+import com.example.demo.model.DeathProject.DeathFiles;
+import com.example.demo.model.DeathProject.DeathUser;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.example.demo.Service.FileMeataDataService;
-import com.example.demo.model.DeathProject.DeathFiles;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/filemetadata")
+@RequestMapping("/api/files")
 public class FileMetadataController {
 
     @Autowired
-    private FileMeataDataService fileMetadataService;
+    private DeathUserService deathUserService;
+    private static final Logger logger = LoggerFactory.getLogger(FileMetadataController.class);
 
-    /**
-     * Get file metadata by ID
-     *
-     * @param id The ID of the file metadata
-     * @return ResponseEntity with the file metadata or an error status
-     */
+    private final SupabaseService supabaseService;
+    private final FileMeataDataService fileMetadataService;
+
+    @Autowired
+    public FileMetadataController(SupabaseService supabaseService, FileMeataDataService fileMetadataService) {
+        this.supabaseService = supabaseService;
+        this.fileMetadataService = fileMetadataService;
+    }
+
+    @PostMapping("/upload")
+    public ResponseEntity<?> uploadFile(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("idOfUser") String idOfUser) {
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body("File is empty");
+        }
+
+        try {
+            logger.info("Starting file upload for user: {}", idOfUser);
+            
+            // Determine bucket and upload file
+            String bucket = determineBucket(file.getContentType());
+            String uniqueFileName = idOfUser + "_" + System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            String filePath = idOfUser + "/" + uniqueFileName;
+
+            // Upload to Supabase
+            String fileUrl = supabaseService.uploadFile(bucket, filePath, file.getBytes(), file.getContentType());
+            
+            // Create and save file metadata
+            DeathFiles deathFiles = new DeathFiles();
+            DeathUser user = deathUserService.getUserById(idOfUser)
+    .orElseThrow(() -> new RuntimeException("User not found with ID: " + idOfUser));
+            deathFiles.setUsery(user);
+            deathFiles.setIdOfUser(idOfUser);
+            if (bucket.equals("letters")) {
+                deathFiles.setLetterFileUrl(fileUrl);
+            } else {
+                deathFiles.setMediaFileUrl(fileUrl);
+            }
+
+            // Save metadata to database
+            DeathFiles savedFileMetadata = fileMetadataService.saveOrUpdateFileMetaDataRepo(deathFiles);
+            logger.info("File metadata saved successfully: {}", savedFileMetadata);
+
+            return ResponseEntity.ok(savedFileMetadata);
+
+        } catch (Exception e) {
+            logger.error("Error during file upload: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error processing file upload: " + e.getMessage());
+        }
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getFileMetadataById(@PathVariable Long id) {
         try {
-            if (id == null || id <= 0) {
-                return new ResponseEntity<>("Invalid file ID provided.", HttpStatus.BAD_REQUEST);
-            }
-
             Optional<DeathFiles> fileMetadata = fileMetadataService.getFileMetadata(id);
-
-            if (fileMetadata.isPresent()) {
-                return ResponseEntity.ok(fileMetadata.get());
-            } else {
-                return new ResponseEntity<>("File metadata not found.", HttpStatus.NOT_FOUND);
-            }
+            return fileMetadata
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("An unexpected error occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error fetching file metadata: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching file metadata: " + e.getMessage());
         }
     }
 
-
-    //This is tentive controller structure 
-    
     @GetMapping("/getAllFiles/{userId}")
-    public List<DeathFiles> getAllUserByID(@PathVariable String userId){
-        // implement logic to get all files by specific user ID
-        // return fileMetadataList;
-        return fileMetadataService.getAllFilesBySpecifiUserId(userId);
-
-    }
-
-    /**
-     * Save or update file metadata
-     *
-     * @param fileMetadata The file metadata to be saved or updated
-     * @return ResponseEntity with the saved or updated file metadata
-     */
-    @PostMapping
-    public ResponseEntity<?> saveOrUpdateFileMetadata(@RequestBody DeathFiles fileMetadata) {
+    public ResponseEntity<List<DeathFiles>> getAllUserFiles(@PathVariable String userId) {
         try {
-            if (fileMetadata == null) {
-                return new ResponseEntity<>("File metadata is required.", HttpStatus.BAD_REQUEST);
-            }
-
-            DeathFiles savedFileMetadata = fileMetadataService.saveOrUpdateFileMetaDataRepo(fileMetadata);
-            return ResponseEntity.ok(savedFileMetadata);
+            List<DeathFiles> files = fileMetadataService.getAllFilesBySpecifiUserId(userId);
+            return ResponseEntity.ok(files);
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("An unexpected error occurred while saving the metadata.", HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error fetching user files: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    /**
-     * Delete file metadata by ID
-     *
-     * @param id The ID of the file metadata to delete
-     * @return ResponseEntity with a success or error status
-     */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFileMetadataById(@PathVariable Long id) {
+    public ResponseEntity<?> deleteFileMetadata(@PathVariable Long id) {
         try {
-            if (id == null || id <= 0) {
-                return new ResponseEntity<>("Invalid file ID provided.", HttpStatus.BAD_REQUEST);
-            }
-
             fileMetadataService.deleteFileMetaDataRepo(id);
-            return new ResponseEntity<>("File metadata deleted successfully.", HttpStatus.NO_CONTENT);
+            return ResponseEntity.noContent().build();
         } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("An unexpected error occurred while deleting the metadata.", HttpStatus.INTERNAL_SERVER_ERROR);
+            logger.error("Error deleting file metadata: ", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error deleting file metadata: " + e.getMessage());
         }
+    }
+
+    private String determineBucket(String contentType) {
+        if (contentType != null && (contentType.startsWith("image") || contentType.startsWith("video"))) {
+            return "media";
+        }
+        return "letters";
     }
 }

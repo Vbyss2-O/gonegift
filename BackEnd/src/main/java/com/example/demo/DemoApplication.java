@@ -14,7 +14,7 @@ public class DemoApplication {
 	}
 	@Bean	
 	//bean
-	public WebMvcConfigurer corsConfigurer() {	
+	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
