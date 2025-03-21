@@ -2,6 +2,75 @@
 
 
 # ----new config 
+# spring:
+#   datasource:
+#     url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?user=postgres.nzdfurdfnrlhgqhhdogd&password=Kasar@625
+#     driver-class-name: org.postgresql.Driver
+#     hikari:
+#       minimum-idle: 5
+#       maximum-pool-size: 20
+#       pool-name: HikariCP
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#       show-sql: true
+#     properties:
+#       hibernate:
+#         format_sql: true
+#         dialect: org.hibernate.dialect.PostgreSQLDialect
+#         # Add detailed SQL logging
+#         generate_statistics: true
+#         session.events.log: ALL
+#   mail:
+#     host: smtp.gmail.com
+#     port: 587
+#     username: devlomentpurpose@gmail.com
+#     password: eurs pbeq taog rqpo 
+#     properties: 
+#       mail:
+#         smtp:
+#           auth: true
+#           starttls:
+#             enable: true
+#   servlet:
+#     multipart:
+#       max-file-size: 10MB
+#       max-request-size: 10MB
+#       enabled: true
+
+# server:
+#   port: 8080
+#   error:
+#     include-message: always
+#     include-binding-errors: always
+#     include-stacktrace: always
+#     include-exception: true
+#     whitelabel:
+#       enabled: true
+
+# # detailed logging configuration
+# logging:
+#   level:
+#     root: INFO
+#     com.example.demo: DEBUG  # replace with your base package name
+#     org.springframework: INFO
+#     org.springframework.web: DEBUG
+#     org.hibernate: DEBUG
+#     org.hibernate.SQL: DEBUG
+#     org.hibernate.type.descriptor.sql: TRACE
+#     com.zaxxer.hikari: DEBUG
+#     org.springframework.security: DEBUG
+#   pattern:
+#     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+#     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+#   file:
+#     name: logs/application.log
+#     max-size: 10MB
+#     max-history: 7
+
+# # enable debug mode
+# debug: true
+# trace: true
 spring:
   datasource:
     url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?user=postgres.nzdfurdfnrlhgqhhdogd&password=Kasar@625
@@ -13,14 +82,9 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-      show-sql: true
     properties:
       hibernate:
-        format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        # Add detailed SQL logging
-        generate_statistics: true
-        session.events.log: ALL
   mail:
     host: smtp.gmail.com
     port: 587
@@ -43,31 +107,5 @@ server:
   error:
     include-message: always
     include-binding-errors: always
-    include-stacktrace: always
-    include-exception: true
     whitelabel:
       enabled: true
-
-# detailed logging configuration
-logging:
-  level:
-    root: INFO
-    com.example.demo: DEBUG  # replace with your base package name
-    org.springframework: INFO
-    org.springframework.web: DEBUG
-    org.hibernate: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
-    com.zaxxer.hikari: DEBUG
-    org.springframework.security: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
-  file:
-    name: logs/application.log
-    max-size: 10MB
-    max-history: 7
-
-# enable debug mode
-debug: true
-trace: true
