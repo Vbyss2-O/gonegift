@@ -82,8 +82,8 @@ const Dashboard = () => {
     if (userData) { 
       fetch(`http://localhost:8080/api/deathusers/beneficiarysize/${userData.userIdX}`) 
         .then((response) => response.text()) 
-        .then((data) => {
-          setCountBenificiary(parseInt(data, 10)); 
+        .then((datax) => {
+          setCountBenificiary(parseInt(datax, 10)); 
         })
         .catch((error) => console.error("Error fetching beneficiary count:", error));
     }

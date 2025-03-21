@@ -15,23 +15,25 @@ const LetterEditor = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
-  const fetchCurrentUser = async () => {
-    const { data: { user }, error } = await supabase.auth.getUser();
-    if (error) {
-      console.error("Error fetching user data:", error);
-      return;
-    }
-    if (user) {
-      console.log("Fetched current user:", user);
-      setCurrentUser(user);
-    } else {
-      console.log("No authenticated user found.");
-    }
-  };
-
   useEffect(() => {
     fetchCurrentUser();
   }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error) throw error;
+      if (user) {
+        console.log("Fetched current user:", user);
+        setCurrentUser(user);
+      } else {
+        console.log("No authenticated user found.");
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      setMessage("Error fetching user data");
+    }
+  };
 
   const handleSave = async () => {
     if (!currentUser) {
@@ -48,84 +50,41 @@ const LetterEditor = () => {
     setMessage(null);
 
     try {
-      // Convert letter content to a Blob (HTML file)
+      // Create a file from the letter content
       const fileName = `${letterTitle.replace(/\s+/g, "_")}_${Date.now()}.html`;
       const file = new Blob([letterContent], { type: "text/html" });
-      const bucket = "letters";
-      const filePath = `${currentUser.id}/${fileName}`;
+      
+      // Create FormData object
+      const formData = new FormData();
+      formData.append('file', file, fileName);
+      formData.append('idOfUser', currentUser.id);
 
-      // Get user session for authenticated upload
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-      if (sessionError || !session) {
-        throw new Error("Unable to get user session: " + (sessionError?.message || "No session"));
-      }
-
-      console.log("Saving letter as user:", currentUser.id, "to bucket:", bucket);
-
-      // Upload the letter to Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from(bucket)
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false,
-          contentType: "text/*",
-        });
-
-      if (uploadError) {
-        console.error("Supabase upload error details:", uploadError);
-        throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
-      }
-
-      console.log("Letter uploaded successfully:", uploadData);
-
-      // Get public URL for the uploaded file
-      const { data: publicUrlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
-      const fileUrl = publicUrlData.publicUrl;
-      console.log("Public URL:", fileUrl);
-
-      // Prepare metadata for backend
-      const fileMetadata = {
-        idOfUser: currentUser.id,
-        letterFileUrl: fileUrl,
-        mediaFileUrl: null, // Explicitly null for letters
-        usery: {
-          userIdX: currentUser.id,
-        },
-      };
-
-      console.log("Sending metadata to backend:", fileMetadata);
-
-      // Send metadata to backend
+      // Send to backend
       const response = await axios.post(
-        "http://localhost:8080/api/filemetadata",
-        fileMetadata,
+        'http://localhost:8080/api/files/upload',
+        formData,
         {
           headers: {
-            "Content-Type": "application/json",
-          },
+            'Content-Type': 'multipart/form-data',
+          }
         }
       );
 
-      if (response.status === 200 || response.status === 201) {
-        setMessage("Letter saved successfully!");
+      if (response.data) {
+        setMessage('Letter saved successfully!');
         setLetterTitle("");
         setLetterContent("");
-      } else {
-        throw new Error("Failed to save letter metadata.");
       }
     } catch (error) {
-      console.error("Save error:", error);
-      setMessage(error.message || "Failed to save letter");
+      console.error('Error saving letter:', error);
+      setMessage(`Error saving letter: ${error.response?.data || error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   if (!currentUser) {
-    return <div>Loading user information...</div>;
+    return <div>Please log in to create letters.</div>;
   }
 
   return (
@@ -174,7 +133,6 @@ const LetterEditor = () => {
     </div>
   );
 };
-
 const styles = {
   container: {
     maxWidth: "800px",
