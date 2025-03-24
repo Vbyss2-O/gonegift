@@ -96,10 +96,12 @@ spring:
           auth: true
           starttls:
             enable: true
+          timeout: 30000
+          writetimeout : 30000
   servlet:
     multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
+      max-file-size: 25MB
+      max-request-size: 25MB
       enabled: true
 
 server:
