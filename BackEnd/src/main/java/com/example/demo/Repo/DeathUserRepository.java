@@ -14,5 +14,4 @@ public interface DeathUserRepository extends JpaRepository<DeathUser, String> {
     DeathUser findBySecretKey(String secretKey);
 
     List<DeathUser> findByNextBuddyDateBefore(LocalDateTime now);
-    
 }

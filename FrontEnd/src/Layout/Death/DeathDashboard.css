@@ -136,34 +136,24 @@
 /* Vibrant Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .stat-card {
-  background: var(--bg-white);
-  padding: 1.75rem;
-  border-radius: 1rem;
-  box-shadow: var(--shadow-sm);
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  transition: var(--transition);
-  border: 1px solid var(--border-light);
-  position: relative;
-  overflow: hidden;
+  gap: 1rem;
 }
 
-.stat-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 6px;
-  height: 100%;
-  background: var(--primary);
-  border-radius: 8px 0 0 8px;
+.stat-card.clickable {
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .stat-card:hover {
@@ -172,34 +162,44 @@
   border-color: var(--primary-light);
 }
 
+.stat-card.clickable:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background-color: #f8f9fa;
+}
+
+.stat-card.clickable:active {
+  transform: translateY(0);
+}
+
+.stat-card.clickable:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 .stat-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--primary-light);
-  color: var(--bg-white);
-  font-size: 1.5rem;
+  background: #f8f9fa;
+  padding: 1rem;
+  border-radius: 8px;
+  color: #007bff;
+}
+
+.stat-info {
+  flex: 1;
 }
 
 .stat-info h3 {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--text-dark);
-  opacity: 0.7;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 0.25rem;
+  margin: 0;
+  font-size: 0.9rem;
+  color: #6c757d;
 }
 
 .stat-info p {
+  margin: 0.5rem 0 0;
   font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary);
+  font-weight: bold;
+  color: #212529;
 }
-
 /* Vibrant Dashboard Grid */
 .dashboard-grid {
   display: grid;

@@ -21,11 +21,8 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const [countFile, setCountFile] = useState(null); 
   const [countBenificiary, setCountBenificiary] = useState(null);
-
- 
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -114,7 +111,6 @@ const Dashboard = () => {
     { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
     { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
     { icon: <FaRobot size={24} />, text: "Visite Budddy", path: "/lifebuddy" },
-
   ];
 
   const adminMenuItems = [
@@ -167,25 +163,40 @@ const Dashboard = () => {
         </header>
 
         <div className="stats-grid">
-          <div className="stat-card">
+          <div 
+            className="stat-card clickable" 
+            onClick={() => navigate("/allFiles")}
+            role="button"
+            tabIndex={0}
+          >
             <div className="stat-icon">
               <FiBox size={24} />
             </div>
-            <div className="stat-info" onClick={() => navigate("/allFiles")}>
+            <div className="stat-info">
               <h3>Total Files</h3>
               <p>{countFile}</p>
             </div>
           </div>
-          <div className="stat-card">
+          <div 
+            className="stat-card clickable" 
+            onClick={() => navigate("/allBenificiarys")}
+            role="button"
+            tabIndex={0}
+          >
             <div className="stat-icon">
               <FiUsers size={24} />
             </div>
-            <div className="stat-info" onClick={() => navigate("/allBenificiarys")}>
+            <div className="stat-info">
               <h3>Beneficiaries</h3>
               <p>{countBenificiary}</p>
             </div>
           </div>
-          <div className="stat-card">
+          <div 
+            className="stat-card clickable"
+            onClick={() => navigate("/pending-deliveries")}
+            role="button"
+            tabIndex={0}
+          >
             <div className="stat-icon">
               <FiTrendingUp size={24} />
             </div>
@@ -194,7 +205,6 @@ const Dashboard = () => {
               <p>0</p>
             </div>
           </div>
-         
         </div>
 
         <div className="dashboard-grid">
@@ -214,7 +224,6 @@ const Dashboard = () => {
           <br />
           <br />
           <br />
-
           <center><h2>Recent Activity</h2></center>
           <div className="activity-list">
             <center><p>No recent activity</p></center>

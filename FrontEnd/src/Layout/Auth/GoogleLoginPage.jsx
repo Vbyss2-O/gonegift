@@ -1,39 +1,54 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../Death/supabaseClient";
-import axios from "axios";
-import { v4 as uuidv4 } from "uuid";
 
 const GoogleLoginPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleAuth = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
-      if (error || !user) {
-        console.log("No user logged in yet");
-        return;
-      }
+      try {
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-      const { data: existingUser, error: fetchError } = await supabase
-        .from("death_user")
-        .select("user_role")
-        .eq("user_idx", user.id)
-        .single();
+        if (userError || !user) {
+          console.log("No user logged in yet");
+          return;
+        }
 
-      if (fetchError && fetchError.code !== "PGRST116") {
-        console.error("Error checking user:", fetchError);
-        return;
-      }
+        // Check if user exists in death_user table
+        let { data: existingUser, error: fetchError } = await supabase
+          .from("death_user")
+          .select("user_role")
+          .eq("user_idx", user.id)
+          .maybeSingle(); // Ensures only a single row is returned
 
-      if (existingUser) {
-        navigate("/death-dashboard");
-      } else {
-        navigate("/primaryinfo");
+        if (fetchError) {
+          console.error("Error checking user:", fetchError);
+          return;
+        }
+
+        if (!existingUser) {
+          // new user: Insert into death_user with default role
+          const { error: insertError } = await supabase.from("death_user").insert([
+            { user_idx: user.id, user_role: "general" }, // Assign default "user" role
+          ]);
+
+          if (insertError) {
+            console.error("Error inserting new user:", insertError);
+            return;
+          }
+
+          console.log("New user added successfully");
+          navigate("/primaryinfo"); // Redirect new users to primary info page
+        } else {
+          navigate("/death-dashboard");
+        }
+      } catch (err) {
+        console.error("Error in auth flow:", err);
       }
     };
 
-    handleAuth();
+    handleAuth(); // Run once on component mount
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {

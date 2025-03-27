@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+//here basic fix i want to impliment that i can store the uuid key in amazon sdk or somekind of localstorage flag i am going to store in localstorage
+//that for uuid exist
 
 const FileList = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState([]); 
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        // Get logged-in user
         const { data: { user }, error } = await supabase.auth.getUser();
         if (error || !user) {
           console.error("Error fetching user:", error?.message || "No user found");
@@ -19,7 +20,6 @@ const FileList = () => {
           return;
         }
 
-        // Fetch user details from death_user table
         const { data: existingUser, error: fetchError } = await supabase
           .from("death_user")
           .select("first_name, lastname, user_role")
@@ -41,7 +41,7 @@ const FileList = () => {
         });
 
         // Fetch files using the user ID
-        fetchFiles(user.id);
+        await fetchFiles(user.id);
       } catch (error) {
         console.error("Error in fetchUserData:", error.message);
         navigate("/login");
@@ -57,35 +57,55 @@ const FileList = () => {
     try {
       const response = await fetch(`http://localhost:8080/api/deathusers/listOfFiles/${userId}`);
       const data = await response.json();
-      setFiles(data);
+      
+      // Ensure data is an array
+      if (Array.isArray(data)) {
+        setFiles(data);
+      } else {
+        console.error("Received non-array data:", data);
+        setFiles([]); //empty array set
+      }
     } catch (error) {
       console.error("Error fetching files:", error);
+      setFiles([]); // Set empty array on error
     }
   };
 
   const deleteFile = async (fileId) => {
     try {
-      await fetch(`http://localhost:8080/api/filemetadata/deleteFileMetadataById/${fileId}`, {
+      const response = await fetch(`http://localhost:8080/api/filemetadata/deleteFileMetadataById/${fileId}`, {
         method: "DELETE",
       });
-      setFiles(files.filter((file) => file.id !== fileId));
+      
+      if (response.ok) {
+        setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+      } else {
+        console.error("Failed to delete file");
+      }
     } catch (error) {
       console.error("Error deleting file:", error);
     }
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <p>Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="file-list-container">
       <h2 className="welcome-header">Welcome, {userData?.firstName} {userData?.lastname}</h2>
       <h3 className="files-header">Your Uploaded Files:</h3>
-      {files.length === 0 ? (
+      
+      {!Array.isArray(files) || files.length === 0 ? (
         <p className="no-files">No files found.</p>
       ) : (
         <ul className="file-list">
           {files.map((file) => (
-            <li key={file.id} className="file-item">
+            <li key={file.id || Math.random()} className="file-item">
               <div className="file-info">
                 <div className="file-type">
                   <strong>File Type:</strong> {file.fileType}
@@ -113,6 +133,13 @@ const FileList = () => {
         </ul>
       )}
       <style jsx>{`
+        .loading-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 200px;
+        }
+
         .file-list-container {
           max-width: 800px;
           margin: 0 auto;
