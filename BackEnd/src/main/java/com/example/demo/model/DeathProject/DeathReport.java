@@ -23,7 +23,5 @@ public class DeathReport {
     
     private String status = "pending";
 
-    // @ManyToOne
-    // @JoinColumn(name = "beneficiary_id", nullable = false)
-    // private Beneficiary beneficiary; // Many-to-one mapping with Beneficiary
+   
 }

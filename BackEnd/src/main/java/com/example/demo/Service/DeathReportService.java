@@ -1,7 +1,9 @@
+
+
+
+// // -------
 // package com.example.demo.Service;
 
-
-// import com.example.demo.Repo.BeneficiaryRepository;
 // import com.example.demo.Repo.DeathReportRepository;
 // import com.example.demo.Repo.DeathUserRepository;
 // import com.example.demo.model.DeathProject.Beneficiary;
@@ -14,6 +16,7 @@
 // import org.springframework.transaction.annotation.Transactional;
 
 // import java.util.List;
+// import java.util.stream.Collectors;
 
 // @Service
 // public class DeathReportService {
@@ -24,73 +27,120 @@
 //     @Autowired
 //     private DeathUserRepository deathUserRepository;
 
-//     @Autowired
-//     private BeneficiaryRepository beneficiaryRepository;
+   
 
 //     @Autowired
-//     private JavaMailSender mailSender; // Inject JavaMailSender
+//     private JavaMailSender mailSender;
 
 //     public List<DeathReport> findAllReports() {
 //         return deathReportRepository.findAll();
 //     }
 
 //     @Transactional
-//     // public void saveDeathReport(DeathReport report) {
-//     //     Beneficiary beneficiary = beneficiaryRepository.findById(report.getBeneficiary().getId())
-//     //         .orElseThrow(() -> new RuntimeException("Beneficiary not found with ID: " + report.getBeneficiary().getId()));
-//     //     report.setBeneficiary(beneficiary);
-//     //     deathReportRepository.save(report);
-//     // }
 //     public void saveDeathReport(DeathReport report) {
+//         // Validate the beneficiary exists
+//         //just save
 //         deathReportRepository.save(report);
 //     }
 
+//     //admin side trigger
+//     @Transactional
 //     public void triggerReport(Long reportId) {
+//         // Fetch the report
 //         DeathReport report = deathReportRepository.findById(reportId)
 //             .orElseThrow(() -> new RuntimeException("Report not found with ID: " + reportId));
+
+//         // Update report status
 //         report.setStatus("approved");
 //         deathReportRepository.save(report);
 
+//         // Fetch and update the DeathUser
 //         DeathUser user = deathUserRepository.findBySecretKey(report.getSecretId());
-         
 //         if (user == null) {
 //             throw new RuntimeException("User not found with secret ID: " + report.getSecretId());
 //         }
 //         user.setIsdeceased(true);
 //         deathUserRepository.save(user);
 
-//         // Fetch all beneficiaries for the user using the new query
-//         List<Beneficiary> beneficiaries = beneficiaryRepository.findByUserIdX(user.getUserIdX());
+//         // Fetch beneficiaries (handle null case)
+//         List<Beneficiary> beneficiaries = user.getBeneficiaries();
+//         if (beneficiaries == null || beneficiaries.isEmpty()) {
+//             throw new RuntimeException("No beneficiaries found for user: " + user.getUserIdX());
+//         }
 
-//         // Fetch all files for the user
-//         List<String> fileUrls = deathUserRepository.findById(user.getUserIdX())
-//             .map(u -> u.getFiles().stream()
-//                 .map(f -> f.getLetterFileUrl() != null ? f.getLetterFileUrl() : f.getMediaFileUrl())
-//                 .filter(url -> url != null)
-//                 .toList())
-//             .orElse(List.of());
+//         // Fetch files (handle null case)
+//         List<String> fileUrls = (user.getFiles() != null)
+//             ? user.getFiles().stream()
+//                 .map(f -> (f.getLetterFileUrl() != null) ? f.getLetterFileUrl() : f.getMediaFileUrl())
+//                 .filter(url -> url != null) // Ensure no null values
+//                 .collect(Collectors.toList())
+//             : List.of();
 
 //         String fileList = fileUrls.isEmpty() ? "No files available" : String.join("\n", fileUrls);
 
 //         // Send email to all beneficiaries
 //         for (Beneficiary beneficiary : beneficiaries) {
-//             SimpleMailMessage message = new SimpleMailMessage();
-//             message.setFrom("your-email@gmail.com"); 
-//             message.setTo(beneficiary.getEmail());
-//             message.setSubject("Data Transfer for User " + user.getUserIdX());
-//             message.setText(
-//                 "Dear Beneficiary,\n\n" +
-//                 "The user with ID " + user.getUserIdX() + " has been confirmed deceased. Here is their data:\n\n" +
-//                 fileList + "\n\n" +
-//                 "Regards,\nGoneGift Team"
-//             );
-//             mailSender.send(message);
+//             try {
+//                 SimpleMailMessage message = new SimpleMailMessage();
+//                 message.setFrom("devlomentpurpose@gmai.com"); // Replace with your actual sender email
+//                 message.setTo(beneficiary.getEmail());
+//                 message.setSubject("Data Transfer for User " + user.getUserIdX());
+//                 message.setText(
+//                     "Dear Beneficiary,\n\n" +
+//                     "The user with ID " + user.getUserIdX() + " has been confirmed deceased. Here is their data:\n\n" +
+//                     fileList + "\n\n" +
+//                     "Regards,\nGoneGift Team"
+//                 );
+//                 mailSender.send(message);
+//             } catch (Exception e) {
+//                 System.err.println("Failed to send email to " + beneficiary.getEmail() + ": " + e.getMessage());
+//             }
+//         }
+//     }
+//     @Transactional
+//     public void triggerUser(DeathUser user){
+//         if (user == null) {
+//             throw new RuntimeException("null user founded");
+//         }
+//         user.setIsdeceased(true);
+//         deathUserRepository.save(user);
+
+//         // Fetch beneficiaries (handle null case)
+//         List<Beneficiary> beneficiaries = user.getBeneficiaries();
+//         if (beneficiaries == null || beneficiaries.isEmpty()) {
+//             throw new RuntimeException("No beneficiaries found for user: " + user.getUserIdX());
+//         }
+
+//         // Fetch files (handle null case)
+//         List<String> fileUrls = (user.getFiles() != null)
+//             ? user.getFiles().stream()
+//                 .map(f -> (f.getLetterFileUrl() != null) ? f.getLetterFileUrl() : f.getMediaFileUrl())
+//                 .filter(url -> url != null) // Ensure no null values
+//                 .collect(Collectors.toList())
+//             : List.of();
+
+//         String fileList = fileUrls.isEmpty() ? "No files available" : String.join("\n", fileUrls);
+
+//         // Send email to all beneficiaries
+//         for (Beneficiary beneficiary : beneficiaries) {
+//             try {
+//                 SimpleMailMessage message = new SimpleMailMessage();
+//                 message.setFrom("devlomentpurpose@gmai.com"); // Replace with your actual sender email
+//                 message.setTo(beneficiary.getEmail());
+//                 message.setSubject("Data Transfer for User " + user.getUserIdX());
+//                 message.setText(
+//                     "Dear Beneficiary,\n\n" +
+//                     "The user with ID " + user.getUserIdX() + " has been confirmed deceased. Here is their data:\n\n" +
+//                     fileList + "\n\n" +
+//                     "Regards,\nGoneGift Team"
+//                 );
+//                 mailSender.send(message);
+//             } catch (Exception e) {
+//                 System.err.println("Failed to send email to " + beneficiary.getEmail() + ": " + e.getMessage());
+//             }
 //         }
 //     }
 // }
-
-
-// -------
 package com.example.demo.Service;
 
 import com.example.demo.Repo.DeathReportRepository;
@@ -98,14 +148,19 @@ import com.example.demo.Repo.DeathUserRepository;
 import com.example.demo.model.DeathProject.Beneficiary;
 import com.example.demo.model.DeathProject.DeathReport;
 import com.example.demo.model.DeathProject.DeathUser;
+import com.example.demo.model.DeathProject.Token;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class DeathReportService {
@@ -116,10 +171,11 @@ public class DeathReportService {
     @Autowired
     private DeathUserRepository deathUserRepository;
 
-   
-
     @Autowired
     private JavaMailSender mailSender;
+
+    @Autowired
+    private TokenService tokenService;
 
     public List<DeathReport> findAllReports() {
         return deathReportRepository.findAll();
@@ -127,23 +183,17 @@ public class DeathReportService {
 
     @Transactional
     public void saveDeathReport(DeathReport report) {
-        // Validate the beneficiary exists
-        //just save
         deathReportRepository.save(report);
     }
 
-    //admin side trigger
     @Transactional
     public void triggerReport(Long reportId) {
-        // Fetch the report
         DeathReport report = deathReportRepository.findById(reportId)
             .orElseThrow(() -> new RuntimeException("Report not found with ID: " + reportId));
 
-        // Update report status
         report.setStatus("approved");
         deathReportRepository.save(report);
 
-        // Fetch and update the DeathUser
         DeathUser user = deathUserRepository.findBySecretKey(report.getSecretId());
         if (user == null) {
             throw new RuntimeException("User not found with secret ID: " + report.getSecretId());
@@ -151,33 +201,41 @@ public class DeathReportService {
         user.setIsdeceased(true);
         deathUserRepository.save(user);
 
-        // Fetch beneficiaries (handle null case)
+        sendMagicLinks(user);
+    }
+
+    @Transactional
+    public void triggerUser(DeathUser user) {
+        if (user == null) {
+            throw new RuntimeException("Null user found");
+        }
+        user.setIsdeceased(true);
+        deathUserRepository.save(user);
+
+        sendMagicLinks(user);
+    }
+
+    private void sendMagicLinks(DeathUser user) {
         List<Beneficiary> beneficiaries = user.getBeneficiaries();
         if (beneficiaries == null || beneficiaries.isEmpty()) {
             throw new RuntimeException("No beneficiaries found for user: " + user.getUserIdX());
         }
 
-        // Fetch files (handle null case)
-        List<String> fileUrls = (user.getFiles() != null)
-            ? user.getFiles().stream()
-                .map(f -> (f.getLetterFileUrl() != null) ? f.getLetterFileUrl() : f.getMediaFileUrl())
-                .filter(url -> url != null) // Ensure no null values
-                .collect(Collectors.toList())
-            : List.of();
-
-        String fileList = fileUrls.isEmpty() ? "No files available" : String.join("\n", fileUrls);
-
-        // Send email to all beneficiaries
         for (Beneficiary beneficiary : beneficiaries) {
             try {
+                String token = generateMagicToken(user.getUserIdX());
+                
+                String magicLink = "https://yourdomain.com/verify?token=" + token;
+
                 SimpleMailMessage message = new SimpleMailMessage();
-                message.setFrom("devlomentpurpose@gmai.com"); // Replace with your actual sender email
+                message.setFrom("devlomentpurpose@gmai.com"); 
                 message.setTo(beneficiary.getEmail());
-                message.setSubject("Data Transfer for User " + user.getUserIdX());
+                message.setSubject("Access to Deceased User Data - Magic Link");
                 message.setText(
                     "Dear Beneficiary,\n\n" +
-                    "The user with ID " + user.getUserIdX() + " has been confirmed deceased. Here is their data:\n\n" +
-                    fileList + "\n\n" +
+                    "The user with ID " + user.getUserIdX() + " has been confirmed deceased.\n" +
+                    "To access their data, please click the link below and enter your decryption key:\n\n" +
+                    magicLink + "\n\n" +
                     "Regards,\nGoneGift Team"
                 );
                 mailSender.send(message);
@@ -186,47 +244,20 @@ public class DeathReportService {
             }
         }
     }
-    @Transactional
-    public void triggerUser(DeathUser user){
-        if (user == null) {
-            throw new RuntimeException("null user founded");
-        }
-        user.setIsdeceased(true);
-        deathUserRepository.save(user);
 
-        // Fetch beneficiaries (handle null case)
-        List<Beneficiary> beneficiaries = user.getBeneficiaries();
-        if (beneficiaries == null || beneficiaries.isEmpty()) {
-            throw new RuntimeException("No beneficiaries found for user: " + user.getUserIdX());
-        }
-
-        // Fetch files (handle null case)
-        List<String> fileUrls = (user.getFiles() != null)
-            ? user.getFiles().stream()
-                .map(f -> (f.getLetterFileUrl() != null) ? f.getLetterFileUrl() : f.getMediaFileUrl())
-                .filter(url -> url != null) // Ensure no null values
-                .collect(Collectors.toList())
-            : List.of();
-
-        String fileList = fileUrls.isEmpty() ? "No files available" : String.join("\n", fileUrls);
-
-        // Send email to all beneficiaries
-        for (Beneficiary beneficiary : beneficiaries) {
-            try {
-                SimpleMailMessage message = new SimpleMailMessage();
-                message.setFrom("devlomentpurpose@gmai.com"); // Replace with your actual sender email
-                message.setTo(beneficiary.getEmail());
-                message.setSubject("Data Transfer for User " + user.getUserIdX());
-                message.setText(
-                    "Dear Beneficiary,\n\n" +
-                    "The user with ID " + user.getUserIdX() + " has been confirmed deceased. Here is their data:\n\n" +
-                    fileList + "\n\n" +
-                    "Regards,\nGoneGift Team"
-                );
-                mailSender.send(message);
-            } catch (Exception e) {
-                System.err.println("Failed to send email to " + beneficiary.getEmail() + ": " + e.getMessage());
-            }
-        }
+    public String generateMagicToken(String userId) {
+        String rawToken = UUID.randomUUID().toString(); // Generate random token
+        String hashedToken = BCrypt.hashpw(rawToken, BCrypt.gensalt(10)); // Hash token
+        String encodedToken = Base64.getEncoder().encodeToString(rawToken.getBytes()); // Encode token for URL
+    
+        // Store the hashed version in the database (not the raw token)
+        Token magicToken = new Token();
+        magicToken.setUserIDX(userId);
+        magicToken.setHashtoken(hashedToken);
+        
+        magicToken.setExpirydate(LocalDate.now().plusDays(7)); 
+        tokenService.storeToken(magicToken);
+    
+        return encodedToken; // Send encoded raw token to the user
     }
 }

@@ -78,6 +78,7 @@ const BeneficiaryList = () => {
       // Ensure data is an array
       const beneficiaryArray = Array.isArray(data) ? data : [data];
       setBeneficiaries(beneficiaryArray);
+      console.log(beneficiaries);
     } catch (error) {
       console.error("Error fetching beneficiaries:", error);
       setError(error.message);

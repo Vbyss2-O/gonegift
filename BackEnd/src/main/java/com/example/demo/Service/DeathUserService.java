@@ -90,5 +90,35 @@ public class DeathUserService {
             throw new RuntimeException("User not found with ID: " + id);
         }
     }
-}
+    public void storeSecretKey(String serectID , String userID){
+        DeathUser user = deathUserRepository.findById(userID).orElse(null);
+        if (user!= null) {
+            user.setSecretKey(serectID);
+            deathUserRepository.save(user);
+        } else {
+            throw new RuntimeException("User not found with ID: " + userID);
+        }
+    }
+    public void storeHashToken(String userID , String hashuuid){
+        DeathUser user = deathUserRepository.findById(userID).orElse(null);
+        if (user!= null) {
+            user.setHashuuid(hashuuid);
+            deathUserRepository.save(user);
+        }
+        else {
+            throw new RuntimeException("User not found with ID: " + userID);
+        }
 
+    }
+    public boolean findByHashuuidEquals(String hashtoken , String userid){
+       
+        
+        DeathUser user = deathUserRepository.findById(userid).orElse(null);
+        if (user!= null) {
+            return user.getHashuuid().equals(hashtoken);
+            }
+           return false;
+                
+    }
+    
+}

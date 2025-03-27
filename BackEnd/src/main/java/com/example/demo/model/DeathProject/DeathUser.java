@@ -2,7 +2,7 @@ package com.example.demo.model.DeathProject;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+//in production i will make all column as the not null currelty skip not null constraint
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.Column;
@@ -43,6 +43,8 @@ public class DeathUser {
     private String relativeId; // Adjust type if needed
     private String secretKey;
     private String userRole;
+    //this hashtoken will be in use when we are verfity the uuid of the user
+    private String hashuuid;
     //colum should not be null  
     @Column(nullable = false)
     private boolean isdeceased; 

@@ -62,14 +62,39 @@ public class DeathUserController {
     }
 
     //below two get controller is for the showing the list of proper benificaries and files 
-    @GetMapping("listOfBeneficiary/{id}")
+    @GetMapping("/listOfBeneficiary/{id}")
     public List<Beneficiary> getBeneficiaryList(@PathVariable String id) {
         return deathUserService.getBeneficiaryList(id);
     }
-    @GetMapping("listOfFiles/{id}")
+    @GetMapping("/listOfFiles/{id}")
     public List<DeathFiles> getFileList(@PathVariable String id) {
         return deathUserService.getFileList(id);
     }
-    
-    
+    @PostMapping("/storeSecretKey/{useruid}")
+    public void storeSerectKey(@RequestBody String id, @PathVariable String useruid) {
+        deathUserService.storeSecretKey(id , useruid);
+    }
+    @GetMapping("/getKey/{userid}")
+    public String getKey(@PathVariable String userid) {
+        return deathUserService.findUserBySecretId(userid).getSecretKey();
+        
+    }
+    @PostMapping("/sendSecretKey/{useruid}")
+    public void storeSecretKey(@PathVariable String useruid , @RequestBody String encryptedAesKey) {
+        deathUserService.storeSecretKey(encryptedAesKey , useruid);
+    }  
+    @PostMapping("/sendHashToken/{useruid}")
+    public void storeHashToken(@PathVariable String useruid , @RequestBody String hashToken) {
+        deathUserService.storeSecretKey(useruid , hashToken);
+    } 
+    @GetMapping("/findHashToken")
+    public ResponseEntity<Void> validateHashuuid(@RequestBody String hashuuid , @RequestBody String userid){
+        if(deathUserService.findByHashuuidEquals(hashuuid , userid)){
+            return ResponseEntity.ok().build();
+        }
+        else{
+            return ResponseEntity.notFound().build();
+        }
+
+    } 
 }
