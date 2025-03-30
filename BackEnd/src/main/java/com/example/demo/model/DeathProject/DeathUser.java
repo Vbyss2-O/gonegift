@@ -5,6 +5,7 @@ import java.util.List;
 //in production i will make all column as the not null currelty skip not null constraint
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+// import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -61,12 +62,12 @@ public class DeathUser {
     
 
     // corrected the mapping for beneficiaries
-    @OneToMany(mappedBy = "userx" , fetch = FetchType.EAGER) 
+    @OneToMany(mappedBy = "userx"  , fetch = FetchType.LAZY) 
     @JsonManagedReference
     private List<Beneficiary> beneficiaries;
 
     // Corrected the mapping for files
-    @OneToMany(mappedBy = "usery" , fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "usery" , fetch = FetchType.LAZY )
     @JsonManagedReference 
     private List<DeathFiles> files;
 }

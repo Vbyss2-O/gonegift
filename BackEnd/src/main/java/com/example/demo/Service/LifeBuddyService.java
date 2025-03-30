@@ -42,7 +42,7 @@ public class LifeBuddyService {
             messageText += "\nClick here to chat back: " + replyLink;
 
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("lifebuddy.deathproject@gmail.com");
+            message.setFrom("devlomentpurpose@gmail.com");
             message.setTo(user.getEmail());
             message.setSubject("LifeBuddy Checking In!");
             message.setText(messageText);
@@ -59,7 +59,7 @@ public class LifeBuddyService {
     public void sendGoodbyeNotification(DeathUser user) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("lifebuddy.deathproject@gmail.com");
+            message.setFrom("devlomentpurpose@gmail.com");
             message.setTo(user.getEmail());
             message.setSubject("LifeBuddy’s Final Call");
             message.setText("LifeBuddy thinks " + user.getUserIdX() + " might be gone. No response after all attempts.");

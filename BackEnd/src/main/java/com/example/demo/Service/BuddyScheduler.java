@@ -28,8 +28,10 @@ public class BuddyScheduler {
 
         @Autowired
         private DeathReportService deathReportService;
+
+       
     
-        @Scheduled(fixedRate = 43200000) // Runs 12 hour 
+        @Scheduled(fixedRate = 12 * 60 * 60 * 1000) // runs 12 hour 
         public void checkUsers() {
             LocalDateTime now = LocalDateTime.now();
             List<DeathUser> users = userRepository.findAll();
@@ -46,10 +48,11 @@ public class BuddyScheduler {
                 // User responded, reset to CHILLING
                 
                 user.setLastActivityDate(user.getLastInteraction());
-                user.setInactivityThresholdDays(0); // Reset inactivity counter
+                user.setInactivityThresholdDays(0); // inactivity counter
                 user.setLastInteraction(null);
                 user.setBuddyStatus(BuddyStatus.CHILLING);
                 user.setAttemptCount(0);
+                
             } else {
                 // No response, proceed with state transitions
                 switch (user.getBuddyStatus()) {
@@ -59,7 +62,8 @@ public class BuddyScheduler {
                             user.setAttemptCount(1);
                             buddyService.sendBuddyMessage(user);
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
-                            
+                            user.setLastInteraction(now);
+                                
                         }
                         break;
                     case CHILLING1:
@@ -68,6 +72,7 @@ public class BuddyScheduler {
                             user.setAttemptCount(2);
                             buddyService.sendBuddyMessage(user);
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
+                            user.setLastInteraction(now);
                         }
                         break;
                     case CURIOUS:
@@ -76,6 +81,7 @@ public class BuddyScheduler {
                             user.setAttemptCount(3);
                             buddyService.sendBuddyMessage(user);
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
+                            user.setLastInteraction(now);
                         }
                         break;
                     case WORRIED:
@@ -83,6 +89,7 @@ public class BuddyScheduler {
                             user.setBuddyStatus(BuddyStatus.GOODBYE);
                             buddyService.sendGoodbyeNotification(user);
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
+                            user.setLastInteraction(now);
                             
                         }
                         break;
