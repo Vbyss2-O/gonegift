@@ -12,7 +12,6 @@ import com.example.demo.model.DeathProject.BuddyActivity;
 import com.example.demo.model.DeathProject.DeathUser;
 
 import java.util.Random;
-import java.util.UUID;
 
 @Service
 public class LifeBuddyService {
@@ -34,11 +33,13 @@ public class LifeBuddyService {
         try {
             Random random = new Random();
             String name = user.getFirstName() + " " +  user.getLastname();
+            //genrate a reandom token 
+            
             // Adjust attemptCount to 0-based index for MESSAGES array
             int messageIndex = random.nextInt(MESSAGES.length);
             if (messageIndex < 0) messageIndex = 0; // Handle attemptCount = 0 edge case
             String messageText = String.format(MESSAGES[messageIndex], name);
-            String replyLink = "http://localhost:8080/buddy?userId=" + user.getUserIdX() + "&token=" + UUID.randomUUID();
+            String replyLink = "http://localhost:8080/lifebuddy?userId=" + user.getUserIdX();
             messageText += "\nClick here to chat back: " + replyLink;
 
             SimpleMailMessage message = new SimpleMailMessage();

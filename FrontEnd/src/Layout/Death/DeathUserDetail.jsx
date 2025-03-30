@@ -57,7 +57,7 @@ const UserDetailsForm = () => {
       const generatedUuid = uuidv4();
       setUuid(generatedUuid);
 
-      const hashedUuid = await hashWithSalt(generatedUuid);
+      const hashedUuid = await hashWithSalt(uuid);
 
       const userDetails = {
         userIdX : userIdX,

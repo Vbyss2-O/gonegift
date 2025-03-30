@@ -19,6 +19,7 @@ const FileUpload = () => {
   const [uuid, setUuid] = useState("");
   const [isUuidValid, setIsUuidValid] = useState(false);
  
+  //this is for the UUID hashing and checking it is there any hash exist of the same uuid
   const hashWithSalt = async (uuid) => {
     const salt = uuid.substring(0, 16); // Use first 16 characters of UUID as salt
     const text = uuid + salt; 
@@ -34,6 +35,7 @@ const FileUpload = () => {
 
  const validateUuid = async () => {
     try {
+      //here token is refering to the uuid itslef 
       const response = await axios.get("http://localhost:8080/api/deathusers/findHashToken", hashWithSalt(currentUser.id) , currentUser.id);
       if (response.status === 200) {
         setIsUuidValid(true);
@@ -49,18 +51,18 @@ const FileUpload = () => {
   };
   // Generate random UUID, derive AES key, and encrypt it
   const generateKeys = () => {
-    const salt = lib.WordArray.random(16); // Random salt for PBKDF2
+    //currelty salt is fucked up 
+    const salt = hashWithSalt(hashWithSalt(currentUser.id));
 
     // Derive AES-256 key from UUID using PBKDF2
-    const derivedKey = PBKDF2(newUuid, salt, {
+    const derivedKey = PBKDF2(uuid, salt, {
       keySize: 256 / 32, // 256 bits
-      iterations: 10000,
+      iterations: 10000,  
     }).toString();
 
     // Encrypt the AES key with the UUID using AES
-    const encryptedKey = AES.encrypt(derivedKey, newUuid).toString();
+    const encryptedKey = AES.encrypt(derivedKey, uuid).toString();
 
-    setUuid(newUuid);
     setEncryptionKey(derivedKey);
     setEncryptedAesKey(encryptedKey);
 

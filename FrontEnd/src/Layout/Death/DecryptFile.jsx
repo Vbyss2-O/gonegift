@@ -11,6 +11,18 @@ const DecryptFile = ({ magicToken }) => {
   const [loading, setLoading] = useState(false);
   const [userID, setUserId] = useState(null);
 
+  const hashWithSalt = async (uuid) => {
+    const salt = uuid.substring(0, 16); // Use first 16 characters of UUID as salt
+    const text = uuid + salt; 
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  
+    return Array.from(new Uint8Array(hashBuffer))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  };
+
   // 1️⃣ Fetch userUID from the magic token
   useEffect(() => {
     const fetchUserUID = async () => {
@@ -57,7 +69,7 @@ const DecryptFile = ({ magicToken }) => {
     fetchEncryptedKey();
   }, [userID]);
 
-  // 3️⃣ Fetch all encrypted files using userUID (API 2)
+  // 3️ Fetch all encrypted files using userUID (API 2)
   useEffect(() => {
     const fetchEncryptedFiles = async () => {
       try {
@@ -74,7 +86,7 @@ const DecryptFile = ({ magicToken }) => {
             mediaFileUrl: fileObj.mediaFileUrl,
           }));
 
-          setEncryptedFiles(files);
+          setEncryptedFileUrls(files);
         } else {
           throw new Error("No encrypted files found.");
         }
@@ -88,23 +100,19 @@ const DecryptFile = ({ magicToken }) => {
   }, [userID]);
 
   // decrypt the key using the uuid 
-  const decryptAesKey = () => {
-    try {
-      if (!uuid || !encryptedAesKey) {
-        throw new Error("Missing UUID or encrypted AES key.");
-      }
-
-      const decryptedKey = AES.decrypt(encryptedAesKey, uuid).toString(enc.Utf8);
-
-      if (!decryptedKey) {
-        throw new Error("Invalid UUID. Decryption failed.");
-      }
-
-      return decryptedKey;
-    } catch (error) {
-      setError("Failed to decrypt the AES key. Please check the UUID.");
-      return null;
-    }
+  const decryptKey = (uuid, salt, encryptedKey) => {
+    // Parse stored salt from database
+    const parsedSalt = lib.enc.Hex.parse(salt);
+  
+    // Derive the same AES key using stored salt and UUID
+    const derivedKey = PBKDF2(uuid, parsedSalt, {
+      keySize: 256 / 32,
+      iterations: 10000,
+    });
+  
+    // Decrypt the AES key
+    const decryptedKey = AES.decrypt(encryptedKey, uuid).toString(lib.enc.Utf8);
+    return decryptedKey === derivedKey.toString();
   };
 
   // decrypt all files using AES key
@@ -118,7 +126,7 @@ const DecryptFile = ({ magicToken }) => {
         throw new Error("No encrypted files available.");
       }
 
-      const decryptedKey = decryptAesKey();
+      const decryptedKey = decryptKey(uuid ,hashWithSalt(hashWithSalt(uuid)), encryptedAesKey);
       if (!decryptedKey) {
         throw new Error("Invalid UUID. Cannot decrypt files.");
       }
