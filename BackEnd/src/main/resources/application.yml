@@ -73,24 +73,32 @@
 # trace: true
 spring:
   datasource:
-    url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?user=postgres.nzdfurdfnrlhgqhhdogd&password=Kasar@625
+    url: jdbc:postgresql://aws-0-us-west-1.pooler.supabase.com:6543/postgres?sslmode=require&prepareThreshold=0
+    username: postgres.nzdfurdfnrlhgqhhdogd
+    password: Kasar@625
     driver-class-name: org.postgresql.Driver
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
       pool-name: HikariCP
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      # Removed: connection-init-sql: DEALLOCATE ALL
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          use_legacy_prepared_statement_naming: true  # Keep this to avoid naming conflicts
+    show-sql: true  # Keep for debugging
   mail:
     host: smtp.gmail.com
     port: 587
     username: devlomentpurpose@gmail.com
-    password: eurs pbeq taog rqpo 
-    properties: 
+    password: eurs pbeq taog rqpo
+    properties:
       mail:
         smtp:
           auth: true
@@ -109,3 +117,8 @@ server:
     include-binding-errors: always
     whitelabel:
       enabled: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG  # Added for detailed SQL logging
+    org.hibernate.type.descriptor.sql: TRACE  # Added to log parameter bindings
