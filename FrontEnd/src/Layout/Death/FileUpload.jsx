@@ -15,13 +15,13 @@ const FileUpload = () => {
   const [message, setMessage] = useState(null);
   const [loading, setLoading] = useState(false);
   const [encryptionKey, setEncryptionKey] = useState(null); // AES key for file
-  const [encryptedAesKey, setEncryptedAesKey] = useState(null); // AES key encrypted with UUID
+  const [encryptedAesKey, setEncryptedAesKey] = useState(null); // aES key encrypted with UUID
   const [uuid, setUuid] = useState("");
   const [isUuidValid, setIsUuidValid] = useState(false);
  
   //this is for the UUID hashing and checking it is there any hash exist of the same uuid
   const hashWithSalt = async (uuid) => {
-    const salt = uuid.substring(0, 16); // Use first 16 characters of UUID as salt
+    const salt = uuid.substring(0, 16); // use first 16 characters of UUID as salt
     const text = uuid + salt; 
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
@@ -49,18 +49,18 @@ const FileUpload = () => {
       setMessage("Validation failed. Please try again.");
     }
   };
-  // Generate random UUID, derive AES key, and encrypt it
+  // generate random UUID, derive AES key, and encrypt it
   const generateKeys = () => {
     //currelty salt is fucked up 
     const salt = hashWithSalt(hashWithSalt(currentUser.id));
 
-    // Derive AES-256 key from UUID using PBKDF2
+    // derive AES-256 key from UUID using PBKDF2
     const derivedKey = PBKDF2(uuid, salt, {
       keySize: 256 / 32, // 256 bits
       iterations: 10000,  
     }).toString();
 
-    // Encrypt the AES key with the UUID using AES
+    // encrypt the AES key with the UUID using AES
     const encryptedKey = AES.encrypt(derivedKey, uuid).toString();
 
     setEncryptionKey(derivedKey);
@@ -81,7 +81,7 @@ const FileUpload = () => {
     if (user) {
       console.log("Fetched current user:", user);
       setCurrentUser(user);
-      generateKeys(); // Generate keys on login
+      generateKeys(); // generate keys on login
     } else {
       console.log("No authenticated user found.");
     }

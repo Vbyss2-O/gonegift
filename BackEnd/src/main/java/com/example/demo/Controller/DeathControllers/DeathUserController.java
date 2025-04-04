@@ -74,6 +74,7 @@ public class DeathUserController {
     public void storeSerectKey(@RequestBody String id, @PathVariable String useruid) {
         deathUserService.storeSecretKey(id , useruid);
     }
+    //this is for getting the aes encrypted key
     @GetMapping("/getKey/{userid}")
     public String getKey(@PathVariable String userid) {
         return deathUserService.findUserBySecretId(userid).getSecretKey();

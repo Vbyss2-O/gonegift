@@ -23,7 +23,7 @@ const DecryptFile = ({ magicToken }) => {
       .join("");
   };
 
-  // 1️⃣ Fetch userUID from the magic token
+  // fetch userUID from the magic token
   useEffect(() => {
     const fetchUserUID = async () => {
       try {
@@ -69,7 +69,7 @@ const DecryptFile = ({ magicToken }) => {
     fetchEncryptedKey();
   }, [userID]);
 
-  // 3️ Fetch all encrypted files using userUID (API 2)
+  //fetch all encrypted files using userUID (API 2)
   useEffect(() => {
     const fetchEncryptedFiles = async () => {
       try {
@@ -101,10 +101,10 @@ const DecryptFile = ({ magicToken }) => {
 
   // decrypt the key using the uuid 
   const decryptKey = (uuid, salt, encryptedKey) => {
-    // Parse stored salt from database
+    // parse stored salt from database
     const parsedSalt = lib.enc.Hex.parse(salt);
   
-    // Derive the same AES key using stored salt and UUID
+    // derive the same AES key using stored salt and UUID
     const derivedKey = PBKDF2(uuid, parsedSalt, {
       keySize: 256 / 32,
       iterations: 10000,
