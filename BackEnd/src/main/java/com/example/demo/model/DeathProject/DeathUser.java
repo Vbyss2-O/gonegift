@@ -5,6 +5,7 @@ import java.util.List;
 //in production i will make all column as the not null currelty skip not null constraint
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.CascadeType;
 // import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,42 +33,58 @@ import lombok.ToString;
 public class DeathUser {
 
     @Id
+    @Column(nullable = false)
     private String userIdX;
-    private String email;
-    private String firstName;
-    private String lastname ;
 
+    @Column(nullable = false , unique = true)
+    private String email;
+
+    @Column(nullable = false)
+    private String firstName;
+
+    @Column(nullable = false)
+    private String lastname ;
+    
+    @Column(nullable = false)
     private LocalDateTime lastActivityDate;
+
+    @Column(nullable = false)
     private Integer inactivityThresholdDays;
     
-    // Added relativeId field as per your previous code 
-    private String relativeId; // Adjust type if needed
+   
+
+    @Column(nullable = false) // Adjust type if needed
     private String secretKey;
+
+    @Column(nullable = false)
     private String userRole;
     //this hashtoken will be in use when we are verfity the uuid of the user
+    @Column(nullable = false)
     private String hashuuid;
     //colum should not be null  
     @Column(nullable = false)
     private boolean isdeceased; 
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     // @Column(nullable = false)
     private BuddyStatus buddyStatus = BuddyStatus.CHILLING; 
 
-    
+    @Column(nullable = false)
     private Integer attemptCount;
 
     private LocalDateTime nextBuddyDate;
+
     private LocalDateTime lastInteraction;
     
 
     // corrected the mapping for beneficiaries
-    @OneToMany(mappedBy = "userx"  , fetch = FetchType.LAZY) 
+    @OneToMany(mappedBy = "userx"  ,fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) 
     @JsonManagedReference
     private List<Beneficiary> beneficiaries;
 
     // Corrected the mapping for files
-    @OneToMany(mappedBy = "usery" , fetch = FetchType.LAZY )
+    @OneToMany(mappedBy = "usery" , fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference 
     private List<DeathFiles> files;
 }

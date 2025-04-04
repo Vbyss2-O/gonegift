@@ -1,10 +1,10 @@
 package com.example.demo.model.DeathProject;
 
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,20 +31,21 @@ public class Beneficiary {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
 
+    @Column(nullable = false)
     private String idOfUser;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false)
     private String email;
 
     // Implementing Many-to-One mapping correctly
     @ManyToOne
     @JoinColumn(name = "relative_id", nullable = false)
     @JsonBackReference
-    @OnDelete(action = OnDeleteAction.CASCADE) // Changed relative_id to user_id to match the reference in DeathUser
-    private DeathUser userx; // This references the DeathUser entity
-
-
-
-
+    private DeathUser userx; // this references the DeathUser entity
 }

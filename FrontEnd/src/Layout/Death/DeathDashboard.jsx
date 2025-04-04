@@ -97,12 +97,12 @@ const Dashboard = () => {
     }
   };
 
-  if (loading) return (
-    <div className="loading-screen">
-      <div className="loader"></div>
-      <p>Loading your dashboard...</p>
-    </div>
-  );
+  // if (loading) return (
+  //   <div className="loading-screen">
+  //     <div className="loader"></div>
+  //     <p>Loading your dashboard...</p>
+  //   </div>
+  // );
 
   const generalMenuItems = [
     { icon: <FiUpload size={24} />, text: "Upload File", path: "/upload-file" },

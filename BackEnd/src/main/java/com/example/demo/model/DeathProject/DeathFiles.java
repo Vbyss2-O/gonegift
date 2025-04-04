@@ -2,6 +2,7 @@ package com.example.demo.model.DeathProject;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -28,10 +29,16 @@ public class DeathFiles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(nullable = false)
     private Long id;
-
+     
+    @Column(nullable = false)
     private String idOfUser;
+
+    @Column(nullable = false)
     private String letterFileUrl;
+
+    @Column(nullable = false)
     private String mediaFileUrl;
 
     @ManyToOne
