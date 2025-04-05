@@ -220,7 +220,7 @@ const Dashboard = () => {
           ))}
         </div>
 
-        <div className="recent-activity">
+        {/* <div className="recent-activity">
           <br />
           <br />
           <br />
@@ -228,7 +228,7 @@ const Dashboard = () => {
           <div className="activity-list">
             <center><p>No recent activity</p></center>
           </div>
-        </div>
+        </div> */}
       </main>
     </div>
   );
