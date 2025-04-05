@@ -191,6 +191,7 @@ body {
 
 /* Vibrant Stats Grid */
 .stats-grid {
+  
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
@@ -310,7 +311,7 @@ body {
 /* Vibrant Dashboard Grid */
 .dashboard-grid {
   display: flex;
-  padding: 7rem 0;
+  padding: 5rem 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
