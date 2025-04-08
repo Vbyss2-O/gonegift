@@ -51,9 +51,7 @@ public class DeathUser {
     @Column(nullable = false)
     private Integer inactivityThresholdDays;
     
-   
-
-    @Column(nullable = false) // Adjust type if needed
+   //here i am going to store encrypted AES key at all
     private String secretKey;
 
     @Column(nullable = false)

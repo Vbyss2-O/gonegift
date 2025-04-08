@@ -35,10 +35,8 @@ public class DeathFiles {
     @Column(nullable = false)
     private String idOfUser;
 
-    @Column(nullable = false)
     private String letterFileUrl;
 
-    @Column(nullable = false)
     private String mediaFileUrl;
 
     @ManyToOne

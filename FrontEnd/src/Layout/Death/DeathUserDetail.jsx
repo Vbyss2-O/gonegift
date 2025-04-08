@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import {enc, AES, PBKDF2 } from "crypto-js";
+import CryptoJS from "crypto-js";
+
 
 const UserDetailsForm = () => {
   const navigate = useNavigate();
@@ -75,6 +78,43 @@ const UserDetailsForm = () => {
       .join("");
   };
 
+  const generateKeys = async (uuid) => {
+    try {
+      // 1. Generate salt
+      const salt = CryptoJS.SHA256(uuid).toString();
+      console.log('Salt:', salt);
+  
+      // 2. Derive key - keep as WordArray
+      const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
+        keySize: 256/32,
+        iterations: 10000,
+      }); // Remove .toString()
+  
+      console.log('Derived Key (Hex):', derivedKey.toString(CryptoJS.enc.Hex));
+  
+      // // 3. Encrypt with proper key handling
+      // const encrypted = CryptoJS.AES.encrypt(
+      //   derivedKey.toString(), // Data to encrypt (as string)
+      //   derivedKey, // Key as WordArray (correct)
+      //   { 
+      //     keySize: 256/32, // Explicitly set
+      //     mode: CryptoJS.mode.CBC,
+      //     padding: CryptoJS.pad.Pkcs7,
+      //     iv: CryptoJS.enc.Hex.parse('00000000000000000000000000000000')
+      //   }
+      // );
+  
+      // const encryptedKey = encrypted.toString();
+      // console.log('Encrypted Key:', encryptedKey);
+      // return encryptedKey ;
+      return derivedKey.toString(CryptoJS.enc.Hex); // Return the derived key as hex string
+      
+    } catch (error) {
+      console.error('Key generation failed:', error);
+      throw error;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -92,6 +132,9 @@ const UserDetailsForm = () => {
 
       const generatedUuid = uuidv4();
       const hashedUuid = await hashWithSalt(generatedUuid);
+      
+      // Get the encrypted key directly from the function
+      const encryptedKey = await generateKeys(generatedUuid);
 
       const userDetails = {
         userIdX,
@@ -107,7 +150,7 @@ const UserDetailsForm = () => {
         lastInteraction: null,
         buddyStatus: "CHILLING",
         hashuuid: hashedUuid,
-        secretKey: generatedUuid,
+        secretKey: encryptedKey, // Use the returned value directly
       };
 
       console.log("Submitting user details:", userDetails);

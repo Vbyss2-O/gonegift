@@ -77,7 +77,13 @@ public class DeathUserController {
     //this is for getting the aes encrypted key
     @GetMapping("/getKey/{userid}")
     public String getKey(@PathVariable String userid) {
-        return deathUserService.findUserBySecretId(userid).getSecretKey();
+        //error beucase of useruuid
+        Optional<DeathUser> user = deathUserService.getUserById(userid);
+        if(user.isPresent()) {
+            return user.get().getSecretKey(); // Assuming you have a method to get the secret key
+        } else {
+            throw new RuntimeException("User not found");
+        }
         
     }
     @PostMapping("/sendSecretKey/{useruid}")
@@ -89,8 +95,8 @@ public class DeathUserController {
         deathUserService.storeSecretKey(useruid , hashToken);
     } 
     @GetMapping("/findHashToken")
-    public ResponseEntity<Void> validateHashuuid(@RequestBody String hashuuid , @RequestBody String userid){
-        if(deathUserService.findByHashuuidEquals(hashuuid , userid)){
+    public ResponseEntity<Void> validateHashuuid(@RequestParam  String token , @RequestParam  String userId){
+        if(deathUserService.findByHashuuidEquals(token , userId)){
             return ResponseEntity.ok().build();
         }
         else{
