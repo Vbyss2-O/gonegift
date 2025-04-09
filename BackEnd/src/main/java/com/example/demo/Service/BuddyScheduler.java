@@ -31,7 +31,7 @@ public class BuddyScheduler {
 
        
     
-        @Scheduled(fixedRate = 12 * 60 * 60 * 1000) // runs 12 hour 
+        @Scheduled(fixedRate = 60*1000) // runs 12 hour 
         public void checkUsers() {
             LocalDateTime now = LocalDateTime.now();
             List<DeathUser> users = userRepository.findAll();

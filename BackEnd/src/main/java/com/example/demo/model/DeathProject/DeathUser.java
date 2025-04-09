@@ -77,7 +77,7 @@ public class DeathUser {
     
 
     // corrected the mapping for beneficiaries
-    @OneToMany(mappedBy = "userx"  ,fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) 
+    @OneToMany(mappedBy = "userx"  ,fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true) 
     @JsonManagedReference
     private List<Beneficiary> beneficiaries;
 
