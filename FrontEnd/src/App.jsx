@@ -12,6 +12,7 @@ import UserDetailsForm from "./Layout/Death/DeathUserDetail";
 import BeneficiaryList from "./Layout/Death/BeneficiaryList";
 import FileList from "./Layout/Death/FileList";
 import LifeBuddyDashboard from "./Layout/LifeBuddyDashboard";
+import DecryptFile from "./Layout/Death/DecryptFile";
 
 function App() {
   return (
@@ -85,10 +86,13 @@ function App() {
         <LifeBuddyDashboard/>
         </ProtectedRoute>
         } />
+        
+        <Route
+        path = "/ClaimAssets" element = {
+           <DecryptFile/>
+        }
+        ></Route>
 
-
-
-      
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

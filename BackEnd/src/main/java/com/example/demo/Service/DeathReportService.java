@@ -86,7 +86,7 @@ public class DeathReportService {
             try {
                 String token = generateMagicToken(user.getUserIdX());
                 
-                String magicLink = "http://localhost:5173/verify?token=" + token;
+                String magicLink = "http://localhost:5173/ClaimAssets/verify?token=" + token;
 
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("devlomentpurpose@gmail.com"); 
