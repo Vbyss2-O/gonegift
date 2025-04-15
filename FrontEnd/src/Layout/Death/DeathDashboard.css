@@ -51,6 +51,8 @@ body {
   transition: var(--transition);
   font-weight: 600;
   box-shadow: 0 4px 12px rgba(245, 54, 132, 0.2);
+  /* Added margin to position the button lower */
+  margin-bottom: 20px;
 }
 
 .logout-button:hover {
@@ -124,7 +126,7 @@ body {
   text-align: left;
   position: relative;
   overflow: hidden;
-  margin-bottom: 4px;
+  margin-bottom: 8px; /* Increased spacing between menu items */
 }
 
 .menu-item:hover {
@@ -191,7 +193,6 @@ body {
 
 /* Vibrant Stats Grid */
 .stats-grid {
-  
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   gap: 1.5rem;
@@ -232,6 +233,7 @@ body {
 .stat-card.clickable {
   cursor: pointer;
   transition: var(--transition-bounce);
+  margin-bottom: 4rem; /* Added margin for more spacing */
 }
 
 .stat-card:hover {
@@ -310,16 +312,17 @@ body {
 
 /* Vibrant Dashboard Grid */
 .dashboard-grid {
-  display: flex;
-  padding: 5rem 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1.5rem;
+  padding-bottom: 3rem;
+  /* Added padding to push grid lower */
+  padding-top: 1.5rem;
 }
 
 .dashboard-card {
-  width: 300px; /* or max-width: 220px; */
-  padding: 1rem;
+  width: 80%;
+  padding: 1.5rem;
   background-color: var(--bg-white);
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
@@ -333,9 +336,10 @@ body {
   gap: 0.75rem;
   position: relative;
   overflow: hidden;
+  /* Added margin for more spacing */
+  margin-bottom: 1rem;
+  
 }
-
-
 
 .dashboard-card:nth-child(odd) {
   background-color: var(--bg-pink-light);
@@ -377,6 +381,8 @@ body {
   font-size: 1.75rem;
   transition: var(--transition);
   position: relative;
+  /* Added margin to push icons lower in cards */
+  margin-top: 0.5rem;
 }
 
 .dashboard-card:nth-child(1) .dashboard-card-icon {
@@ -416,7 +422,7 @@ body {
 .dashboard-card h3 {
   font-size: 1.3rem;
   font-weight: 600;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem; /* Increased to push title down a bit */
   background: linear-gradient(45deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -426,7 +432,7 @@ body {
   color: var(--text-gray);
   font-size: 0.925rem;
   max-width: 90%;
-  margin: 0 auto;
+  margin: 0.5rem auto 0.75rem; /* Added bottom margin */
 }
 
 /* Mobile Navigation */
@@ -445,42 +451,13 @@ body {
   cursor: pointer;
   box-shadow: var(--shadow-md);
   transition: var(--transition);
+  /* Lowered the toggle button */
+  top: 1.5rem;
 }
 
 .mobile-nav-toggle:hover {
   transform: scale(1.05);
   box-shadow: var(--shadow-lg);
-}
-
-/* Enhanced Responsive Design */
-.dashboard-grid {
-  
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Changed from 280px to 350px */
-  gap: 1.5rem;
-}
-
-/* Update the media queries for better responsiveness */
-@media (max-width: 1280px) {
-  .dashboard-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideIn {
-  from { transform: translateX(-15px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
 }
 
 /* Loading Animation */
@@ -522,6 +499,16 @@ body {
 /* Dashboard Animation */
 .dashboard-container {
   animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-15px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
 }
 
 /* Confetti Background Pattern */
@@ -586,4 +573,223 @@ body {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
+}
+
+/* === IMPROVED RESPONSIVE DESIGN === */
+
+/* Large screens */
+@media (min-width: 1281px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Medium-large screens */
+@media (max-width: 1280px) {
+  .dashboard-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Medium screens */
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 240px;
+  }
+  
+  .main-content {
+    margin-left: 240px;
+    padding: 1.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .mobile-nav-toggle {
+    display: block;
+    top: 1.5rem; /* Position lower */
+  }
+  
+  .sidebar {
+    transform: translateX(-100%);
+    width: 260px;
+  }
+  
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+    /* Add padding to push content lower on mobile */
+    padding-top: 4rem;
+  }
+  
+  .main-header {
+    padding: 1.25rem;
+    border-radius: 1rem;
+    /* Added margin to push it lower */
+    margin-top: 1rem;
+  }
+  
+  .user-welcome h1 {
+    font-size: 1.75rem;
+  }
+  
+  .user-welcome p {
+    font-size: 1rem;
+  }
+  
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .mobile-nav-toggle {
+    top: 1rem; /* Position lower on mobile */
+    right: 0.75rem;
+    padding: 0.5rem;
+    font-size: 1rem;
+  }
+  
+  .sidebar {
+    width: 85%;
+    padding: 1.25rem 1rem;
+  }
+  
+  .main-content {
+    padding: 0.75rem;
+    /* Add padding to push content lower on mobile */
+    padding-top: 3.5rem;
+  }
+  
+  .main-header {
+    padding: 1rem;
+    margin-bottom: 1.25rem;
+    margin-top: 1rem; /* Added margin to push it lower */
+    border-radius: 0.75rem;
+  }
+  
+  .user-welcome h1 {
+    font-size: 1.5rem;
+  }
+  
+  .user-welcome p {
+    font-size: 0.9rem;
+  }
+  
+  .stat-card {
+    padding: 1rem;
+    border-radius: 12px;
+  }
+  
+  .stat-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 1.25rem;
+  }
+  
+  .stat-info p {
+    font-size: 1.25rem;
+  }
+  
+  .dashboard-card {
+    padding: 1.25rem 1rem;
+    /* Added margin for more spacing */
+    margin-bottom: 0.75rem;
+  }
+  
+  .dashboard-card-icon {
+    width: 50px;
+    height: 50px;
+    font-size: 1.5rem;
+    /* Added margin to push icons lower */
+    margin-top: 0.75rem;
+  }
+  
+  .dashboard-card h3 {
+    font-size: 1.1rem;
+    margin-top: 0.75rem; /* Push text lower */
+  }
+  
+  .dashboard-card p {
+    font-size: 0.85rem;
+    margin-bottom: 1rem; /* Added bottom margin */
+  }
+  
+  .logout-button {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    margin-bottom: 25px; /* Increased bottom margin */
+  }
+}
+
+/* Small mobile screens */
+@media (max-width: 320px) {
+  .main-content {
+    padding: 0.5rem;
+    padding-top: 3rem; /* Push content lower */
+  }
+  
+  .main-header {
+    padding: 0.75rem;
+    margin-top: 1rem; /* Added margin to push it lower */
+  }
+  
+  .user-welcome h1 {
+    font-size: 1.25rem;
+  }
+  
+  .user-welcome p {
+    font-size: 0.8rem;
+  }
+  
+  .dashboard-card h3 {
+    font-size: 1rem;
+  }
+  
+  .dashboard-card p {
+    font-size: 0.8rem;
+  }
+  
+  .mobile-nav-toggle {
+    top: 1.25rem; /* Position lower on smaller screens */
+  }
+}
+
+/* For JavaScript - Toggle sidebar functionality */
+/* Add this class via JS when mobile menu button is clicked */
+.sidebar-open body {
+  overflow: hidden;
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  display: block;
+  opacity: 1;
 }

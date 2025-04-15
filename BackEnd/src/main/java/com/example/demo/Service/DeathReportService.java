@@ -85,7 +85,7 @@ public class DeathReportService {
         for (Beneficiary beneficiary : beneficiaries) {
             try {
                 String token = generateMagicToken(user.getUserIdX());
-                
+                //at time of production change this properly 
                 String magicLink = "http://localhost:5173/ClaimAssets/verify?token=" + token;
 
                 SimpleMailMessage message = new SimpleMailMessage();
