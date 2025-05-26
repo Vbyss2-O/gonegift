@@ -50,9 +50,9 @@ This will start the React app on `http://localhost:5173`.
 
 ```bash
 cd Backend/src/main/java/com/example/demo/DemoApplication.java
-Run DemoApplication.java manually.
 
 ```
+Run DemoApplication.java manually.
 
 
 Or, if you have Maven installed globally:
