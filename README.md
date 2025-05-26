@@ -50,7 +50,10 @@ This will start the React app on `http://localhost:5173`.
 
 ```bash
 cd Backend/src/main/java/com/example/demo/DemoApplication.java
+Run DemoApplication.java manually.
+
 ```
+
 
 Or, if you have Maven installed globally:
 
@@ -61,17 +64,7 @@ mvn spring-boot:run
 
 The backend will start on `http://localhost:8080`.
 
-Make sure to configure any environment variables or `application.properties` for your database/API keys.
 
----
-
-## 🌐 Connecting Frontend and Backend
-
-Ensure your React app makes API requests to the correct backend URL (e.g., `http://localhost:8080/api/...`).
-
-
-
----
 
 ## ✅ Features
 
