@@ -133,77 +133,189 @@ const LetterEditor = () => {
     </div>
   );
 };
-const styles = {
+  const styles = {
   container: {
     maxWidth: "800px",
-    margin: "0 auto",
-    padding: "2rem",
-    backgroundColor: "#fff",
-    borderRadius: "10px",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    margin: "2rem auto",
+    padding: "2.5rem",
+    background: "var(--bg-glass)",
+    borderRadius: "var(--radius-xl)",
+    boxShadow: "var(--shadow-rainbow)",
+    backdropFilter: "var(--blur-light)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    position: "relative",
+    overflow: "hidden",
+    transition: "var(--transition-spring)",
+    "&::before": {
+      content: "''",
+      position: "absolute",
+      top: "0",
+      left: "0",
+      width: "100%",
+      height: "4px",
+      background: "var(--border-gradient)",
+      backgroundSize: "200% 200%",
+      animation: "gradientMove 3s linear infinite",
+    }
   },
+
   editorContainer: {
     display: "flex",
     flexDirection: "column",
-    gap: "1.5rem",
+    gap: "2rem",
+    position: "relative",
+    zIndex: "1",
   },
+
   inputGroup: {
-    marginBottom: "1rem",
+    marginBottom: "1.5rem",
+    position: "relative",
   },
+
   input: {
     width: "100%",
-    padding: "12px 16px",
-    fontSize: "16px",
-    border: "2px solid #e1e1e1",
-    borderRadius: "8px",
-    transition: "border-color 0.3s ease",
-    outline: "none",
+    padding: "1rem 1.25rem",
+    fontSize: "1rem",
+    background: "var(--bg-glass)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "var(--radius-lg)",
+    color: "var(--text-primary)",
+    transition: "var(--transition)",
+    backdropFilter: "var(--blur-light)",
+    boxShadow: "var(--shadow-sm)",
+    "&:focus": {
+      outline: "none",
+      borderColor: "var(--primary)",
+      boxShadow: "var(--shadow-glow)",
+      transform: "translateY(-2px)",
+    },
+    "&:hover": {
+      borderColor: "var(--primary-light)",
+      boxShadow: "var(--shadow-md)",
+    }
   },
+
   quill: {
     height: "300px",
-    marginBottom: "15px",
-    border: "2px solid #e1e1e1",
-    borderRadius: "8px",
+    marginBottom: "1.5rem",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "var(--radius-lg)",
     overflow: "hidden",
+    background: "var(--bg-glass)",
+    backdropFilter: "var(--blur-light)",
+    boxShadow: "var(--shadow-sm)",
+    transition: "var(--transition)",
+    "&:hover": {
+      boxShadow: "var(--shadow-md)",
+    },
+    "& .ql-toolbar": {
+      border: "none",
+      borderBottom: "1px solid rgba(255, 255, 255, 0.2)",
+      background: "var(--bg-glass)",
+    },
+    "& .ql-container": {
+      border: "none",
+      background: "var(--bg-white)",
+    }
   },
+
   buttonContainer: {
     display: "flex",
     justifyContent: "center",
-    marginTop: "1.5rem",
+    marginTop: "2rem",
+    gap: "1rem",
   },
+
   saveButton: {
-    padding: "12px 24px",
-    fontSize: "16px",
+    padding: "1rem 2rem",
+    fontSize: "1rem",
     fontWeight: "600",
-    backgroundColor: "#28a745",
-    color: "#fff",
+    background: "linear-gradient(135deg, var(--primary), var(--secondary))",
+    color: "var(--text-light)",
     border: "none",
-    borderRadius: "8px",
+    borderRadius: "var(--radius-lg)",
     cursor: "pointer",
-    transition: "all 0.3s ease",
+    transition: "var(--transition-spring)",
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "var(--shadow-md)",
+    "&::before": {
+      content: "''",
+      position: "absolute",
+      top: "0",
+      left: "-100%",
+      width: "100%",
+      height: "100%",
+      background: "linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent)",
+      transition: "var(--transition)",
+    },
+    "&:hover:not(:disabled)": {
+      transform: "translateY(-2px)",
+      boxShadow: "var(--shadow-xl)",
+      "&::before": {
+        left: "100%",
+      }
+    },
+    "&:active:not(:disabled)": {
+      transform: "translateY(-1px)",
+    }
   },
+
   saveButtonDisabled: {
-    opacity: 0.7,
+    background: "linear-gradient(135deg, var(--text-gray), #999)",
+    opacity: "0.7",
     cursor: "not-allowed",
+    transform: "none",
+    boxShadow: "none",
   },
+
   successMessage: {
-    marginTop: "1rem",
-    padding: "12px",
-    backgroundColor: "#d4edda",
-    color: "#155724",
-    borderRadius: "6px",
+    marginTop: "1.5rem",
+    padding: "1rem",
+    background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))",
+    color: "var(--accent3)",
+    borderRadius: "var(--radius-lg)",
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "600",
+    border: "1px solid rgba(16, 185, 129, 0.2)",
+    animation: "fadeInUp 0.5s ease-out",
   },
+
   errorMessage: {
-    marginTop: "1rem",
-    padding: "12px",
-    backgroundColor: "#f8d7da",
-    color: "#721c24",
-    borderRadius: "6px",
+    marginTop: "1.5rem",
+    padding: "1rem",
+    background: "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05))",
+    color: "var(--accent4)",
+    borderRadius: "var(--radius-lg)",
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "600",
+    border: "1px solid rgba(239, 68, 68, 0.2)",
+    animation: "fadeInUp 0.5s ease-out",
   },
+
+  "@media (max-width: 768px)": {
+    container: {
+      margin: "1.5rem",
+      padding: "2rem",
+    },
+    quill: {
+      height: "250px",
+    }
+  },
+
+  "@media (max-width: 480px)": {
+    container: {
+      margin: "1rem",
+      padding: "1.5rem",
+    },
+    buttonContainer: {
+      flexDirection: "column",
+    },
+    saveButton: {
+      width: "100%",
+    }
+  }
 };
+
 
 export default LetterEditor;
