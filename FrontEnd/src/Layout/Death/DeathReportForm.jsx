@@ -1,7 +1,11 @@
+//here also for verification there should be need to upload the death certificate i will add this
+// additional feather as soon as possible 
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+
 
 const DeathReportForm = () => {
   const navigate = useNavigate();
@@ -111,6 +115,7 @@ const DeathReportForm = () => {
   return (
     <div style={styles.container}>
       <h2>Report a Death</h2>
+      <br />
       <form onSubmit={handleSubmit}>
         <div style={styles.inputGroup}>
           <label>Secret ID</label>
@@ -168,13 +173,145 @@ const DeathReportForm = () => {
 };
 
 const styles = {
-  container: { padding: "20px", maxWidth: "600px", margin: "0 auto" },
-  inputGroup: { marginBottom: "15px" },
-  input: { width: "100%", padding: "8px", fontSize: "16px" },
-  textarea: { width: "100%", padding: "8px", fontSize: "16px", height: "100px" },
-  button: { padding: "10px 20px", backgroundColor: "#007bff", color: "#fff", border: "none" },
-  success: { color: "green", marginTop: "10px" },
-  error: { color: "red", marginTop: "10px" },
+  container: {
+    padding: "2.5rem",
+    maxWidth: "600px",
+    margin: "2rem auto",
+    background: "var(--bg-glass)",
+    borderRadius: "var(--radius-xl)",
+    boxShadow: "var(--shadow-rainbow)",
+    backdropFilter: "var(--blur-light)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    position: "relative",
+    overflow: "hidden",
+    transition: "var(--transition-spring)",
+  },
+
+  inputGroup: {
+    marginBottom: "1.5rem",
+    position: "relative",
+  },
+
+  input: {
+    width: "100%",
+    padding: "1rem 1.25rem",
+    fontSize: "1rem",
+    background: "var(--bg-glass)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "var(--radius-lg)",
+    color: "var(--text-primary)",
+    transition: "var(--transition)",
+    backdropFilter: "var(--blur-light)",
+    boxShadow: "var(--shadow-sm)",
+    "&:focus": {
+      outline: "none",
+      borderColor: "var(--primary)",
+      boxShadow: "var(--shadow-glow)",
+      transform: "translateY(-2px)",
+    },
+    "&:hover": {
+      borderColor: "var(--primary-light)",
+      boxShadow: "var(--shadow-md)",
+    },
+  },
+
+  textarea: {
+    width: "100%",
+    padding: "1rem 1.25rem",
+    fontSize: "1rem",
+    minHeight: "120px",
+    background: "var(--bg-glass)",
+    border: "1px solid rgba(255, 255, 255, 0.2)",
+    borderRadius: "var(--radius-lg)",
+    color: "var(--text-primary)",
+    transition: "var(--transition)",
+    backdropFilter: "var(--blur-light)",
+    boxShadow: "var(--shadow-sm)",
+    resize: "vertical",
+    "&:focus": {
+      outline: "none",
+      borderColor: "var(--primary)",
+      boxShadow: "var(--shadow-glow)",
+      transform: "translateY(-2px)",
+    },
+    "&:hover": {
+      borderColor: "var(--primary-light)",
+      boxShadow: "var(--shadow-md)",
+    },
+  },
+
+  button: {
+    padding: "1rem 2rem",
+    background: "linear-gradient(135deg, var(--primary), var(--secondary))",
+    color: "var(--text-light)",
+    border: "none",
+    borderRadius: "var(--radius-lg)",
+    fontSize: "1rem",
+    fontWeight: "600",
+    cursor: "pointer",
+    transition: "var(--transition-spring)",
+    position: "relative",
+    overflow: "hidden",
+    boxShadow: "var(--shadow-md)",
+    "&:hover": {
+      transform: "translateY(-2px)",
+      boxShadow: "var(--shadow-xl)",
+    },
+    "&:active": {
+      transform: "translateY(-1px)",
+    },
+    "&:disabled": {
+      background: "linear-gradient(135deg, var(--text-gray), #999)",
+      cursor: "not-allowed",
+      opacity: "0.7",
+    },
+  },
+
+  success: {
+    color: "var(--accent3)",
+    marginTop: "1rem",
+    padding: "1rem",
+    borderRadius: "var(--radius-lg)",
+    background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))",
+    fontWeight: "600",
+    border: "1px solid rgba(16, 185, 129, 0.2)",
+  },
+
+  error: {
+    color: "var(--accent4)",
+    marginTop: "1rem",
+    padding: "1rem",
+    borderRadius: "var(--radius-lg)",
+    background: "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05))",
+    fontWeight: "600",
+    border: "1px solid rgba(239, 68, 68, 0.2)",
+  },
+
+  // Add media queries for responsiveness
+  "@media (max-width: 768px)": {
+    container: {
+      margin: "1.5rem",
+      padding: "2rem",
+    },
+    button: {
+      width: "100%",
+    },
+  },
+
+  "@media (max-width: 480px)": {
+    container: {
+      margin: "1rem",
+      padding: "1.5rem",
+    },
+    input: {
+      padding: "0.875rem 1rem",
+    },
+    textarea: {
+      padding: "0.875rem 1rem",
+    },
+  },
 };
+
+
 
 export default DeathReportForm;

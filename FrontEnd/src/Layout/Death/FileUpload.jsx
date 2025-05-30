@@ -230,63 +230,41 @@ const FileUpload = () => {
   }
 
   return (
-    <div className="file-upload">
-      <input
-        type="text"
-        placeholder="Enter UUID"
-        value={uuid}
-        onChange={(e) => setUuid(e.target.value)}
-      />
-      <button 
-        onClick={validateUuid}
-        disabled={!uuid || !currentUser}
-      >
-        Validate UUID
-      </button>
+<div className="file-upload">
+  <h2>File Upload</h2>
+  
+  <div className="uuid-container">
+    <input
+      type="text"
+      className="uuid-input"
+      id="uuid"
+      placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      maxLength="36"
+    />
+     
+    <label className="uuid-label" htmlFor="uuid">Enter UUID</label>
+    <div className="uuid-hint" style={{
+    //incese the font size
+    fontSize: '20px',
+    fontWeight: 'bold',
+  }}>Format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</div>
+  </div>
+  <div className="upload-zone">
+    <input type="file" id="file" />
+    <p>Drag and drop your file here or click to select</p>
+  </div>
 
-      <h2>Upload File</h2>
+  <button className="upload-button" type="button">
+    Upload File
+  </button>
 
-      <input
-        type="file"
-        onChange={handleFileChange}
-        accept="image/*,video/*,application/pdf"
-        disabled={loading || !isUuidValid}
-      />
-      {file && (
-        <div style={{ margin: "10px 0" }}>
-          <p>
-            Selected: {file.name} ({(file.size / 1024).toFixed(2)} KB)
-          </p>
-        </div>
-      )}
-      <button
-        onClick={handleSubmit}
-        disabled={loading || !file || !isUuidValid || !AesKey}
-        style={{
-          marginTop: "10px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: loading || !AesKey || !isUuidValid ? "#6c757d" : "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "4px",
-          cursor: loading || !isUuidValid || !AesKey ? "not-allowed" : "pointer",
-        }}
-      >
-        {loading ? "Encrypting & Uploading..." : "Upload Encrypted File"}
-      </button>
-      {message.text && (
-        <p
-          style={{
-            marginTop: "10px",
-            color: message.isSuccess ? "#28a745" : "#dc3545",
-            fontWeight: "bold"
-          }}
-        >
-          {message.text}
-        </p>
-      )}
+  {/* Add status message conditionally */}
+  {status && (
+    <div className={`status-message ${status.type}`}>
+      {status.message}
     </div>
+  )}
+</div>
   );
 };
 
