@@ -44,15 +44,15 @@
   --border-gradient: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
   
   /* Shadows */
-  --shadow-sm: 0 4px 6px rgba(139, 92, 246, 0.05);
-  --shadow-md: 0 6px 16px rgba(139, 92, 246, 0.1);
-  --shadow-lg: 0 12px 24px rgba(139, 92, 246, 0.15);
-  --shadow-xl: 0 20px 40px rgba(139, 92, 246, 0.2);
-  --shadow-glow: 0 0 20px rgba(139, 92, 246, 0.25);
-  --shadow-pink: 0 5px 15px rgba(236, 72, 153, 0.25);
-  --shadow-cyan: 0 5px 15px rgba(6, 182, 212, 0.25);
-  --shadow-neon: 0 0 30px rgba(139, 92, 246, 0.4);
-  --shadow-rainbow: 0 8px 32px rgba(139, 92, 246, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  --shadow-sm: 0 4px 6px rgb(6, 6, 6);
+  --shadow-md: 0 6px 16px rgb(6, 6, 6);
+  --shadow-lg: 0 12px 24px rgb(6, 6, 6);
+  --shadow-xl: 0 20px 40px rgb(6, 6, 6);
+  --shadow-glow: 0 0 20px rgb(6, 6, 6);
+  --shadow-pink: 0 5px 15px rgb(6, 6, 6);
+  --shadow-cyan: 0 5px 15px rgb(6, 6, 6);
+  --shadow-neon: 0 0 30px rgb(6, 6, 6);
+  --shadow-rainbow: 0 8px 32px rgb(6, 6, 6);
   
   /* Transitions */
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

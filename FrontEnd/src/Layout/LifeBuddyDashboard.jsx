@@ -314,6 +314,11 @@ const LifeBuddyDashboard = () => {
   `}</style>
 
       <center><h1>Buddy's Dashboard</h1></center>
+      //create one simple i logo where clicking that i should redirect to the LifeBuddy page
+      <div>
+        <a href="https://www.flaticon.com/free-icons/about" title="about icons">About icons created by Yogi Aprelliyanto - Flaticon</a>
+      </div>
+
       <br />
       <center>
         <img
