@@ -34,6 +34,10 @@ public class DeathFiles {
      
     @Column(nullable = false)
     private String idOfUser;
+    
+    // @Column(nullable = false)
+    private String fileName;
+    
 
     private String letterFileUrl;
 

@@ -73,9 +73,10 @@ const FileList = () => {
 
   const deleteFile = async (fileId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/filemetadata/deleteFileMetadataById/${fileId}`, {
+      const response = await fetch(`http://localhost:8080/api/filemetadata/${fileId}`, {
         method: "DELETE",
       });
+      console.log("Delete response:", response);
       
       if (response.ok) {
         setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));

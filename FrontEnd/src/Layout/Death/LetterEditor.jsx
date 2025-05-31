@@ -91,6 +91,7 @@ const LetterEditor = () => {
         idOfUser: currentUser.id,
         letterFileUrl: fileUrl,
         mediaFileUrl: null, // Explicitly null for letters
+        fileName :letterTitle,
         usery: {
           userIdX: currentUser.id,
         },

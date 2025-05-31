@@ -189,6 +189,7 @@ const FileUpload = () => {
         idOfUser: currentUser.id,
         letterFileUrl: bucket === "letters" ? fileUrl : null,
         mediaFileUrl: bucket === "media" ? fileUrl : null,
+        fileName: file.name,
         usery: {
           userIdX: currentUser.id,
         },
@@ -226,45 +227,63 @@ const FileUpload = () => {
   }, []);
 
   if (!currentUser) {
-    return <div>Loading user data...</div>;
+    return <div className="no-auth">Loading user data...</div>;
   }
 
   return (
-<div className="file-upload">
-  <h2>File Upload</h2>
-  
-  <div className="uuid-container">
-    <input
-      type="text"
-      className="uuid-input"
-      id="uuid"
-      placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      maxLength="36"
-    />
-     
-    <label className="uuid-label" htmlFor="uuid">Enter UUID</label>
-    <div className="uuid-hint" style={{
-    //incese the font size
-    fontSize: '20px',
-    fontWeight: 'bold',
-  }}>Format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</div>
-  </div>
-  <div className="upload-zone">
-    <input type="file" id="file" />
-    <p>Drag and drop your file here or click to select</p>
-  </div>
-
-  <button className="upload-button" type="button">
-    Upload File
-  </button>
-
-  {/* Add status message conditionally */}
-  {status && (
-    <div className={`status-message ${status.type}`}>
-      {status.message}
+    <div className="file-upload">
+      <h2>Upload File</h2>
+      <div className="uuid-section">
+        <div className="uuid-container">
+          <input
+            type="text"
+            placeholder="Enter UUID"
+            value={uuid}
+            onChange={(e) => setUuid(e.target.value)}
+            className="uuid-input"
+            disabled={loading}
+          />
+          <label className="uuid-label">UUID</label>
+        </div>
+        <button
+          onClick={validateUuid}
+          disabled={!uuid || !currentUser || loading}
+          className={`validate-button ${loading ? "loading" : ""}`}
+        >
+          Validate UUID
+        </button>
+      </div>
+      <div className="upload-section">
+        <div className="upload-zone">
+          <span className="upload-zone-icon">📤</span>
+          <p className="upload-zone-text">
+            {file
+              ? `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`
+              : "Drag & drop or click to upload an image, video, or PDF"}
+          </p>
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*,video/*,application/pdf"
+            disabled={loading || !isUuidValid}
+          />
+        </div>
+        <div className="button-container">
+          <button
+            onClick={handleSubmit}
+            disabled={loading || !file || !isUuidValid || !AesKey}
+            className={`upload-button ${loading ? "loading" : ""}`}
+          >
+            {loading ? "Encrypting & Uploading..." : "Upload Encrypted File"}
+          </button>
+        </div>
+      </div>
+      {message.text && (
+        <p className={`status-message ${message.isSuccess ? "success" : "error"}`}>
+          {message.text}
+        </p>
+      )}
     </div>
-  )}
-</div>
   );
 };
 
