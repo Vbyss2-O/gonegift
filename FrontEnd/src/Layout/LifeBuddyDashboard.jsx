@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { supabase } from "./Death/supabaseClient"; // Adjust path if needed
 import { v4 as uuidv4 } from "uuid";
+import { useNavigate } from 'react-router-dom';
 
 const LifeBuddyDashboard = () => {
   const [userIdX, setUserIdX] = useState(null);
@@ -11,6 +12,7 @@ const LifeBuddyDashboard = () => {
   const [replyMessage, setReplyMessage] = useState("");
   const [replyStatus, setReplyStatus] = useState(null);
   const [userx, setUserX] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch userIdX and initial DeathUser data from Supabase and API on mount
   useEffect(() => {
@@ -83,6 +85,10 @@ const LifeBuddyDashboard = () => {
       console.error(err);
     }
   };
+  
+   async function goToInfoPage() {
+    navigate('/buddyAbout');
+   }
 
   // Update DeathUser when replyStatus is not null
   useEffect(() => {
@@ -289,6 +295,16 @@ const LifeBuddyDashboard = () => {
         width: 150px;
         height: 150px;
     }
+      .lifebuddy-about {
+        width: 50px;
+        height: 50px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin: 10px; /* Optional: adds some space from the edges */
+        z-index: 1000; /* Optional: keeps it on top of other elements */
+    }
+
 
     @media (max-width: 768px) {
       .lifebuddy-dashboard {
@@ -314,10 +330,9 @@ const LifeBuddyDashboard = () => {
   `}</style>
 
       <center><h1>Buddy's Dashboard</h1></center>
-      //create one simple i logo where clicking that i should redirect to the LifeBuddy page
-      <div>
-        <a href="https://www.flaticon.com/free-icons/about" title="about icons">About icons created by Yogi Aprelliyanto - Flaticon</a>
-      </div>
+      <button onClick={goToInfoPage} style={{ all: 'unset', cursor: 'pointer' }}>
+        <img src="/about.png" alt="About icon" className="lifebuddy-about" />
+      </button>
 
       <br />
       <center>
@@ -325,6 +340,7 @@ const LifeBuddyDashboard = () => {
           src="https://thumbs.dreamstime.com/b/vector-funny-cartoon-red-friendly-robot-character-isolated-white-background-kids-d-toy-chat-bot-icon-logo-design-template-117144509.jpg?w=768"
           alt="LifeBuddy Icon"
           className="lifebuddy-icon"
+          
         />
       </center>
 

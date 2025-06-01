@@ -13,6 +13,8 @@ import BeneficiaryList from "./Layout/Death/BeneficiaryList";
 import FileList from "./Layout/Death/FileList";
 import LifeBuddyDashboard from "./Layout/LifeBuddyDashboard";
 import DecryptFile from "./Layout/Death/DecryptFile";
+import LifeBuddyAbout from "./Layout/Death/lifebuddyAbout";
+
 
 function App() {
   return (
@@ -84,6 +86,12 @@ function App() {
         <Route path="/lifebuddy" element={
         <ProtectedRoute redirectTo="/login">
         <LifeBuddyDashboard/>
+        </ProtectedRoute>
+        } />
+
+        <Route path="/buddyAbout" element={
+        <ProtectedRoute redirectTo="/login">
+        <LifeBuddyAbout/>
         </ProtectedRoute>
         } />
         
