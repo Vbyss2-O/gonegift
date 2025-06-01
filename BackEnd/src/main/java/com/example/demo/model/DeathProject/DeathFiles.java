@@ -35,7 +35,7 @@ public class DeathFiles {
     @Column(nullable = false)
     private String idOfUser;
     
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private String fileName;
     
 

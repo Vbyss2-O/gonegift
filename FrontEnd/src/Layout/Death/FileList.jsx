@@ -8,14 +8,20 @@ const FileList = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [files, setFiles] = useState([]); 
+  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
         if (error || !user) {
-          console.error("Error fetching user:", error?.message || "No user found");
+          console.error(
+            "Error fetching user:",
+            error?.message || "No user found"
+          );
           navigate("/login");
           return;
         }
@@ -28,7 +34,10 @@ const FileList = () => {
           .maybeSingle();
 
         if (fetchError || !existingUser) {
-          console.error("Error fetching user data:", fetchError || "User not found in death_user table");
+          console.error(
+            "Error fetching user data:",
+            fetchError || "User not found in death_user table"
+          );
           navigate("/login");
           return;
         }
@@ -55,9 +64,11 @@ const FileList = () => {
 
   const fetchFiles = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/deathusers/listOfFiles/${userId}`);
+      const response = await fetch(
+        `http://localhost:8080/api/deathusers/listOfFiles/${userId}`
+      );
       const data = await response.json();
-      
+
       // Ensure data is an array
       if (Array.isArray(data)) {
         setFiles(data);
@@ -73,13 +84,16 @@ const FileList = () => {
 
   const deleteFile = async (fileId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/filemetadata/${fileId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:8080/api/filemetadata/${fileId}`,
+        {
+          method: "DELETE",
+        }
+      );
       console.log("Delete response:", response);
-      
+
       if (response.ok) {
-        setFiles(prevFiles => prevFiles.filter(file => file.id !== fileId));
+        setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
       } else {
         console.error("Failed to delete file");
       }
@@ -98,9 +112,16 @@ const FileList = () => {
 
   return (
     <div className="file-list-container">
-      <h2 className="welcome-header">Welcome, {userData?.firstName} {userData?.lastname}</h2>
+      <h2 className="welcome-header">
+        Welcome, {userData?.firstName} {userData?.lastname}
+      </h2>
       <h3 className="files-header">Your Uploaded Files:</h3>
-      
+      <h4>
+        Note : Your all files are Encrypted and Stored securly so Delete files
+        from there names only
+      </h4>
+      <br />
+
       {!Array.isArray(files) || files.length === 0 ? (
         <p className="no-files">No files found.</p>
       ) : (
@@ -109,27 +130,68 @@ const FileList = () => {
             <li key={file.id || Math.random()} className="file-item">
               <div className="file-info">
                 <div className="file-type">
-                  <strong>File Type:</strong> {file.fileType}
+                  <strong>File Name:</strong> {file.fileName}
                 </div>
-                <div className="file-url">
-                  <strong>File URL:</strong> 
-                  <a 
-                    href={file.fileUrl} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="file-link"
-                  >
-                    View File
-                  </a>
-                </div>
+                {/* <div className="file-url">
+                  <strong>File URL:</strong>
+
+                  {file.letterFileUrl && !file.mediaFileUrl && (
+                    <a
+                      href={file.letterFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="file-link"
+                    >
+                      View Letter File
+                    </a>
+                  )}
+
+                  {file.mediaFileUrl && !file.letterFileUrl && (
+                    <a
+                      href={file.mediaFileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="file-link"
+                    >
+                      View Media File
+                    </a>
+                  )}
+
+                  {file.letterFileUrl && file.mediaFileUrl && (
+                    <>
+                      <div>
+                        <a
+                          href={file.letterFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="file-link"
+                        >
+                          View Letter File
+                        </a>
+                      </div>
+                      <div>
+                        <a
+                          href={file.mediaFileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="file-link"
+                        >
+                          View Media File
+                        </a>
+                      </div>
+                    </>
+                  )}
+                </div> */}
               </div>
-              <button 
+              <button
                 onClick={() => deleteFile(file.id)}
                 className="delete-button"
               >
                 Delete
               </button>
+              
             </li>
+            
           ))}
         </ul>
       )}
@@ -142,33 +204,40 @@ const FileList = () => {
         }
 
         .file-list-container {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 20px;
-          font-family: Arial, sans-serif;
+          max-width: 900px;
+          margin: 40px auto;
+          padding: 30px;
+          background-color: var(--bg-glass, #ffffff);
+          border-radius: 16px;
+          box-shadow: var(--shadow-rainbow, 0 8px 20px rgba(0, 0, 0, 0.08));
+          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .welcome-header {
-          color: #2c3e50;
-          font-size: 24px;
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: 2px solid #ecf0f1;
+          color: var(--text-primary, #2c3e50);
+          font-size: 28px;
+          font-weight: 600;
+          margin-bottom: 24px;
+          padding-bottom: 12px;
+          border-bottom: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .files-header {
-          color: #34495e;
-          font-size: 20px;
-          margin: 20px 0;
+          color: var(--text-primary, #34495e);
+          font-size: 22px;
+          margin: 24px 0 12px;
         }
 
         .no-files {
-          color: #7f8c8d;
+          color: var(--text-secondary, #7f8c8d);
           font-style: italic;
-          padding: 20px;
+          padding: 24px;
           text-align: center;
-          background: #f8f9fa;
-          border-radius: 8px;
+          background: var(--bg-glass, #f8f9fa);
+          border-radius: 10px;
+          font-size: 16px;
         }
 
         .file-list {
@@ -181,59 +250,65 @@ const FileList = () => {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 15px;
-          margin: 10px 0;
-          background: white;
-          border: 1px solid #e1e8ed;
-          border-radius: 8px;
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+          padding: 18px;
+          margin: 12px 0;
+          background: var(--bg-glass, #f9f9f9);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 10px;
+          box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.05));
           transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .file-item:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+          box-shadow: var(--shadow-lg, 0 6px 12px rgba(0, 0, 0, 0.12));
         }
 
         .file-info {
           flex: 1;
+          color: var(--text-primary, #2c3e50);
         }
 
-        .file-type, .file-url {
-          margin: 5px 0;
+        .file-type,
+        .file-url {
+          margin: 4px 0;
+          font-size: 15px;
+          word-break: break-word;
         }
 
         .file-link {
-          color: #3498db;
+          color: var(--primary, #3498db);
           text-decoration: none;
-          margin-left: 10px;
-          padding: 4px 8px;
-          border-radius: 4px;
-          background-color: #ebf5fb;
+          margin-left: 12px;
+          padding: 6px 12px;
+          border-radius: 6px;
+          background-color: rgba(0, 123, 255, 0.1);
+          font-weight: 500;
           transition: background-color 0.2s ease;
         }
 
         .file-link:hover {
-          background-color: #d4e6f1;
+          background-color: rgba(0, 123, 255, 0.2);
           text-decoration: underline;
         }
 
         .delete-button {
-          background-color: #e74c3c;
+          background-color: var(--accent5, #e74c3c);
           color: white;
           border: none;
-          padding: 8px 16px;
-          border-radius: 4px;
+          padding: 8px 18px;
+          border-radius: 6px;
           cursor: pointer;
-          transition: background-color 0.2s ease;
+          font-weight: 500;
           font-size: 14px;
+          transition: background-color 0.2s ease;
         }
 
         .delete-button:hover {
           background-color: #c0392b;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
           .file-item {
             flex-direction: column;
             align-items: flex-start;
@@ -242,6 +317,15 @@ const FileList = () => {
           .delete-button {
             margin-top: 10px;
             align-self: flex-end;
+          }
+
+          .file-link {
+            margin-left: 0;
+            margin-top: 8px;
+          }
+
+          .file-info {
+            width: 100%;
           }
         }
       `}</style>
