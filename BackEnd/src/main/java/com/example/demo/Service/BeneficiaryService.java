@@ -1,6 +1,7 @@
 package com.example.demo.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Repo.BeneficiaryRepository;
@@ -27,6 +28,7 @@ public class BeneficiaryService {
     }
 
     // Get Beneficiary by ID
+    @Cacheable(value = "beneficiaries", key = "#id")
     public Optional<Beneficiary> getBeneficiaryById(Long id) {
         try {
             return beneficiaryRepository.findById(id);
