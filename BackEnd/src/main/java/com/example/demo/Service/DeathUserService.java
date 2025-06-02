@@ -1,6 +1,8 @@
 package com.example.demo.Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Repo.DeathUserRepository;
@@ -56,6 +58,8 @@ public class DeathUserService {
         return deathUserRepository.findBySecretKey(secretId);
     }
     //------------------------
+    //this not makes any sense
+    // @CachePut(value = "filesize", key = "#id")
     public int getFileSize(String id) {
        DeathUser user = deathUserRepository.findById(id).orElse(null);
        if (user != null) {
@@ -64,6 +68,7 @@ public class DeathUserService {
            throw new RuntimeException("User not found with ID: " + id);
        }
     }
+    // @CachePut(value = "beneficiarySize", key = "#id")
     public int getSizeOfBeneficiary(String id) {
         DeathUser user = deathUserRepository.findById(id).orElse(null);
         if (user != null) {

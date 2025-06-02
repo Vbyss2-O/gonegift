@@ -2,9 +2,14 @@ package com.example.demo.model.DeathProject;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 //in production i will make all column as the not null currelty skip not null constraint
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
+import jakarta.persistence.Cacheable;
 import jakarta.persistence.CascadeType;
 // import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,6 +35,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DeathUser {
 
     @Id

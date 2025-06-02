@@ -4,12 +4,15 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
 
+
+
 @Entity
 @Data
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class BuddyActivity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
