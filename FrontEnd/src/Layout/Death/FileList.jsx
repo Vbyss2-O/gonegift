@@ -131,6 +131,8 @@ const FileList = () => {
               <div className="file-info">
                 <div className="file-type">
                   <strong>File Name:</strong> {file.fileName}
+                  <br />
+                  <strong>File Type:</strong> {file.letterFileUrl != null ? "Letter File" : "Media File"}
                 </div>
                 {/* <div className="file-url">
                   <strong>File URL:</strong>
