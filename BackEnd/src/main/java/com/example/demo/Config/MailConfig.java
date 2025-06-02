@@ -23,8 +23,8 @@ public class MailConfig {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername("lifebuddy.deathproject@gmail.com");
-        mailSender.setPassword("your-lifebuddy-app-password");
+        mailSender.setUsername(developmentEmail);
+        mailSender.setPassword(developmentPassword);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.smtp.auth", "true");

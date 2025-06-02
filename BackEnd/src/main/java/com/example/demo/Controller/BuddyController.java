@@ -45,7 +45,7 @@ public class BuddyController {
         activity.setAction("User Responded");
         activityRepository.save(activity);
 
-        return ResponseEntity.ok("LifeBuddy says: Yay, you’re alive! Thanks for checking in!");
+        return ResponseEntity.ok("LifeBuddy says: Yay,Thanks for checking in!");
     }
 
     @GetMapping("/lifebuddy/activities/{userId}")

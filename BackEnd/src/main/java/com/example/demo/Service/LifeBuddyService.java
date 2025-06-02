@@ -45,7 +45,7 @@ public class LifeBuddyService {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom("devlomentpurpose@gmail.com");
             message.setTo(user.getEmail());
-            message.setSubject("LifeBuddy Checking In!");
+            message.setSubject("Buddy's Checking In!");
             message.setText(messageText);
             lifeBuddyMailSender.send(message);
 
@@ -55,6 +55,19 @@ public class LifeBuddyService {
             logActivity(user.getUserIdX(), "Failed to send message"+e.getMessage());
             throw new RuntimeException("Failed to send LifeBuddy message", e);
         }
+    }
+    public void lastCall(DeathUser user){
+           String replyLink = "http://localhost:8080/lifebuddy?userId=" + user.getUserIdX();
+           String messageText = "This is my final effort to reach you dear......." +"\nClick here to chat back: " + replyLink;
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("devlomentpurpose@gmail.com");
+            message.setTo(user.getEmail());
+            message.setSubject("Buddy's Checking In!");
+            message.setText(messageText);
+            lifeBuddyMailSender.send(message);
+
+            logActivity(user.getUserIdX(), "Sent message");
     }
 
     public void sendGoodbyeNotification(DeathUser user) {
