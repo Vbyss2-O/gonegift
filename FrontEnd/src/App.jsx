@@ -17,6 +17,7 @@ import LifeBuddyAbout from "./Layout/Death/lifebuddyAbout";
 
 
 function App() {
+  
   return (
     <Routes>
       <Route path="/login" element={<GoogleLoginPage />} />

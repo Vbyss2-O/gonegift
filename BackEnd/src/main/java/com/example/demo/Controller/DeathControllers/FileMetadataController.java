@@ -3,6 +3,7 @@ package com.example.demo.Controller.DeathControllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,7 @@ public class FileMetadataController {
     //This is tentive controller structure 
     
     @GetMapping("/getAllFiles/{userId}")
-    public List<DeathFiles> getAllUserByID(@PathVariable String userId){
+    public List<DeathFiles> getAllUserByID(@PathVariable UUID userId){
         // implement logic to get all files by specific user ID
         // return fileMetadataList;
         return fileMetadataService.getAllFilesBySpecifiUserId(userId);

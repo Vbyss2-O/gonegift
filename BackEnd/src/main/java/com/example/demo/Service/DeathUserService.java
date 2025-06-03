@@ -12,6 +12,7 @@ import com.example.demo.model.DeathProject.DeathUser;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DeathUserService {
@@ -37,12 +38,12 @@ public class DeathUserService {
         return deathUserRepository.findAll();
     }
 
-    public Optional<DeathUser> getUserById(String id) {
+    public Optional<DeathUser> getUserById(UUID id) {
         return deathUserRepository.findById(id);
     }
 
     // Delete a DeathUser by ID
-    public void deleteUserById(String id) {
+    public void deleteUserById(UUID id) {
         if (deathUserRepository.existsById(id)) {
             deathUserRepository.deleteById(id);
         } else {
@@ -60,7 +61,7 @@ public class DeathUserService {
     //------------------------
     //this not makes any sense
     // @CachePut(value = "filesize", key = "#id")
-    public int getFileSize(String id) {
+    public int getFileSize(UUID id) {
        DeathUser user = deathUserRepository.findById(id).orElse(null);
        if (user != null) {
            return user.getFiles().size();
@@ -69,7 +70,7 @@ public class DeathUserService {
        }
     }
     // @CachePut(value = "beneficiarySize", key = "#id")
-    public int getSizeOfBeneficiary(String id) {
+    public int getSizeOfBeneficiary(UUID id) {
         DeathUser user = deathUserRepository.findById(id).orElse(null);
         if (user != null) {
             return user.getBeneficiaries().size();
@@ -79,7 +80,7 @@ public class DeathUserService {
     }
 
     // list of all 
-    public List<Beneficiary> getBeneficiaryList(String id) {
+    public List<Beneficiary> getBeneficiaryList(UUID id) {
         DeathUser user = deathUserRepository.findById(id).orElse(null);
         if (user != null) {
             return user.getBeneficiaries();
@@ -87,7 +88,7 @@ public class DeathUserService {
             throw new RuntimeException("User not found with ID: " + id);
         }
     }
-    public List<DeathFiles> getFileList(String id) {
+    public List<DeathFiles> getFileList(UUID id) {
         DeathUser user = deathUserRepository.findById(id).orElse(null);
         if (user!= null) {
             return user.getFiles();
@@ -95,7 +96,7 @@ public class DeathUserService {
             throw new RuntimeException("User not found with ID: " + id);
         }
     }
-    public void storeSecretKey(String serectID , String userID){
+    public void storeSecretKey(String serectID , UUID userID){
         DeathUser user = deathUserRepository.findById(userID).orElse(null);
         if (user!= null) {
             user.setSecretKey(serectID);
@@ -104,7 +105,7 @@ public class DeathUserService {
             throw new RuntimeException("User not found with ID: " + userID);
         }
     }
-    public void storeHashToken(String userID , String hashuuid){
+    public void storeHashToken(UUID userID , String hashuuid){
         DeathUser user = deathUserRepository.findById(userID).orElse(null);
         if (user!= null) {
             user.setHashuuid(hashuuid);
@@ -115,7 +116,7 @@ public class DeathUserService {
         }
 
     }
-    public boolean findByHashuuidEquals(String hashtoken , String userid){
+    public boolean findByHashuuidEquals(String hashtoken , UUID userid){
        
         
         DeathUser user = deathUserRepository.findById(userid).orElse(null);

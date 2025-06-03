@@ -1,6 +1,7 @@
 package com.example.demo.model.DeathProject;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,19 +16,19 @@ import lombok.Setter;
 import lombok.ToString;
 
 
-@ToString
+@Entity
 @Data
-@Setter
+@ToString
 @EqualsAndHashCode
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
-@Entity
+@AllArgsConstructor
 public class Token {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String hashtoken;
-    private String userIDX;
+    private UUID userIDX;
     private LocalDate expirydate;
 }

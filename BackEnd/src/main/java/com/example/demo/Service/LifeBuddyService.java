@@ -12,6 +12,7 @@ import com.example.demo.model.DeathProject.BuddyActivity;
 import com.example.demo.model.DeathProject.DeathUser;
 
 import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class LifeBuddyService {
@@ -86,7 +87,7 @@ public class LifeBuddyService {
         }
     }
 
-    private void logActivity(String userIdX, String action) {
+    private void logActivity(UUID userIdX, String action) {
         BuddyActivity activity = new BuddyActivity();
         activity.setUserIdX(userIdX);
         activity.setAction(action);

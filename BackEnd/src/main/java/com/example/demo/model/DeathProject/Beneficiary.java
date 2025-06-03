@@ -2,6 +2,8 @@ package com.example.demo.model.DeathProject;
 
 
 
+import java.util.UUID;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -41,7 +43,7 @@ public class Beneficiary {
     private Long id;
 
     @Column(nullable = false)
-    private String idOfUser;
+    private UUID idOfUser;
 
     @Column(nullable = false)
     private String name;

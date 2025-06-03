@@ -2,6 +2,7 @@ package com.example.demo.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class FileMeataDataService {
     }
     // i have to query the user according to the username
     @CachePut("deathFilesByUser")
-    public List<DeathFiles> getAllFilesBySpecifiUserId(String userID) {
+    public List<DeathFiles> getAllFilesBySpecifiUserId(UUID userID) {
         // find all users with spercific userId
         return fileMetaDataRepo.findByIdOfUser(userID);
     }

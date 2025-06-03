@@ -13,6 +13,7 @@ import com.example.demo.model.DeathProject.DeathUser;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class BuddyController {
@@ -24,7 +25,7 @@ public class BuddyController {
     private BuddyActivityRepository activityRepository;
 
     @GetMapping("/buddy")
-    public ResponseEntity<String> handleBuddyResponse(@RequestParam("userId") String userId, @RequestParam String token) {
+    public ResponseEntity<String> handleBuddyResponse(@RequestParam("userId") UUID userId, @RequestParam String token) {
         Optional<DeathUser> userOpt = userRepository.findById(userId);
         if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid user ID.");
@@ -49,7 +50,7 @@ public class BuddyController {
     }
 
     @GetMapping("/lifebuddy/activities/{userId}")
-    public ResponseEntity<List<BuddyActivity>> getUserActivities(@PathVariable String userId) {
+    public ResponseEntity<List<BuddyActivity>> getUserActivities(@PathVariable UUID userId) {
         List<BuddyActivity> activities = activityRepository.findByUserIdXOrderByTimestampAsc(userId);
         if (activities.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content, no body

@@ -9,6 +9,7 @@ import com.example.demo.Service.TokenService;
 import com.example.demo.model.DeathProject.DeathUser;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/magic-link")
@@ -29,7 +30,7 @@ public class MagicTokenController {
 
     @GetMapping("/retrieve")
     public ResponseEntity<String> validateMagicLink(@RequestParam String token) {
-        Optional<String> userId = magicTokenService.validateMagicToken(token);
+        Optional<UUID> userId = magicTokenService.validateMagicToken(token);
         return userId.map(uuid -> ResponseEntity.ok(uuid.toString()))
                      .orElseGet(() -> ResponseEntity.status(401).body("Invalid or expired link"));
     }

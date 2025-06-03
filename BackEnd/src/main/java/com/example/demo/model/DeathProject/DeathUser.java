@@ -41,8 +41,8 @@ import lombok.ToString;
 public class DeathUser {
 
     @Id
-    @Column(nullable = false , unique = true, length = 36)
-    private String userIdX = UUID.randomUUID().toString();
+    @Column(nullable = false , unique = true)
+    private UUID userIdX ;
 
     @Column(nullable = false , unique = true)
     private String email;

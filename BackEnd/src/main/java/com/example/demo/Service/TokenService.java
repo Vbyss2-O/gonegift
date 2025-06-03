@@ -2,6 +2,7 @@ package com.example.demo.Service;
 
 import java.util.Base64;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -18,7 +19,7 @@ public class TokenService {
     public void storeToken(Token token) {
         tokenRepository.save(token);
     }
-    public Optional<String> validateMagicToken(String encodedToken) {
+    public Optional<UUID> validateMagicToken(String encodedToken) {
         try {
             // Decode Base64 token
             byte[] decodedBytes = Base64.getDecoder().decode(encodedToken);
@@ -33,7 +34,7 @@ public class TokenService {
             }
 
             // Retrieve user ID and delete the token (one-time use)
-            String userId = storedToken.get().getUserIDX();
+            UUID userId = storedToken.get().getUserIDX();
             tokenRepository.delete(storedToken.get());
 
             return Optional.of(userId);

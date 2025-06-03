@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 
 @RestController
@@ -29,14 +30,14 @@ public class DeathUserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<DeathUser> getUserById(@PathVariable String id) {
+    public ResponseEntity<DeathUser> getUserById(@PathVariable UUID id) {
         Optional<DeathUser> user = deathUserService.getUserById(id);
         return user.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUserById(@PathVariable String id) {
+    public ResponseEntity<Void> deleteUserById(@PathVariable UUID id) {
         try {
             deathUserService.deleteUserById(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT); // 204 No Content on success
@@ -53,30 +54,30 @@ public class DeathUserController {
     
     // here i am adding the two get request methods for checking the size of the files and benificary
     @GetMapping("/filesize/{id}")
-    public int getFileSize(@PathVariable String id) {
+    public int getFileSize(@PathVariable UUID id) {
         return deathUserService.getFileSize(id);
     }
    @GetMapping("/beneficiarysize/{id}")
-    public int getBeneficiarySize(@PathVariable String id) {
+    public int getBeneficiarySize(@PathVariable UUID id) {
         return deathUserService.getSizeOfBeneficiary(id);
     }
 
     //below two get controller is for the showing the list of proper benificaries and files 
     @GetMapping("/listOfBeneficiary/{id}")
-    public List<Beneficiary> getBeneficiaryList(@PathVariable String id) {
+    public List<Beneficiary> getBeneficiaryList(@PathVariable UUID id) {
         return deathUserService.getBeneficiaryList(id);
     }
     @GetMapping("/listOfFiles/{id}")
-    public List<DeathFiles> getFileList(@PathVariable String id) {
+    public List<DeathFiles> getFileList(@PathVariable UUID id) {
         return deathUserService.getFileList(id);
     }
     @PostMapping("/storeSecretKey/{useruid}")
-    public void storeSerectKey(@RequestBody String id, @PathVariable String useruid) {
+    public void storeSerectKey(@RequestBody String id, @PathVariable UUID useruid) {
         deathUserService.storeSecretKey(id , useruid);
     }
     //this is for getting the aes encrypted key
     @GetMapping("/getKey/{userid}")
-    public String getKey(@PathVariable String userid) {
+    public String getKey(@PathVariable UUID userid) {
         //error beucase of useruuid
         Optional<DeathUser> user = deathUserService.getUserById(userid);
         if(user.isPresent()) {
@@ -87,15 +88,15 @@ public class DeathUserController {
         
     }
     @PostMapping("/sendSecretKey/{useruid}")
-    public void storeSecretKey(@PathVariable String useruid , @RequestBody String encryptedAesKey) {
+    public void storeSecretKey(@PathVariable UUID useruid , @RequestBody String encryptedAesKey) {
         deathUserService.storeSecretKey(encryptedAesKey , useruid);
     }  
     @PostMapping("/sendHashToken/{useruid}")
-    public void storeHashToken(@PathVariable String useruid , @RequestBody String hashToken) {
-        deathUserService.storeSecretKey(useruid , hashToken);
+    public void storeHashToken(@PathVariable UUID useruid , @RequestBody String hashToken) {
+        deathUserService.storeHashToken(useruid , hashToken);
     } 
     @GetMapping("/findHashToken")
-    public ResponseEntity<Void> validateHashuuid(@RequestParam  String token , @RequestParam  String userId){
+    public ResponseEntity<Void> validateHashuuid(@RequestParam  String token , @RequestParam  UUID userId){
         if(deathUserService.findByHashuuidEquals(token , userId)){
             return ResponseEntity.ok().build();
         }

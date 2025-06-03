@@ -115,7 +115,7 @@ public class DeathReportService {
         }
     }
 
-    public String generateMagicToken(String userId) {
+    public String generateMagicToken(UUID userId) {
         String rawToken = UUID.randomUUID().toString(); // Generate random token
         String hashedToken = BCrypt.hashpw(rawToken, BCrypt.gensalt(10)); // Hash token
         String encodedToken = Base64.getEncoder().encodeToString(rawToken.getBytes()); // Encode token for URL

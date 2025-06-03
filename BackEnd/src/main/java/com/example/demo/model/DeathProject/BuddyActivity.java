@@ -3,6 +3,7 @@ package com.example.demo.model.DeathProject;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 
 
@@ -20,7 +21,7 @@ public class BuddyActivity {
     private Long activityId;
 
     @Column(nullable = false)
-    private String userIdX; // Changed to String to match DeathUser's PK
+    private UUID userIdX; // Changed to String to match DeathUser's PK
 
     @Column(nullable = false)
     private LocalDateTime timestamp = LocalDateTime.now();
