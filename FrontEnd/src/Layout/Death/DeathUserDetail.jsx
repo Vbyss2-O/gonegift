@@ -105,6 +105,7 @@ const UserDetailsForm = () => {
       const { encryptedKey, iv } = generateKeysWithEncryption(generatedUuid);
 
       const userDetails = {
+        userIdX: user.id,
         email: email,
         firstName : firstName,
         lastname : lastname,
@@ -118,6 +119,7 @@ const UserDetailsForm = () => {
         buddyStatus: "CHILLING",
         hashuuid: hashedUuid,
         secretKey: encryptedKey, // Use the returned value directly
+        
       };
 
       console.log("Submitting user details:", userDetails);
