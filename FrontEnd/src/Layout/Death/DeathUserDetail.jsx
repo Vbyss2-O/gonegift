@@ -14,56 +14,30 @@ const UserDetailsForm = () => {
   const [loading, setLoading] = useState(false);
   const [loadingScreen, setLoadingScreen] = useState(true);  // Added for initial loading state
   const [userEmail, setUserEmail] = useState("");
+  const [user, setUser] = useState(null);
+
 
   // Check if user is logged in, if not redirect to login
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (error || !data?.user) {
-          console.error("User not found or error:", error?.message || "No user found");
-          navigate("/login");
-        } else {
-          setUserEmail(data.user.email);
-        }
-      } catch (err) {
-        console.error("Error in checkUser:", err.message);
+  const checkUser = async () => {
+    try {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data?.user) {
+        console.error("User not found or error:", error?.message || "No user found");
         navigate("/login");
+      } else {
+        setUser(data.user);  // Save full user object
+        setLoadingScreen(false); // Show form after loading completes
       }
-    };
-    checkUser();
-  }, [navigate]);
+    } catch (err) {
+      console.error("Error in checkUser:", err.message);
+      navigate("/login");
+    }
+  };
+  checkUser();
+}, [navigate]);
 
-  // Check if user exists in database, if yes redirect to death-dashboard
-  useEffect(() => {
-    const checkUserInDatabase = async () => {
-      if (!userEmail) return;
-
-      try {
-        const { data: existingUser, error } = await supabase
-          .from("death_user")
-          .select("email, first_name, lastname")
-          .eq("email", userEmail)
-          .maybeSingle();
-
-        if (error) {
-          console.error("Error checking user:", error.message);
-          return;
-        }
-
-        if (existingUser && existingUser.first_name && existingUser.lastname) { 
-          console.log("User already exists and has completed profile, redirecting...");
-          navigate("/death-dashboard");
-        }
-      } catch (err) {
-        console.error("Error in checkUserInDatabase:", err.message);
-      } finally {
-        setLoadingScreen(false);  // Stop loading once checks are done
-      }
-    };
-
-    checkUserInDatabase();
-  }, [userEmail, navigate]);
+ 
 
   // Hashing function using crypto.subtle API
   const hashWithSalt = async (uuid) => {
@@ -78,69 +52,62 @@ const UserDetailsForm = () => {
       .join("");
   };
 
-  const generateKeys = async (uuid) => {
-    try {
-      // 1. Generate salt
-      const salt = CryptoJS.SHA256(uuid).toString();
-      console.log('Salt:', salt);
-  
-      // 2. Derive key - keep as WordArray
-      const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
-        keySize: 256/32,
-        iterations: 10000,
-      }); // Remove .toString()
-  
-      console.log('Derived Key (Hex):', derivedKey.toString(CryptoJS.enc.Hex));
-  
-      // // 3. Encrypt with proper key handling
-      // const encrypted = CryptoJS.AES.encrypt(
-      //   derivedKey.toString(), // Data to encrypt (as string)
-      //   derivedKey, // Key as WordArray (correct)
-      //   { 
-      //     keySize: 256/32, // Explicitly set
-      //     mode: CryptoJS.mode.CBC,
-      //     padding: CryptoJS.pad.Pkcs7,
-      //     iv: CryptoJS.enc.Hex.parse('00000000000000000000000000000000')
-      //   }
-      // );
-  
-      // const encryptedKey = encrypted.toString();
-      // console.log('Encrypted Key:', encryptedKey);
-      // return encryptedKey ;
-      return derivedKey.toString(CryptoJS.enc.Hex); // Return the derived key as hex string
-      
-    } catch (error) {
-      console.error('Key generation failed:', error);
-      throw error;
-    }
-  };
+  const generateKeysWithEncryption = (uuid) => {
+  try {
+    // 1. Generate salt from UUID (SHA256)
+    const salt = CryptoJS.SHA256(uuid).toString();
+
+    // 2. Derive a 256-bit key using PBKDF2
+    const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
+      keySize: 256 / 32,
+      iterations: 10000,
+    });
+
+    // 3. Generate a random IV (Initialization Vector)
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    // 4. Encrypt the derived key itself as string
+    const encrypted = CryptoJS.AES.encrypt(
+      derivedKey.toString(CryptoJS.enc.Hex), // Data to encrypt
+      derivedKey,                            // Use derived key as encryption key
+      {
+        iv: iv,
+        mode: CryptoJS.mode.CBC,
+        padding: CryptoJS.pad.Pkcs7,
+      }
+    );
+
+    // 5. Return both encrypted value and IV as Base64 (needed for decryption)
+    return {
+      encryptedKey: encrypted.toString(),       // Base64 string
+      iv: iv.toString(CryptoJS.enc.Base64),     // Also Base64 string
+    };
+
+  } catch (error) {
+    console.error('Key generation/encryption failed:', error);
+    throw error;
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data?.user) {
-        console.error("Error fetching user:", error?.message || "No user found");
-        navigate("/login");
-        return;
-      }
-
-      const userIdX = data.user.id;
-      const email = data.user.email;
-
+      
       const generatedUuid = uuidv4();
+      const email = user.email;
+      
       const hashedUuid = await hashWithSalt(generatedUuid);
       
       // Get the encrypted key directly from the function
-      const encryptedKey = await generateKeys(generatedUuid);
+      const { encryptedKey, iv } = generateKeysWithEncryption(generatedUuid);
 
       const userDetails = {
-        userIdX,
-        email,
-        firstName,
-        lastname,
+        email: email,
+        firstName : firstName,
+        lastname : lastname,
         lastActivityDate: new Date().toISOString(),
         inactivityThresholdDays: 0,
         userRole: "general",
@@ -160,7 +127,7 @@ const UserDetailsForm = () => {
       });
 
       console.log("User created successfully:", response.data);
-      alert(`This is your most important key. Do not share it with anyone other than your beneficiary: ${generatedUuid}`);
+      alert(`This is your most important key. Do not share it with anyone other than your beneficiary: Your Id: ${generatedUuid} Your Password: ${iv} `);
       navigate("/death-dashboard");
     } catch (err) {
       console.error("Error submitting form:", err.response?.data || err.message);

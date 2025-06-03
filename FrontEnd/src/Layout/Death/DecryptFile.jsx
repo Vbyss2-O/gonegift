@@ -10,6 +10,8 @@ const DecryptFile = ({ magicToken }) => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userID, setUserId] = useState(null);
+  //this this password mince the IV of the AES256
+  const [password , setPassword] = useState(null);
 
   const hashWithSalt = async (uuid) => {
     const salt = uuid.substring(0, 16); // Use first 16 characters of UUID as salt
@@ -100,20 +102,35 @@ const DecryptFile = ({ magicToken }) => {
   }, [userID]);
 
   // decrypt the key using the uuid 
-  const decryptKey = (uuid, salt, encryptedKey) => {
-    // parse stored salt from database
-    const parsedSalt = lib.enc.Hex.parse(salt);
-  
-    // derive the same AES key using stored salt and UUID
-    const derivedKey = PBKDF2(uuid, parsedSalt, {
+ const decryptKey = (uuid, encryptedKey, ivBase64) => {
+  try {
+    // 1. Recreate the salt and derived key
+    const salt = CryptoJS.SHA256(uuid).toString();
+
+    const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
       keySize: 256 / 32,
       iterations: 10000,
     });
-  
-    // Decrypt the AES key
-    const decryptedKey = AES.decrypt(encryptedKey, uuid).toString(lib.enc.Utf8);
-    return decryptedKey === derivedKey.toString();
-  };
+
+    // 2. Convert Base64 IV back to WordArray
+    const iv = CryptoJS.enc.Base64.parse(ivBase64);
+
+    // 3. Decrypt the encrypted key
+    const decrypted = CryptoJS.AES.decrypt(encryptedKey, derivedKey, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+
+    // 4. Convert to UTF-8 string
+    return decrypted.toString(CryptoJS.enc.Utf8);
+
+  } catch (error) {
+    console.error('Decryption failed:', error);
+    throw error;
+  }
+};
+
 
   // decrypt all files using AES key
   const decryptFiles = async () => {
@@ -126,7 +143,7 @@ const DecryptFile = ({ magicToken }) => {
         throw new Error("No encrypted files available.");
       }
 
-      const decryptedKey = decryptKey(uuid ,hashWithSalt(hashWithSalt(uuid)), encryptedAesKey);
+      const decryptedKey = decryptKey(uuid ,encryptedAesKey , password);
       if (!decryptedKey) {
         throw new Error("Invalid UUID. Cannot decrypt files.");
       }
@@ -188,14 +205,23 @@ const DecryptFile = ({ magicToken }) => {
     <div className="decrypt-file">
       <h2>Decrypt Files</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-
+      <h3>Note : Please Enter the secrects of person who's Assets you are going to Clam !</h3>
       <label>Enter UUID:</label>
       <input
         type="text"
         value={uuid}
         onChange={(e) => setUuid(e.target.value)}
-        placeholder="Enter your UUID"
+        placeholder="Enter UUID"
         style={{ margin: "10px 0", padding: "5px" }}
+      />
+
+      <label>Enter Password:</label>
+      <input type="text" 
+         value = {password}
+         onChange={(e) => setPassword(e.target.value)}
+         placeholder="Enter Password"
+        style={{ margin: "10px 0", padding: "5px" }}
+
       />
 
       <button
