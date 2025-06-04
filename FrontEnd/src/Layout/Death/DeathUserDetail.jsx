@@ -40,9 +40,9 @@ const UserDetailsForm = () => {
  
 
   // Hashing function using crypto.subtle API
-  const hashWithSalt = async (uuid) => {
-    const salt = uuid.substring(0, 16);
-    const text = uuid + salt;
+  const hashWithSalt = async (x) => {
+    const salt = x.substring(0, 16);
+    const text = x + salt;
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -99,10 +99,11 @@ const UserDetailsForm = () => {
       const generatedUuid = uuidv4();
       const email = user.email;
       
-      const hashedUuid = await hashWithSalt(generatedUuid);
+      
       
       // Get the encrypted key directly from the function
       const { encryptedKey, iv } = generateKeysWithEncryption(generatedUuid);
+      const hashedUuid = await hashWithSalt(generatedUuid + "Vedant_Kasar" + iv);
 
       const userDetails = {
         userIdX: user.id,

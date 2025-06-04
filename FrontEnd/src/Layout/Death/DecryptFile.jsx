@@ -13,9 +13,9 @@ const DecryptFile = ({ magicToken }) => {
   //this this password mince the IV of the AES256
   const [password , setPassword] = useState(null);
 
-  const hashWithSalt = async (uuid) => {
-    const salt = uuid.substring(0, 16); // Use first 16 characters of UUID as salt
-    const text = uuid + salt; 
+  const hashWithSalt = async (x) => {
+    const salt = x.substring(0, 16); // Use first 16 characters of UUID as salt
+    const text = x + salt; 
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
@@ -23,6 +23,51 @@ const DecryptFile = ({ magicToken }) => {
     return Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
+  };
+  const validateUuid = async () => {
+    if (!currentUser) {
+      setMessage({
+        text: "Please wait for user data to load.",
+        isSuccess: false,
+      });
+      return;
+    }
+
+    try {
+      const hashedToken = await hashWithSalt(uuid+"Vedant_Kasar"+password);
+      const response = await axios.get(
+        `http://localhost:8080/api/deathusers/findHashToken`,
+        {
+          params: { token: hashedToken, userId: currentUser.id },
+        }
+      );
+
+      if (response.status === 200) {
+        setIsUuidValid(true);
+        setMessage({
+          text: "UUID validated successfully. You can now upload a file.",
+          isSuccess: true,
+        });
+
+        // Generate AES key directly from UUID
+        const derivedKey = decryptKey(uuid , AesKey , password);
+
+        setAesKey(derivedKey);
+      } else {
+        setIsUuidValid(false);
+        setMessage({
+          text: "Invalid UUID. Please enter a correct one.",
+          isSuccess: false,
+        });
+      }
+    } catch (error) {
+      console.error("Validation error:", error);
+      setIsUuidValid(false);
+      setMessage({
+        text: "Validation failed. Please try again.",
+        isSuccess: false,
+      });
+    }
   };
 
   // fetch userUID from the magic token
@@ -223,8 +268,24 @@ const DecryptFile = ({ magicToken }) => {
         style={{ margin: "10px 0", padding: "5px" }}
 
       />
+      <button>
+        onClick={validateUuid}
+        disabled={loading || !uuid || !password}
+        style={{
+          marginTop: "10px",
+          padding: "10px 20px",
+          fontSize: "16px",
+          backgroundColor: loading ? "#6c757d" : "#28a745",
+          color: "#fff",
+          border: "none",
+          borderRadius: "4px",
+          cursor: loading || !uuid || !password ? "not-allowed" : "pointer",
+        }}
+        Validate Secrects
+      </button>
 
       <button
+        
         onClick={decryptFiles}
         disabled={loading || !uuid}
         style={{
