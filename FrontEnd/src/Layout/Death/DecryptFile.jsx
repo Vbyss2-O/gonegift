@@ -34,7 +34,7 @@ const DecryptFile = ({ magicToken }) => {
     }
 
     try {
-      const hashedToken = await hashWithSalt(uuid+"Vedant_Kasar"+password);
+      const hashedToken = await hashWithSalt(uuid.trim()+"Vedant_Kasar"+password.trim());
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/findHashToken`,
         {

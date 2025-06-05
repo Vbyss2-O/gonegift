@@ -16,6 +16,7 @@ const FileUpload = () => {
   const [message, setMessage] = useState({ text: null, isSuccess: false });
   const [loading, setLoading] = useState(false);
   const [AesKey, setAesKey] = useState(null);
+  const [decryptedKey, setDecryptedKey] = useState(null);
   const [uuid, setUuid] = useState("");
   const [password, setPassword] = useState("");
   const [isUuidValid, setIsUuidValid] = useState(false);
@@ -47,28 +48,46 @@ const FileUpload = () => {
     return null;
   };
 
+  const getEncryptedKey = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/deathusers/getKey/${currentUser.id}`
+      );
+      if (response.data && typeof response.data === 'string' && response.data.length > 0) {
+        setAesKey(response.data);
+        return response.data;
+      } else {
+        throw new Error("Invalid or empty encrypted key from server");
+      }
+    } catch (error) {
+      console.error("Error fetching encrypted key:", error);
+      throw error;
+    }
+  };
+
   const decryptKey = async (uuid, encryptedKey, ivBase64) => {
     try {
-      // 1. Recreate the salt and derived key
+      if (!encryptedKey || !ivBase64) {
+        throw new Error("Encrypted key or IV is missing");
+      }
       const salt = CryptoJS.SHA256(uuid).toString();
-
       const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
         keySize: 256 / 32,
         iterations: 10000,
       });
-
-      // 2. Convert Base64 IV back to WordArray
+      console.log("Derived Key:", derivedKey.toString());
       const iv = CryptoJS.enc.Base64.parse(ivBase64);
-
-      // 3. Decrypt the encrypted key
-      const decrypted = CryptoJS.AES.decrypt(encryptedKey, derivedKey, {
+      console.log("IV:", iv);
+      const decrypted = CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) }, derivedKey, {
         iv: iv,
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7,
       });
-
-      // 4. Convert to UTF-8 string
-      return decrypted.toString(CryptoJS.enc.Utf8);
+      const decryptedKey = decrypted.toString(CryptoJS.enc.Utf8);
+      if (!decryptedKey) {
+        throw new Error("Decryption resulted in empty key");
+      }
+      return decryptedKey;
     } catch (error) {
       console.error("Decryption failed:", error);
       throw error;
@@ -83,49 +102,65 @@ const FileUpload = () => {
       });
       return;
     }
-
+    if (!uuid.trim() || !password.trim()) {
+      setMessage({
+        text: "UUID and password are required.",
+        isSuccess: false,
+      });
+      return;
+    }
+    setLoading(true);
     try {
-      const hashedToken = await hashWithSalt(uuid+"Vedant_Kasar"+password);
+      const input = uuid.trim() + "Vedant_Kasar" + password.trim();
+      console.log("Input to hashWithSalt:", input);
+      const hashedToken = await hashWithSalt(input);
+      console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/findHashToken`,
         {
           params: { token: hashedToken, userId: currentUser.id },
         }
       );
-
+      console.log("API Response:", response.data);
       if (response.status === 200) {
         setIsUuidValid(true);
         setMessage({
           text: "UUID validated successfully. You can now upload a file.",
           isSuccess: true,
         });
-
-        // Generate AES key directly from UUID
-        const derivedKey = decryptKey(uuid , AesKey , password);
-
-        setAesKey(derivedKey);
+        const encryptedKey = await getEncryptedKey();
+        const derivedKey = await decryptKey(uuid.trim(), encryptedKey, password.trim());
+        setDecryptedKey(derivedKey);
       } else {
         setIsUuidValid(false);
         setMessage({
-          text: "Invalid UUID. Please enter a correct one.",
+          text: "Invalid UUID or password. Please check and try again.",
           isSuccess: false,
         });
       }
     } catch (error) {
       console.error("Validation error:", error);
       setIsUuidValid(false);
-      setMessage({
-        text: "Validation failed. Please try again.",
-        isSuccess: false,
-      });
+      if (error.response && error.response.status === 404) {
+        setMessage({
+          text: "Validation endpoint not found. Please ensure the server is running and the URL is correct.",
+          isSuccess: false,
+        });
+      } else {
+        setMessage({
+          text: `Validation failed: ${error.message || "Please try again."}`,
+          isSuccess: false,
+        });
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   const encryptFile = async (fileData) => {
-    if (!AesKey) {
-      throw new Error("Encryption key not available");
+    if (!decryptedKey) {
+      throw new Error("Decryption key not available");
     }
-
     try {
       const base64 = btoa(
         new Uint8Array(fileData).reduce(
@@ -136,7 +171,7 @@ const FileUpload = () => {
       const fileWordArray = enc.Base64.parse(base64);
       const encryptedData = AES.encrypt(
         fileWordArray.toString(),
-        AesKey
+        decryptedKey
       ).toString();
       return encryptedData;
     } catch (error) {
@@ -155,7 +190,6 @@ const FileUpload = () => {
         "video/mp4",
         "application/pdf",
       ];
-
       if (!allowedTypes.includes(selectedFile.type)) {
         setMessage({
           text: "Invalid file type. Please upload an image, video, or PDF.",
@@ -163,7 +197,6 @@ const FileUpload = () => {
         });
         return;
       }
-
       setFile(selectedFile);
       setMessage({ text: null, isSuccess: false });
     }
@@ -177,7 +210,6 @@ const FileUpload = () => {
       });
       return;
     }
-
     if (!file) {
       setMessage({
         text: "Please select a valid file to upload.",
@@ -185,18 +217,15 @@ const FileUpload = () => {
       });
       return;
     }
-
-    if (!AesKey) {
+    if (!decryptedKey) {
       setMessage({
         text: "Encryption setup not ready. Please validate your UUID first.",
         isSuccess: false,
       });
       return;
     }
-
     setLoading(true);
     setMessage({ text: null, isSuccess: false });
-
     try {
       const fileData = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -204,20 +233,16 @@ const FileUpload = () => {
         reader.onerror = reject;
         reader.readAsArrayBuffer(file);
       });
-
       const encryptedData = await encryptFile(fileData);
       const encryptedBlob = new Blob([encryptedData], {
         type: file.type,
       });
-
       const bucket =
-        file.type.startsWith("image/") || file.type.startsWith("video/")
+        file.type && (file.type.startsWith("image/") || file.type.startsWith("video/"))
           ? "media"
           : "letters";
-
       const uniqueFileName = `${currentUser.id}_${Date.now()}_${file.name}.enc`;
       const filePath = `${currentUser.id}/${uniqueFileName}`;
-
       const { error: uploadError } = await supabase.storage
         .from(bucket)
         .upload(filePath, encryptedBlob, {
@@ -225,17 +250,16 @@ const FileUpload = () => {
           upsert: false,
           contentType: null,
         });
-
       if (uploadError) {
         throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
-
       const { data: publicUrlData } = supabase.storage
         .from(bucket)
         .getPublicUrl(filePath);
-
-      const fileUrl = publicUrlData.publicUrl;
-
+      const fileUrl = publicUrlData?.publicUrl;
+      if (!fileUrl) {
+        throw new Error("Failed to retrieve file URL from Supabase");
+      }
       const fileMetadata = {
         idOfUser: currentUser.id,
         letterFileUrl: bucket === "letters" ? fileUrl : null,
@@ -245,7 +269,6 @@ const FileUpload = () => {
           userIdX: currentUser.id,
         },
       };
-
       const response = await axios.post(
         "http://localhost:8080/api/filemetadata",
         fileMetadata,
@@ -255,7 +278,6 @@ const FileUpload = () => {
           },
         }
       );
-
       if (response.status === 200 || response.status === 201) {
         setMessage({
           text: "Successfully encrypted: Please share your secret key with beneficiary only",
@@ -299,14 +321,14 @@ const FileUpload = () => {
             disabled={loading}
           />
           <label className="password-label">PASSWORD</label>
-          <input type="text" 
+          <input
+            type="text"
             placeholder="Enter Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="password-input"
             disabled={loading}
           />
-          
         </div>
         <button
           onClick={validateUuid}
@@ -334,7 +356,7 @@ const FileUpload = () => {
         <div className="button-container">
           <button
             onClick={handleSubmit}
-            disabled={loading || !file || !isUuidValid || !AesKey}
+            disabled={loading || !file || !isUuidValid || !decryptedKey}
             className={`upload-button ${loading ? "loading" : ""}`}
           >
             {loading ? "Encrypting & Uploading..." : "Upload Encrypted File"}

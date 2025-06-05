@@ -103,7 +103,7 @@ const UserDetailsForm = () => {
       
       // Get the encrypted key directly from the function
       const { encryptedKey, iv } = generateKeysWithEncryption(generatedUuid);
-      const hashedUuid = await hashWithSalt(generatedUuid + "Vedant_Kasar" + iv);
+      const hashedUuid = await hashWithSalt(generatedUuid.trim()+"Vedant_Kasar"+iv.trim());
 
       const userDetails = {
         userIdX: user.id,
