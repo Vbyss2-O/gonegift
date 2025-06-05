@@ -147,34 +147,34 @@ const DecryptFile = ({ magicToken }) => {
   }, [userID]);
 
   // decrypt the key using the uuid 
- const decryptKey = (uuid, encryptedKey, ivBase64) => {
-  try {
-    // 1. Recreate the salt and derived key
-    const salt = CryptoJS.SHA256(uuid).toString();
-
-    const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
-      keySize: 256 / 32,
-      iterations: 10000,
-    });
-
-    // 2. Convert Base64 IV back to WordArray
-    const iv = CryptoJS.enc.Base64.parse(ivBase64);
-
-    // 3. Decrypt the encrypted key
-    const decrypted = CryptoJS.AES.decrypt(encryptedKey, derivedKey, {
-      iv: iv,
-      mode: CryptoJS.mode.CBC,
-      padding: CryptoJS.pad.Pkcs7,
-    });
-
-    // 4. Convert to UTF-8 string
-    return decrypted.toString(CryptoJS.enc.Utf8);
-
-  } catch (error) {
-    console.error('Decryption failed:', error);
-    throw error;
-  }
-};
+  const decryptKey = async (uuid, encryptedKey, ivBase64) => {
+     try {
+       if (!encryptedKey || !ivBase64) {
+         throw new Error("Encrypted key or IV is missing");
+       }
+       const salt = CryptoJS.SHA256(uuid).toString();
+       const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
+         keySize: 256 / 32,
+         iterations: 10000,
+       });
+       console.log("Derived Key:", derivedKey.toString());
+       const iv = CryptoJS.enc.Base64.parse(ivBase64);
+       console.log("IV:", iv);
+       const decrypted = CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) }, derivedKey, {
+         iv: iv,
+         mode: CryptoJS.mode.CBC,
+         padding: CryptoJS.pad.Pkcs7,
+       });
+       const decryptedKey = decrypted.toString(CryptoJS.enc.Utf8);
+       if (!decryptedKey) {
+         throw new Error("Decryption resulted in empty key");
+       }
+       return decryptedKey;
+     } catch (error) {
+       console.error("Decryption failed:", error);
+       throw error;
+     }
+   };
 
 
   // decrypt all files using AES key
