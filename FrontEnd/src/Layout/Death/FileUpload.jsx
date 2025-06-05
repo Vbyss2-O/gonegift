@@ -15,7 +15,6 @@ const FileUpload = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [message, setMessage] = useState({ text: null, isSuccess: false });
   const [loading, setLoading] = useState(false);
-  const [AesKey, setAesKey] = useState(null);
   const [decryptedKey, setDecryptedKey] = useState(null);
   const [uuid, setUuid] = useState("");
   const [password, setPassword] = useState("");
@@ -54,7 +53,6 @@ const FileUpload = () => {
         `http://localhost:8080/api/deathusers/getKey/${currentUser.id}`
       );
       if (response.data && typeof response.data === 'string' && response.data.length > 0) {
-        setAesKey(response.data);
         return response.data;
       } else {
         throw new Error("Invalid or empty encrypted key from server");
