@@ -73,6 +73,13 @@ const LifeBuddyDashboard = () => {
     }
     setReplyStatus(null);
     try {
+      await axios.delete(`http://localhost:8080/buddy/delete/${userIdX}`);
+
+      console.log("Previous logs deleted successfully Thank You!");
+    } catch (err) {
+      console.error("Failed to delete previous logs:", err);
+    }
+    try {
       const token = uuidv4();
       const response = await axios.get(
         `http://localhost:8080/buddy?userId=${userIdX}&token=${token}`
@@ -85,13 +92,7 @@ const LifeBuddyDashboard = () => {
       console.error(err);
     }
     //delete prev logs now
-    try {
-      await axios.delete(`http://localhost:8080/buddy/delete/${userIdX}`);
-
-      console.log("Previous logs deleted successfully Thank You!");
-    } catch (err) {
-      console.error("Failed to delete previous logs:", err);
-    }
+    
   };
 
   async function goToInfoPage() {
