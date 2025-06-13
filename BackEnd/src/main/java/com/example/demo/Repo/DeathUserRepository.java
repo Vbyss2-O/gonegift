@@ -1,7 +1,7 @@
 package com.example.demo.Repo;
 
-import java.time.LocalDateTime;
-import java.util.List;
+// import java.time.LocalDateTime;
+// import java.util.List;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +14,5 @@ public interface DeathUserRepository extends JpaRepository<DeathUser, UUID> {
     //query the user on basic of the secrect id 
     DeathUser findBySecretKey(String secretKey);
 
-    List<DeathUser> findByNextBuddyDateBefore(LocalDateTime now);
+    // List<DeathUser> findByNextBuddyDateBefore(LocalDateTime now);
 }

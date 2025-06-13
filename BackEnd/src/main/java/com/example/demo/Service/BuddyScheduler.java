@@ -31,7 +31,7 @@ public class BuddyScheduler {
 
        
         
-        @Scheduled(fixedRate = 60*1000) // runs 12 hour 
+        @Scheduled(fixedRate = 60*1000) //1 min
         public void checkUsers() {
             LocalDateTime now = LocalDateTime.now();
             List<DeathUser> users = userRepository.findAll();
@@ -71,13 +71,14 @@ public class BuddyScheduler {
                             user.setAttemptCount(2);
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
                             user.setLastInteraction(now);
+                            buddyService.logActivity(user.getUserIdX(), "Buddy Status Changed:)" , "CHILLING1");
                         }
                         break;
                     case CURIOUS:
                         if (daysSinceLastActivity >= 22 && user.getAttemptCount() == 2 && user.getInactivityThresholdDays() >=22) { // 20 + 1 + 1 day
                             user.setBuddyStatus(BuddyStatus.WORRIED);
                             user.setAttemptCount(3);
-                            buddyService.sendBuddyMessage(user);
+                            buddyService.sendBuddyMessage(user , "CURIOUS");
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
                             user.setLastInteraction(now);
                         }
@@ -85,7 +86,7 @@ public class BuddyScheduler {
                     case WORRIED:
                         if (daysSinceLastActivity >= 23 && user.getAttemptCount() == 3 && user.getInactivityThresholdDays() >=23) { // 20 + 1 + 1 + 1 day
                             user.setBuddyStatus(BuddyStatus.GOODBYE);
-                            buddyService.lastCall(user);
+                            buddyService.lastCall(user , "WORRIED");
                             user.setInactivityThresholdDays((int)daysSinceLastActivity);
                             user.setLastInteraction(now);
                             
@@ -93,7 +94,7 @@ public class BuddyScheduler {
                         break;
                     case GOODBYE:
                        if(!user.isIsdeceased()){
-                        buddyService.sendBuddyMessage(user);
+                        buddyService.sendBuddyMessage(user , "GOODBYE");
                         deathReportService.triggerUser(user);
                         user.setIsdeceased(true);
                        }

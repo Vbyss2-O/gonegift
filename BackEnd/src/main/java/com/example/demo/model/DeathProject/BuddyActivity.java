@@ -20,6 +20,9 @@ public class BuddyActivity {
     @Column(nullable = false)
     private Long activityId;
 
+    
+    private String buddyStatus;
+
     @Column(nullable = false)
     private UUID userIdX; // Changed to String to match DeathUser's PK
 

@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.Repo.BuddyActivityRepository;
 import com.example.demo.model.DeathProject.BuddyActivity;
+import com.example.demo.model.DeathProject.BuddyStatus;
 import com.example.demo.model.DeathProject.DeathUser;
+
+import jakarta.transaction.Transactional;
 
 import java.util.Random;
 import java.util.UUID;
@@ -30,7 +33,7 @@ public class LifeBuddyService {
         "Uh-oh %s, did the zombies get you? Reply or I’ll send my cartoon minions!"
     };
 
-    public void sendBuddyMessage(DeathUser user) {
+    public void sendBuddyMessage(DeathUser user , String BuddyStatus) {
         try {
             Random random = new Random();
             String name = user.getFirstName() + " " +  user.getLastname();
@@ -51,13 +54,14 @@ public class LifeBuddyService {
             lifeBuddyMailSender.send(message);
 
             // Log with current attemptCount (not +1, since it’s already set in scheduler)
-            logActivity(user.getUserIdX(), "Sent message");
+            logActivity(user.getUserIdX(), "Buddy Status Changed:)" , BuddyStatus);
         } catch (Exception e) {
-            logActivity(user.getUserIdX(), "Failed to send message"+e.getMessage());
+            logActivity(user.getUserIdX(), "Failed to send message"+e.getMessage() , BuddyStatus);
             throw new RuntimeException("Failed to send LifeBuddy message", e);
         }
     }
-    public void lastCall(DeathUser user){
+   
+    public void lastCall(DeathUser user , String BuddyStatus) {
            String replyLink = "http://localhost:8080/lifebuddy?userId=" + user.getUserIdX();
            String messageText = "This is my final effort to reach you dear......." +"\nClick here to chat back: " + replyLink;
 
@@ -68,7 +72,7 @@ public class LifeBuddyService {
             message.setText(messageText);
             lifeBuddyMailSender.send(message);
 
-            logActivity(user.getUserIdX(), "Sent message");
+            logActivity(user.getUserIdX(), "Buddy Status Changed:)" , BuddyStatus);
     }
 
     public void sendGoodbyeNotification(DeathUser user) {
@@ -80,17 +84,25 @@ public class LifeBuddyService {
             message.setText("LifeBuddy thinks " + user.getUserIdX() + " might be gone. No response after all attempts.");
             lifeBuddyMailSender.send(message);
 
-            logActivity(user.getUserIdX(), "Marked as deceased");
+            logActivity(user.getUserIdX(), "Marked as deceased" , BuddyStatus.GOODBYE.toString());
         } catch (Exception e) {
-            logActivity(user.getUserIdX(), "Failed to send goodbye notification"+e.getMessage());
+            logActivity(user.getUserIdX(), "Failed to send goodbye notification"+e.getMessage() , BuddyStatus.GOODBYE.toString());
             throw new RuntimeException("Failed to send goodbye notification", e);
         }
     }
 
-    private void logActivity(UUID userIdX, String action) {
+    public void logActivity(UUID userIdX, String action , String buddyStatus) {
         BuddyActivity activity = new BuddyActivity();
         activity.setUserIdX(userIdX);
+        activity.setBuddyStatus(buddyStatus); 
         activity.setAction(action);
         activityRepository.save(activity);
+    }
+    
+    @Transactional
+     public void deleteActivitiesByUserIdX(UUID userIdX) {
+        if (activityRepository.existsByUserIdX(userIdX)) {
+            activityRepository.deleteAllByUserIdX(userIdX);
+        }
     }
 }

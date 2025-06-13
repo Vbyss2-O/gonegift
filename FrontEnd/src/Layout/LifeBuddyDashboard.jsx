@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { supabase } from "./Death/supabaseClient"; // Adjust path if needed
 import { v4 as uuidv4 } from "uuid";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const LifeBuddyDashboard = () => {
   const [userIdX, setUserIdX] = useState(null);
@@ -84,11 +84,19 @@ const LifeBuddyDashboard = () => {
       setReplyStatus("Failed to send reply. Try again!");
       console.error(err);
     }
+    //delete prev logs now
+    try {
+      await axios.delete(`http://localhost:8080/buddy/delete/${userIdX}`);
+
+      console.log("Previous logs deleted successfully Thank You!");
+    } catch (err) {
+      console.error("Failed to delete previous logs:", err);
+    }
   };
-  
-   async function goToInfoPage() {
-    navigate('/buddyAbout');
-   }
+
+  async function goToInfoPage() {
+    navigate("/buddyAbout");
+  }
 
   // Update DeathUser when replyStatus is not null
   useEffect(() => {
@@ -329,8 +337,13 @@ const LifeBuddyDashboard = () => {
     }
   `}</style>
 
-      <center><h1>Buddy's Dashboard</h1></center>
-      <button onClick={goToInfoPage} style={{ all: 'unset', cursor: 'pointer' }}>
+      <center>
+        <h1>Buddy's Dashboard</h1>
+      </center>
+      <button
+        onClick={goToInfoPage}
+        style={{ all: "unset", cursor: "pointer" }}
+      >
         <img src="/about.png" alt="About icon" className="lifebuddy-about" />
       </button>
 
@@ -340,7 +353,6 @@ const LifeBuddyDashboard = () => {
           src="https://thumbs.dreamstime.com/b/vector-funny-cartoon-red-friendly-robot-character-isolated-white-background-kids-d-toy-chat-bot-icon-logo-design-template-117144509.jpg?w=768"
           alt="LifeBuddy Icon"
           className="lifebuddy-icon"
-          
         />
       </center>
 
@@ -363,7 +375,7 @@ const LifeBuddyDashboard = () => {
                   .replace(" ", "-")}`}
               >
                 <strong>Buddy</strong> - {activity.action} I Am{" "}
-                <strong>{userx ? userx.buddyStatus : "Loading..."}</strong>
+                <strong>{userx ? activity.buddyStatus : "Loading..."}</strong>
                 <br />
                 <small>{new Date(activity.timestamp).toLocaleString()}</small>
                 <br />
@@ -372,6 +384,7 @@ const LifeBuddyDashboard = () => {
             ))}
           </ul>
         )}
+        <br />
       </div>
 
       <div className="reply-section">

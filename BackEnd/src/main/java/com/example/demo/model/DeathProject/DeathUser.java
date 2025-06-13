@@ -79,7 +79,6 @@ public class DeathUser {
     @Column(nullable = false)
     private Integer attemptCount;
 
-    private LocalDateTime nextBuddyDate;
 
     private LocalDateTime lastInteraction;
     

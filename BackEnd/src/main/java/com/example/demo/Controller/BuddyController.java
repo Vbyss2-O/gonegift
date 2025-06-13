@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.Repo.BuddyActivityRepository;
 import com.example.demo.Repo.DeathUserRepository;
+import com.example.demo.Service.LifeBuddyService;
 import com.example.demo.model.DeathProject.BuddyActivity;
 import com.example.demo.model.DeathProject.BuddyStatus;
 import com.example.demo.model.DeathProject.DeathUser;
@@ -24,6 +25,9 @@ public class BuddyController {
     @Autowired
     private BuddyActivityRepository activityRepository;
 
+    @Autowired
+    private LifeBuddyService buddyService;
+
     @GetMapping("/buddy")
     public ResponseEntity<String> handleBuddyResponse(@RequestParam("userId") UUID userId, @RequestParam String token) {
         Optional<DeathUser> userOpt = userRepository.findById(userId);
@@ -32,16 +36,16 @@ public class BuddyController {
         }
 
         DeathUser user = userOpt.get();
-        
 
         user.setLastInteraction(LocalDateTime.now());
-        user.setAttemptCount(0); 
-        user.setBuddyStatus(BuddyStatus.CHILLING); 
+        user.setAttemptCount(0);
+        user.setBuddyStatus(BuddyStatus.CHILLING);
         userRepository.save(user);
 
         // Log the response in BuddyActivity
         BuddyActivity activity = new BuddyActivity();
         activity.setUserIdX(userId);
+        activity.setBuddyStatus(BuddyStatus.CHILLING.toString());
         activity.setTimestamp(LocalDateTime.now());
         activity.setAction("User Responded");
         activityRepository.save(activity);
@@ -57,4 +61,11 @@ public class BuddyController {
         }
         return ResponseEntity.ok(activities);
     }
+
+    @DeleteMapping("/buddy/delete/{userIdX}")
+    public ResponseEntity<String> deleteBuddyActivities(@PathVariable UUID userIdX) {
+        buddyService.deleteActivitiesByUserIdX(userIdX);
+        return ResponseEntity.ok("Activities deleted successfully.");
+    }
+
 }
