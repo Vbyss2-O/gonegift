@@ -13,6 +13,9 @@ import com.example.demo.model.DeathProject.DeathUser;
 public interface DeathUserRepository extends JpaRepository<DeathUser, UUID> {
     //query the user on basic of the secrect id 
     DeathUser findBySecretKey(String secretKey);
+    Boolean existsByHashuuid(String hashUuid);
+
+        
 
     // List<DeathUser> findByNextBuddyDateBefore(LocalDateTime now);
 }

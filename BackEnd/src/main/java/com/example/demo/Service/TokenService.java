@@ -2,10 +2,11 @@ package com.example.demo.Service;
 
 import java.util.Base64;
 import java.util.Optional;
-import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.LocalDate;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.Repo.TokenRepository;
@@ -13,38 +14,55 @@ import com.example.demo.model.DeathProject.Token;
 
 @Service
 public class TokenService {
+
     @Autowired
     private TokenRepository tokenRepository;
-    
+
     public void storeToken(Token token) {
         tokenRepository.save(token);
     }
-    public Optional<UUID> validateMagicToken(String encodedToken) {
+
+    public boolean validateMagicToken(String encodedToken) {
         try {
-            // Decode Base64 token
-            byte[] decodedBytes = Base64.getDecoder().decode(encodedToken);
-            String rawToken = new String(decodedBytes);
+            // Decode URL-safe Base64 token
+            byte[] decodedBytes = Base64.getUrlDecoder().decode(encodedToken);
+            String rawToken = new String(decodedBytes, StandardCharsets.UTF_8);
 
-            // Fetch stored token from the database
-            Optional<Token> storedToken =tokenRepository.findByHashtoken(encodedToken);
+            // Hash the raw token with SHA-256
+            String hashedToken = hashToken(rawToken);
 
-            // Validate token existence and check hash match
-            if (storedToken.isEmpty() || !BCrypt.checkpw(rawToken, storedToken.get().getHashtoken())) {
-                return Optional.empty(); // Invalid token
+            // Find the stored token by hashed token
+            Optional<Token> storedTokenOpt = tokenRepository.findByHashtoken(hashedToken);
+            if (storedTokenOpt.isEmpty()) {
+                return false; // No such token
             }
 
-            // Retrieve user ID and delete the token (one-time use)
-            UUID userId = storedToken.get().getUserIDX();
-            tokenRepository.delete(storedToken.get());
+            Token storedToken = storedTokenOpt.get();
 
-            return Optional.of(userId);
+            // Check if token is expired
+            if (storedToken.getExpirydate().isBefore(LocalDate.now())) {
+                tokenRepository.delete(storedToken); // Clean up expired token
+                return false;
+            }
+
+            return true; // Token is valid
         } catch (IllegalArgumentException e) {
-            return Optional.empty(); // Handle Base64 decoding errors
+            System.err.println("Base64 decoding failed: " + e.getMessage());
+            return false;
         } catch (Exception e) {
-            e.printStackTrace(); // Log the error for debugging
-            return Optional.empty(); // Handle other exceptions safely
+            System.err.println("Token validation failed: " + e.getMessage());
+            return false;
         }
     }
-    
-    
+
+    private String hashToken(String rawToken) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(hash).toLowerCase(); // Convert to hex string
+        } catch (Exception e) {
+            throw new RuntimeException("Hashing failed: " + e.getMessage());
+        }
+    }
+
 }

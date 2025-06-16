@@ -116,15 +116,11 @@ public class DeathUserService {
         }
 
     }
-    public boolean findByHashuuidEquals(String hashtoken , UUID userid){
+    public boolean findByHashuuidEquals(String hashtoken){
        
-        
-        DeathUser user = deathUserRepository.findById(userid).orElse(null);
-        if (user!= null) {
-            return user.getHashuuid().equals(hashtoken);
-            }
-           return false;
+        return deathUserRepository.existsByHashuuid(hashtoken);
                 
     }
+    
     
 }

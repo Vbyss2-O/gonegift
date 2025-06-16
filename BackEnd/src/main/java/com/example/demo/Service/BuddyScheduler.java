@@ -31,7 +31,7 @@ public class BuddyScheduler {
 
        
         
-        @Scheduled(fixedRate = 60*1000) //1 min
+        @Scheduled(fixedRate = 60*60*24*1000) //1/2 min
         public void checkUsers() {
             LocalDateTime now = LocalDateTime.now();
             List<DeathUser> users = userRepository.findAll();
@@ -94,7 +94,7 @@ public class BuddyScheduler {
                         break;
                     case GOODBYE:
                        if(!user.isIsdeceased()){
-                        buddyService.sendBuddyMessage(user , "GOODBYE");
+                        buddyService.sendGoodbyeNotification(user);
                         deathReportService.triggerUser(user);
                         user.setIsdeceased(true);
                        }

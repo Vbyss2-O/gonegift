@@ -2,61 +2,68 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { AES, enc } from "crypto-js";
 
-const DecryptFile = ({ magicToken }) => {
+
+const DecryptFile = () => {
   const [encryptedFileUrls, setEncryptedFileUrls] = useState([]); // Multiple files
   const [encryptedAesKey, setEncryptedAesKey] = useState(null);
   const [decryptedFiles, setDecryptedFiles] = useState([]);
   const [uuid, setUuid] = useState(""); // UUID entered by beneficiary
+  const [password, setPassword] = useState(""); // Password (IV for AES-256)
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const [userID, setUserId] = useState(null);
-  //this this password mince the IV of the AES256
-  const [password , setPassword] = useState(null);
+  const [isUuidValid, setIsUuidValid] = useState(false);
+  const [message, setMessage] = useState({ text: "", isSuccess: false });
 
   const hashWithSalt = async (x) => {
     const salt = x.substring(0, 16); // Use first 16 characters of UUID as salt
-    const text = x + salt; 
+    const text = x + salt;
     const encoder = new TextEncoder();
     const data = encoder.encode(text);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  
+
     return Array.from(new Uint8Array(hashBuffer))
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   };
+
   const validateUuid = async () => {
-    if (!currentUser) {
-      setMessage({
-        text: "Please wait for user data to load.",
-        isSuccess: false,
-      });
-      return;
-    }
+   
 
     try {
-      const hashedToken = await hashWithSalt(uuid.trim()+"Vedant_Kasar"+password.trim());
+      const hashedToken = await hashWithSalt(
+        uuid.trim() + "Vedant_Kasar" + password.trim()
+      );
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken`,
-        {
-          params: { token: hashedToken, userId: currentUser.id },
-        }
+        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
       );
 
       if (response.status === 200) {
         setIsUuidValid(true);
         setMessage({
-          text: "UUID validated successfully. You can now upload a file.",
+          text: "Validated successfully.",
           isSuccess: true,
         });
 
-        // Generate AES key directly from UUID
-        const derivedKey = decryptKey(uuid , AesKey , password);
+        // Fetch userID
+        try {
+          const userIdResponse = await axios.get(
+            `http://localhost:8080/api/deathusers/getidfromHashToken/${hashedToken}`
+          );
 
-        setAesKey(derivedKey);
+          if (userIdResponse.status === 200) {
+            setUserId(userIdResponse.data);
+          } else {
+            throw new Error("No user ID found.");
+          }
+        } catch (error) {
+          console.error("Error fetching user ID:", error);
+          setError("Failed to fetch user ID.");
+        }
       } else {
         setIsUuidValid(false);
         setMessage({
-          text: "Invalid UUID. Please enter a correct one.",
+          text: "Invalid UUID and Password. Please enter correct Secrets.",
           isSuccess: false,
         });
       }
@@ -70,29 +77,7 @@ const DecryptFile = ({ magicToken }) => {
     }
   };
 
-  // fetch userUID from the magic token
-  useEffect(() => {
-    const fetchUserUID = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8080/api/magic-link/retrieve?token=${magicToken}`
-        );
-
-        if (response.status === 200) {
-          setUserId(response.data); // Store userUID
-        } else {
-          throw new Error("Invalid magic token.");
-        }
-      } catch (error) {
-        console.error("Error fetching user UID:", error);
-        setError("Failed to fetch user UID.");
-      }
-    };
-
-    fetchUserUID();
-  }, [magicToken]);
-
-  // fetch key
+  // Fetch encrypted key
   useEffect(() => {
     const fetchEncryptedKey = async () => {
       try {
@@ -116,7 +101,7 @@ const DecryptFile = ({ magicToken }) => {
     fetchEncryptedKey();
   }, [userID]);
 
-  //fetch all encrypted files using userUID (API 2)
+  // Fetch all encrypted files
   useEffect(() => {
     const fetchEncryptedFiles = async () => {
       try {
@@ -127,7 +112,6 @@ const DecryptFile = ({ magicToken }) => {
         );
 
         if (response.status === 200) {
-          // Extract letterFileUrl and mediaFileUrl from each object
           const files = response.data.map((fileObj) => ({
             letterFileUrl: fileObj.letterFileUrl,
             mediaFileUrl: fileObj.mediaFileUrl,
@@ -146,38 +130,39 @@ const DecryptFile = ({ magicToken }) => {
     fetchEncryptedFiles();
   }, [userID]);
 
-  // decrypt the key using the uuid 
+  // Decrypt the key using the UUID
   const decryptKey = async (uuid, encryptedKey, ivBase64) => {
-     try {
-       if (!encryptedKey || !ivBase64) {
-         throw new Error("Encrypted key or IV is missing");
-       }
-       const salt = CryptoJS.SHA256(uuid).toString();
-       const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
-         keySize: 256 / 32,
-         iterations: 10000,
-       });
-       console.log("Derived Key:", derivedKey.toString());
-       const iv = CryptoJS.enc.Base64.parse(ivBase64);
-       console.log("IV:", iv);
-       const decrypted = CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) }, derivedKey, {
-         iv: iv,
-         mode: CryptoJS.mode.CBC,
-         padding: CryptoJS.pad.Pkcs7,
-       });
-       const decryptedKey = decrypted.toString(CryptoJS.enc.Utf8);
-       if (!decryptedKey) {
-         throw new Error("Decryption resulted in empty key");
-       }
-       return decryptedKey;
-     } catch (error) {
-       console.error("Decryption failed:", error);
-       throw error;
-     }
-   };
+    try {
+      if (!encryptedKey || !ivBase64) {
+        throw new Error("Encrypted key or IV is missing");
+      }
+      const salt = CryptoJS.SHA256(uuid).toString();
+      const derivedKey = CryptoJS.PBKDF2(uuid, salt, {
+        keySize: 256 / 32,
+        iterations: 10000,
+      });
+      const iv = CryptoJS.enc.Base64.parse(ivBase64);
+      const decrypted = CryptoJS.AES.decrypt(
+        { ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) },
+        derivedKey,
+        {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7,
+        }
+      );
+      const decryptedKey = decrypted.toString(CryptoJS.enc.Utf8);
+      if (!decryptedKey) {
+        throw new Error("Decryption resulted in empty key");
+      }
+      return decryptedKey;
+    } catch (error) {
+      console.error("Decryption failed:", error);
+      throw error;
+    }
+  };
 
-
-  // decrypt all files using AES key
+  // Decrypt all files using AES key
   const decryptFiles = async () => {
     setLoading(true);
     setError(null);
@@ -188,18 +173,20 @@ const DecryptFile = ({ magicToken }) => {
         throw new Error("No encrypted files available.");
       }
 
-      const decryptedKey = decryptKey(uuid ,encryptedAesKey , password);
+      const decryptedKey = await decryptKey(uuid, encryptedAesKey, password);
       if (!decryptedKey) {
         throw new Error("Invalid UUID. Cannot decrypt files.");
       }
 
       const decryptedFileList = await Promise.all(
-        encryptedFileUrls.map(async (fileUrl) => {
+        encryptedFileUrls.map(async (fileUrl, index) => {
           try {
-            // Fetch encrypted file
-            const fileResponse = await axios.get(fileUrl, {
-              responseType: "blob",
-            });
+            const fileResponse = await axios.get(
+              fileUrl.letterFileUrl || fileUrl.mediaFileUrl,
+              {
+                responseType: "blob",
+              }
+            );
 
             const encryptedBlob = await fileResponse.data;
             const reader = new FileReader();
@@ -208,8 +195,6 @@ const DecryptFile = ({ magicToken }) => {
               reader.onload = () => {
                 try {
                   const encryptedContent = enc.Base64.parse(reader.result);
-
-                  // Decrypt file data using the decrypted AES key
                   const decryptedData = AES.decrypt(
                     encryptedContent.toString(enc.Utf8),
                     decryptedKey
@@ -219,28 +204,29 @@ const DecryptFile = ({ magicToken }) => {
                     reject("Decryption failed. Invalid key.");
                   }
 
-                  // Convert decrypted data to a Blob
                   const decryptedBlob = new Blob([decryptedData], {
                     type: "application/octet-stream",
                   });
 
                   resolve(URL.createObjectURL(decryptedBlob));
                 } catch (error) {
-                  reject("Failed to decrypt file. Invalid key or corrupted data.");
+                  reject(
+                    "Failed to decrypt file. Invalid key or corrupted data."
+                  );
                 }
               };
 
               reader.readAsText(encryptedBlob);
             });
           } catch (error) {
-            return "Error decrypting file.";
+            return `Error decrypting file ${index + 1}.`;
           }
         })
       );
 
       setDecryptedFiles(decryptedFileList);
     } catch (error) {
-      setError("Error decrypting files.");
+      setError("Error decrypting files: " + error.message);
     } finally {
       setLoading(false);
     }
@@ -250,7 +236,15 @@ const DecryptFile = ({ magicToken }) => {
     <div className="decrypt-file">
       <h2>Decrypt Files</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      <h3>Note : Please Enter the secrects of person who's Assets you are going to Clam !</h3>
+      {message.text && (
+        <p style={{ color: message.isSuccess ? "green" : "red" }}>
+          {message.text}
+        </p>
+      )}
+      <h3>
+        Note: Please Enter the secrets of the person whose Assets you are going to
+        Claim!
+      </h3>
       <label>Enter UUID:</label>
       <input
         type="text"
@@ -261,14 +255,14 @@ const DecryptFile = ({ magicToken }) => {
       />
 
       <label>Enter Password:</label>
-      <input type="text" 
-         value = {password}
-         onChange={(e) => setPassword(e.target.value)}
-         placeholder="Enter Password"
+      <input
+        type="password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)}
+        placeholder="Enter Password"
         style={{ margin: "10px 0", padding: "5px" }}
-
       />
-      <button>
+      <button
         onClick={validateUuid}
         disabled={loading || !uuid || !password}
         style={{
@@ -281,13 +275,13 @@ const DecryptFile = ({ magicToken }) => {
           borderRadius: "4px",
           cursor: loading || !uuid || !password ? "not-allowed" : "pointer",
         }}
-        Validate Secrects
+      >
+        Validate Secrets
       </button>
 
       <button
-        
         onClick={decryptFiles}
-        disabled={loading || !uuid}
+        disabled={loading || !uuid || !isUuidValid}
         style={{
           marginTop: "10px",
           padding: "10px 20px",
@@ -296,7 +290,7 @@ const DecryptFile = ({ magicToken }) => {
           color: "#fff",
           border: "none",
           borderRadius: "4px",
-          cursor: loading ? "not-allowed" : "pointer",
+          cursor: loading || !uuid || !isUuidValid ? "not-allowed" : "pointer",
         }}
       >
         {loading ? "Decrypting..." : "Decrypt Files"}

@@ -13,10 +13,11 @@ import org.springframework.mail.MailAuthenticationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
@@ -65,7 +66,6 @@ public class DeathReportService {
         sendMagicLinks(user);
     }
 
-    @Transactional
     public void triggerUser(DeathUser user) {
         if (user == null) {
             throw new RuntimeException("Null user found");
@@ -76,6 +76,7 @@ public class DeathReportService {
         sendMagicLinks(user);
     }
 
+    
     private void sendMagicLinks(DeathUser user) {
         List<Beneficiary> beneficiaries = user.getBeneficiaries();
         if (beneficiaries == null || beneficiaries.isEmpty()) {
@@ -86,7 +87,8 @@ public class DeathReportService {
             try {
                 String token = generateMagicToken(user.getUserIdX());
                 //at time of production change this properly 
-                String magicLink = "http://localhost:5173/ClaimAssets/verify?token=" + token;
+                //check the response of api
+                String magicLink = "http://localhost:8080/api/magic-link/retrieve?token=" + token;
 
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setFrom("devlomentpurpose@gmail.com"); 
@@ -115,19 +117,29 @@ public class DeathReportService {
         }
     }
 
-    public String generateMagicToken(UUID userId) {
+   public String generateMagicToken(UUID userId) {
         String rawToken = UUID.randomUUID().toString(); // Generate random token
-        String hashedToken = BCrypt.hashpw(rawToken, BCrypt.gensalt(10)); // Hash token
-        String encodedToken = Base64.getEncoder().encodeToString(rawToken.getBytes()); // Encode token for URL
-    
-        // Store the hashed version in the database (not the raw token)
+        String encodedToken = Base64.getUrlEncoder().withoutPadding().encodeToString(rawToken.getBytes(StandardCharsets.UTF_8)); // URL-safe encoding
+        String hashedToken = hashToken(rawToken); // Consistent hash with SHA-256
+
+        // Store hashed token in database
         Token magicToken = new Token();
         magicToken.setUserIDX(userId);
         magicToken.setHashtoken(hashedToken);
-        
-        magicToken.setExpirydate(LocalDate.now().plusDays(7)); 
+        magicToken.setExpirydate(LocalDate.now().plusDays(7));
         tokenService.storeToken(magicToken);
-    
-        return encodedToken; // Send encoded raw token to the user
+
+        return encodedToken; // Return URL-safe encoded token
     }
+
+    private String hashToken(String rawToken) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(rawToken.getBytes(StandardCharsets.UTF_8));
+            return java.util.HexFormat.of().formatHex(hash).toLowerCase(); // Convert to hex string
+        } catch (Exception e) {
+            throw new RuntimeException("Hashing failed: " + e.getMessage());
+        }
+    }
+
 }

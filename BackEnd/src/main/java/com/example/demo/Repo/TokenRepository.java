@@ -12,5 +12,8 @@ public interface TokenRepository extends JpaRepository<Token , Long>{
 
     // Optional<Token> findValidToken(); find token with the speicific string hased token okay 
     Optional<Token> findByHashtoken(String encodedToken);
+    //apply the query to find the hashtoken in database that exist or not 
+    // Boolean existsByHashtoken(String encodedToken);
+
     
 }

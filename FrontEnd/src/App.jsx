@@ -14,10 +14,9 @@ import FileList from "./Layout/Death/FileList";
 import LifeBuddyDashboard from "./Layout/LifeBuddyDashboard";
 import DecryptFile from "./Layout/Death/DecryptFile";
 import LifeBuddyAbout from "./Layout/Death/lifebuddyAbout";
-
+import ErrorPage from "./Layout/Death/ErrorPage";
 
 function App() {
-  
   return (
     <Routes>
       <Route path="/login" element={<GoogleLoginPage />} />
@@ -54,55 +53,71 @@ function App() {
         }
       />
 
-      <Route path="/beneficiary-claim" element={
-        <ProtectedRoute redirectTo="/login">
-        <DeathReportForm />
-        </ProtectedRoute>
-      } />
-
-      <Route path="/admin" element={
-        <ProtectedRoute redirectTo="/login">
-        <AdminDashboard />
-        </ProtectedRoute>
-        } />
-
-      <Route path="/primaryinfo" element={
-        <ProtectedRoute redirectTo="/login">
-        <UserDetailsForm/>
-        </ProtectedRoute>
-        } />
-
-       <Route path="/allBenificiarys" element={
-        <ProtectedRoute redirectTo="/login">
-        <BeneficiaryList/>
-         </ProtectedRoute>
-        } />
-
-        <Route path="/allFiles" element={
-        <ProtectedRoute redirectTo="/login">
-        <FileList/>
-        </ProtectedRoute>
-        } />
-
-        <Route path="/lifebuddy" element={
-        <ProtectedRoute redirectTo="/login">
-        <LifeBuddyDashboard/>
-        </ProtectedRoute>
-        } />
-
-        <Route path="/buddyAbout" element={
-        <ProtectedRoute redirectTo="/login">
-        <LifeBuddyAbout/>
-        </ProtectedRoute>
-        } />
-        
-        <Route
-        path = "/ClaimAssets" element = {
-           <DecryptFile/>
+      <Route
+        path="/beneficiary-claim"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <DeathReportForm />
+          </ProtectedRoute>
         }
-        ></Route>
+      />
 
-    
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/primaryinfo"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <UserDetailsForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/allBenificiarys"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <BeneficiaryList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/allFiles"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <FileList />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/lifebuddy"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <LifeBuddyDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/buddyAbout"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <LifeBuddyAbout />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route path="/ClaimAssets" element={<DecryptFile />}></Route>
+      <Route path="/ErrorPage" element={<ErrorPage />}></Route>
 
       <Route path="/" element={<Navigate to="/login" replace />} />
       <Route path="*" element={<Navigate to="/login" replace />} />
