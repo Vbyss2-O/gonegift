@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
+import "./DecryptFile.css"; // Assuming you have a CSS file for styles
 
 const DecryptFile = () => {
   const [encryptedFileUrls, setEncryptedFileUrls] = useState([]);
