@@ -95,8 +95,8 @@ public class DeathUserController {
     public void storeHashToken(@PathVariable UUID useruid , @RequestBody String hashToken) {
         deathUserService.storeHashToken(useruid , hashToken);
     } 
-    @GetMapping("/findHashToken")
-    public ResponseEntity<Void> validateHashuuid(@RequestParam  String token){
+    @GetMapping("/findHashToken/{token}")
+    public ResponseEntity<Void> validateHashuuid(@PathVariable  String token){
         if(deathUserService.findByHashuuidEquals(token)){
             return ResponseEntity.ok().build();
         }
@@ -105,5 +105,14 @@ public class DeathUserController {
         }
 
     } 
+    @GetMapping("/findUUIDByHashuuid/{hashuuid}")
+    public ResponseEntity<UUID> findUserIdByHashuuid(@PathVariable String hashuuid) {
+        UUID userId = deathUserService.findUserIdXByHashuuid(hashuuid);
+        if (userId != null) {
+            return ResponseEntity.ok(userId);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
    
 }

@@ -121,6 +121,9 @@ public class DeathUserService {
         return deathUserRepository.existsByHashuuid(hashtoken);
                 
     }
+    public UUID findUserIdXByHashuuid(String hashtoken) {
+        return deathUserRepository.findUserIdXByHashuuid(hashtoken);
+    }
     
     
 }

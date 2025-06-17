@@ -13,7 +13,6 @@ const UserDetailsForm = () => {
   const [lastname, setLastname] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingScreen, setLoadingScreen] = useState(true);  // Added for initial loading state
-  const [userEmail, setUserEmail] = useState("");
   const [user, setUser] = useState(null);
 
 

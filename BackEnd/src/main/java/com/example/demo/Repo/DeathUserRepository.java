@@ -5,17 +5,21 @@ package com.example.demo.Repo;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.model.DeathProject.DeathUser;
 
 @Repository
 public interface DeathUserRepository extends JpaRepository<DeathUser, UUID> {
-    //query the user on basic of the secrect id 
+    // query the user on basic of the secrect id
     DeathUser findBySecretKey(String secretKey);
-    Boolean existsByHashuuid(String hashUuid);
 
-        
+    Boolean existsByHashuuid(String hashuuid);
+
+    @Query("SELECT d.userIdX FROM DeathUser d WHERE d.hashuuid = :hashuuid")
+    UUID findUserIdXByHashuuid(@Param("hashuuid") String hashuuid);
 
     // List<DeathUser> findByNextBuddyDateBefore(LocalDateTime now);
 }
