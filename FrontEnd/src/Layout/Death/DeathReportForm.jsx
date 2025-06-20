@@ -15,6 +15,7 @@ const DeathReportForm = () => {
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isUuidValid, setIsUuidValid] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -32,6 +33,53 @@ const DeathReportForm = () => {
     fetchUser();
   }, [navigate]);
 
+  const validateUuid = async () => {
+    if (!currentUser) {
+      setMessage("Please wait for user data to load.");
+      return;
+    }
+    if (!secretId.trim() || !password.trim()) {
+      setMessage("UUID and password are required.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const input = secretId.trim() + "Vedant_Kasar" + password.trim();
+      const hashedToken = await hashWithSalt(input);
+      const response = await axios.get(
+        `http://localhost:8080/api/deathusers/findHashToken`,
+        {
+          params: { token: hashedToken, userId: currentUser.id },
+        }
+      );
+      if (response.status === 200) {
+        setIsUuidValid(true);
+        setMessage("UUID validated successfully. You can now upload a file.");
+        const encryptedKey = await getEncryptedKey();
+        const derivedKey = await decryptKey(
+          secretId.trim(),
+          encryptedKey,
+          password.trim()
+        );
+        setDecryptedKey(derivedKey);
+      } else {
+        setIsUuidValid(false);
+        setMessage("Invalid UUID or password. Please check and try again.");
+      }
+    } catch (error) {
+      console.error("Validation error:", error);
+      setIsUuidValid(false);
+      if (error.response && error.response.status === 404) {
+        setMessage("Validation endpoint not found or invalid UUID/password.");
+      } else {
+        setMessage(`Validation failed: ${error.message || "Please try again."}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!currentUser) {
@@ -43,7 +91,6 @@ const DeathReportForm = () => {
       return;
     }
 
-    // ✅ Check MIME type
     if (file.type !== "application/pdf") {
       setMessage("Only PDF files are allowed.");
       return;
@@ -71,7 +118,6 @@ const DeathReportForm = () => {
       const { data: publicUrlData } = supabase.storage
         .from(bucket)
         .getPublicUrl(filePath);
-
       const fileUrl = publicUrlData?.publicUrl;
       if (!fileUrl) {
         throw new Error("Failed to retrieve file URL from Supabase");
@@ -98,6 +144,7 @@ const DeathReportForm = () => {
       setSurname("");
       setReportDetails("");
       setFile(null);
+      setIsUuidValid(false);
     } catch (error) {
       console.error("Report error:", error);
       setMessage(error.message || "Failed to submit death report.");
@@ -134,48 +181,61 @@ const DeathReportForm = () => {
             required
           />
         </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter the user’s name"
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Surname</label>
-          <input
-            type="text"
-            value={surname}
-            onChange={(e) => setSurname(e.target.value)}
-            placeholder="Enter the user’s surname"
-            style={styles.input}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Details</label>
-          <textarea
-            value={reportDetails}
-            onChange={(e) => setReportDetails(e.target.value)}
-            placeholder="Provide any additional details"
-            style={styles.textarea}
-          />
-        </div>
 
-        <div>
-          <label style={styles.label}>Upload Death Certificate</label>
-          <div>
-            <DragNdrop onFilesSelected={setFile} />
+        {!isUuidValid && (
+          <button
+            type="button"
+            onClick={validateUuid}
+            disabled={loading}
+            style={{ ...styles.button, background: "#4f46e5" }}
+          >
+            {loading ? "Validating..." : "Validate UUID"}
+          </button>
+        )}
+
+        <fieldset disabled={!isUuidValid} style={{ border: "none", padding: 0 }}>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter the user’s name"
+              style={styles.input}
+              required
+            />
           </div>
-        </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Surname</label>
+            <input
+              type="text"
+              value={surname}
+              onChange={(e) => setSurname(e.target.value)}
+              placeholder="Enter the user’s surname"
+              style={styles.input}
+              required
+            />
+          </div>
+          <div style={styles.inputGroup}>
+            <label style={styles.label}>Details</label>
+            <textarea
+              value={reportDetails}
+              onChange={(e) => setReportDetails(e.target.value)}
+              placeholder="Provide any additional details"
+              style={styles.textarea}
+            />
+          </div>
+          <div>
+            <label style={styles.label}>Upload Death Certificate</label>
+            <div>
+              <DragNdrop onFilesSelected={setFile} />
+            </div>
+          </div>
 
-        <button type="submit" disabled={loading} style={styles.button}>
-          {loading ? "Submitting..." : "Submit Report"}
-        </button>
+          <button type="submit" disabled={loading} style={styles.button}>
+            {loading ? "Submitting..." : "Submit Report"}
+          </button>
+        </fieldset>
       </form>
       {message && (
         <p style={message.includes("success") ? styles.success : styles.error}>
