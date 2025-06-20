@@ -15,6 +15,12 @@ public class DeathReport {
     
     @Column(nullable = false)
     private String secretId;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
+    private String bucketUrl;
     
     @Column(nullable = false)
     private String name;

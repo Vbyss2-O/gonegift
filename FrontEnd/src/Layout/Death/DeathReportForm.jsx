@@ -1,25 +1,27 @@
-//here also for verification there should be need to upload the death certificate i will add this
-// additional feather as soon as possible 
-
 import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
+import DragNdrop from "../components/DragNDrop";
 
 const DeathReportForm = () => {
   const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [secretId, setSecretId] = useState("");
+  const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [reportDetails, setReportDetails] = useState("");
+  const [file, setFile] = useState(null);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const { data: { user }, error } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
       if (error || !user) {
         console.error("Error fetching user:", error?.message);
         navigate("/login");
@@ -36,8 +38,14 @@ const DeathReportForm = () => {
       setMessage("You must be logged in to report a death.");
       return;
     }
-    if (!secretId || !name || !surname) {
-      setMessage("Please fill in all required fields.");
+    if (!secretId || !name || !surname || !file) {
+      setMessage("Please fill in all required fields and upload a death certificate.");
+      return;
+    }
+
+    // ✅ Check MIME type
+    if (file.type !== "application/pdf") {
+      setMessage("Only PDF files are allowed.");
       return;
     }
 
@@ -45,63 +53,51 @@ const DeathReportForm = () => {
     setMessage("");
 
     try {
-      // Step 1: Query death_user by secretId to get user_idx
-      const { data: deathUsers, error: userError } = await supabase
-        .from("death_user")
-        .select("user_idx")
-        .eq("secret_key", secretId);
+      const bucket = "report";
+      const uniqueFileName = `${currentUser.id}_${Date.now()}_${file.name}`;
+      const filePath = `${currentUser.id}/${uniqueFileName}`;
+      const { error: uploadError } = await supabase.storage
+        .from(bucket)
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+          contentType: file.type,
+        });
 
-      if (userError) {
-        throw new Error(userError.message || "Error fetching user data");
+      if (uploadError) {
+        throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
 
-      if (!deathUsers || deathUsers.length === 0) {
-        throw new Error("No user found with the provided secret ID");
+      const { data: publicUrlData } = supabase.storage
+        .from(bucket)
+        .getPublicUrl(filePath);
+
+      const fileUrl = publicUrlData?.publicUrl;
+      if (!fileUrl) {
+        throw new Error("Failed to retrieve file URL from Supabase");
       }
 
-      if (deathUsers.length > 1) {
-        throw new Error("Multiple users found with the same secret ID. Contact support.");
-      }
-
-      const deathUserIdX = deathUsers[0].user_idx; // Ensure this matches your column name
-
-      // Step 2: Query beneficiaries for this death_user by the user_idx
-      const { data: beneficiaries, error: beneficiaryError } = await supabase
-        .from("beneficiary")
-        .select("id")
-        .eq("id_of_user", deathUserIdX);
-
-      if (beneficiaryError) {
-        throw new Error(beneficiaryError.message || "Error fetching beneficiaries");
-      }
-
-      if (!beneficiaries || beneficiaries.length === 0) {
-        throw new Error("No beneficiaries found for this user. A beneficiary is required.");
-      }
-
-      // Step 3: Use the first beneficiary's ID
-      const beneficiaryId = beneficiaries[0].id;
-
-      // Step 4: Prepare report data without userIdX
       const reportData = {
         secretId,
+        password,
+        fileUrl,
         name,
         surname,
         reportDetails: reportDetails || null,
         status: "pending",
-        beneficiaryId,
       };
 
-      // Step 5: Submit to backend
       await axios.post("http://localhost:8080/api/death-reports", reportData, {
         headers: { "Content-Type": "application/json" },
       });
 
       setMessage("Death report submitted successfully!");
       setSecretId("");
+      setPassword("");
       setName("");
       setSurname("");
       setReportDetails("");
+      setFile(null);
     } catch (error) {
       console.error("Report error:", error);
       setMessage(error.message || "Failed to submit death report.");
@@ -114,22 +110,32 @@ const DeathReportForm = () => {
 
   return (
     <div style={styles.container}>
-      <h2>Report a Death</h2>
-      <br />
+      <h2 style={styles.header}>Report a Death</h2>
       <form onSubmit={handleSubmit}>
         <div style={styles.inputGroup}>
-          <label>Secret ID</label>
+          <label style={styles.label}>ID</label>
           <input
             type="text"
             value={secretId}
             onChange={(e) => setSecretId(e.target.value)}
-            placeholder="Enter the secret ID"
+            placeholder="Enter the secret ID (UUID)"
             style={styles.input}
             required
           />
         </div>
         <div style={styles.inputGroup}>
-          <label>Name</label>
+          <label style={styles.label}>Password</label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter the Password"
+            style={styles.input}
+            required
+          />
+        </div>
+        <div style={styles.inputGroup}>
+          <label style={styles.label}>Name</label>
           <input
             type="text"
             value={name}
@@ -140,7 +146,7 @@ const DeathReportForm = () => {
           />
         </div>
         <div style={styles.inputGroup}>
-          <label>Surname</label>
+          <label style={styles.label}>Surname</label>
           <input
             type="text"
             value={surname}
@@ -151,7 +157,7 @@ const DeathReportForm = () => {
           />
         </div>
         <div style={styles.inputGroup}>
-          <label>Details</label>
+          <label style={styles.label}>Details</label>
           <textarea
             value={reportDetails}
             onChange={(e) => setReportDetails(e.target.value)}
@@ -159,6 +165,14 @@ const DeathReportForm = () => {
             style={styles.textarea}
           />
         </div>
+
+        <div>
+          <label style={styles.label}>Upload Death Certificate</label>
+          <div>
+            <DragNdrop onFilesSelected={setFile} />
+          </div>
+        </div>
+
         <button type="submit" disabled={loading} style={styles.button}>
           {loading ? "Submitting..." : "Submit Report"}
         </button>
@@ -175,143 +189,79 @@ const DeathReportForm = () => {
 const styles = {
   container: {
     padding: "2.5rem",
-    maxWidth: "600px",
+    maxWidth: "650px",
     margin: "2rem auto",
-    background: "var(--bg-glass)",
-    borderRadius: "var(--radius-xl)",
-    boxShadow: "var(--shadow-rainbow)",
-    backdropFilter: "var(--blur-light)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    position: "relative",
-    overflow: "hidden",
-    transition: "var(--transition-spring)",
+    background: "#ffffffcc",
+    borderRadius: "12px",
+    boxShadow: "0 8px 30px rgba(0,0,0,0.1)",
   },
-
-  inputGroup: {
+  header: {
+    color: "#1f2937",
+    fontSize: "1.75rem",
+    fontWeight: "700",
+    textAlign: "center",
     marginBottom: "1.5rem",
-    position: "relative",
   },
-
+  inputGroup: {
+    marginBottom: "1.25rem",
+  },
+  label: {
+    color: "#374151",
+    fontSize: "1rem",
+    fontWeight: "500",
+    marginBottom: "0.5rem",
+    display: "block",
+  },
   input: {
     width: "100%",
-    padding: "1rem 1.25rem",
+    padding: "0.75rem 1rem",
     fontSize: "1rem",
-    background: "var(--bg-glass)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "var(--radius-lg)",
-    color: "var(--text-primary)",
-    transition: "var(--transition)",
-    backdropFilter: "var(--blur-light)",
-    boxShadow: "var(--shadow-sm)",
-    "&:focus": {
-      outline: "none",
-      borderColor: "var(--primary)",
-      boxShadow: "var(--shadow-glow)",
-      transform: "translateY(-2px)",
-    },
-    "&:hover": {
-      borderColor: "var(--primary-light)",
-      boxShadow: "var(--shadow-md)",
-    },
+    border: "1px solid #d1d5db",
+    borderRadius: "8px",
+    outline: "none",
+    backgroundColor: "#f9fafb",
+    transition: "border-color 0.3s ease",
   },
-
   textarea: {
     width: "100%",
-    padding: "1rem 1.25rem",
+    padding: "0.75rem 1rem",
     fontSize: "1rem",
     minHeight: "120px",
-    background: "var(--bg-glass)",
-    border: "1px solid rgba(255, 255, 255, 0.2)",
-    borderRadius: "var(--radius-lg)",
-    color: "var(--text-primary)",
-    transition: "var(--transition)",
-    backdropFilter: "var(--blur-light)",
-    boxShadow: "var(--shadow-sm)",
+    border: "1px solid #d1d5db",
+    borderRadius: "8px",
+    outline: "none",
+    backgroundColor: "#f9fafb",
     resize: "vertical",
-    "&:focus": {
-      outline: "none",
-      borderColor: "var(--primary)",
-      boxShadow: "var(--shadow-glow)",
-      transform: "translateY(-2px)",
-    },
-    "&:hover": {
-      borderColor: "var(--primary-light)",
-      boxShadow: "var(--shadow-md)",
-    },
   },
-
   button: {
     padding: "1rem 2rem",
-    background: "linear-gradient(135deg, var(--primary), var(--secondary))",
-    color: "var(--text-light)",
+    background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+    color: "#fff",
     border: "none",
-    borderRadius: "var(--radius-lg)",
+    borderRadius: "10px",
     fontSize: "1rem",
     fontWeight: "600",
     cursor: "pointer",
-    transition: "var(--transition-spring)",
-    position: "relative",
-    overflow: "hidden",
-    boxShadow: "var(--shadow-md)",
-    "&:hover": {
-      transform: "translateY(-2px)",
-      boxShadow: "var(--shadow-xl)",
-    },
-    "&:active": {
-      transform: "translateY(-1px)",
-    },
-    "&:disabled": {
-      background: "linear-gradient(135deg, var(--text-gray), #999)",
-      cursor: "not-allowed",
-      opacity: "0.7",
-    },
+    width: "100%",
+    marginTop: "1rem",
+    transition: "background 0.3s ease",
   },
-
   success: {
-    color: "var(--accent3)",
-    marginTop: "1rem",
+    color: "#047857",
+    backgroundColor: "#d1fae5",
+    border: "1px solid #10b981",
     padding: "1rem",
-    borderRadius: "var(--radius-lg)",
-    background: "linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05))",
-    fontWeight: "600",
-    border: "1px solid rgba(16, 185, 129, 0.2)",
+    borderRadius: "8px",
+    marginTop: "1.25rem",
   },
-
   error: {
-    color: "var(--accent4)",
-    marginTop: "1rem",
+    color: "#b91c1c",
+    backgroundColor: "#fee2e2",
+    border: "1px solid #ef4444",
     padding: "1rem",
-    borderRadius: "var(--radius-lg)",
-    background: "linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05))",
-    fontWeight: "600",
-    border: "1px solid rgba(239, 68, 68, 0.2)",
-  },
-
-  // Add media queries for responsiveness
-  "@media (max-width: 768px)": {
-    container: {
-      margin: "1.5rem",
-      padding: "2rem",
-    },
-    button: {
-      width: "100%",
-    },
-  },
-
-  "@media (max-width: 480px)": {
-    container: {
-      margin: "1rem",
-      padding: "1.5rem",
-    },
-    input: {
-      padding: "0.875rem 1rem",
-    },
-    textarea: {
-      padding: "0.875rem 1rem",
-    },
+    borderRadius: "8px",
+    marginTop: "1.25rem",
   },
 };
-
-
 
 export default DeathReportForm;
