@@ -10,7 +10,7 @@ const GoogleLoginPage = () => {
   // Handle post-login email check and navigation
   const handlePostLogin = async () => {
     try {
-      setLoggingIn(true); // Keep UI in loading state during checks
+      setLoggingIn(true); // keep UI in loading state during checks
       // Check if user is authenticated in Supabase
       const { data: { user }, error: userError } = await supabase.auth.getUser();
 
@@ -20,10 +20,10 @@ const GoogleLoginPage = () => {
         return;
       }
 
-      // Check if email exists in death_user table
+      // check for fucking details got filled or not
       const { data: existingUser, error: fetchError } = await supabase
         .from("death_user")
-        .select("user_role")
+        .select("user_role, first_name")
         .eq("email", user.email)
         .maybeSingle();
 
@@ -34,6 +34,13 @@ const GoogleLoginPage = () => {
       }
 
       if (existingUser) {
+        // if user exists but has not filled primary info, redirect to /primaryinfo
+        if (!existingUser.first_name || existingUser.first_name.trim() === "") {
+          console.log("User found but primary info not filled, redirecting to /primaryinfo");
+          navigate("/primaryinfo");
+          return;
+        }
+        // user exists and has filled primary info, go to dashboard
         console.log("Existing user found in death_user, redirecting to /death-dashboard");
         navigate("/death-dashboard");
         return;
@@ -80,7 +87,7 @@ const GoogleLoginPage = () => {
           return;
         }
 
-        // Authenticated user found, run post-login logic
+        // authenticated user found, run post-login logic
         await handlePostLogin();
       } catch (err) {
         console.error("Error checking session:", err.message);
@@ -91,7 +98,7 @@ const GoogleLoginPage = () => {
 
     checkSession();
 
-    // Listen for auth state changes (e.g., OAuth callback or sign-out)
+    // listen for auth state changes (e.g., OAuth callback or sign-out)
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session) {
         console.log("User signed in, running post-login logic");
@@ -116,7 +123,7 @@ const GoogleLoginPage = () => {
           scopes: "email profile",
         },
       });
-      // Post-login logic is handled in useEffect via onAuthStateChange
+      // post-login logic is handled in useEffect via onAuthStateChange
     } catch (error) {
       console.error("Google login error:", error.message);
       setLoggingIn(false);
