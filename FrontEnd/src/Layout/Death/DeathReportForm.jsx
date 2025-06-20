@@ -56,13 +56,7 @@ const DeathReportForm = () => {
       if (response.status === 200) {
         setIsUuidValid(true);
         setMessage("UUID validated successfully. You can now upload a file.");
-        const encryptedKey = await getEncryptedKey();
-        const derivedKey = await decryptKey(
-          secretId.trim(),
-          encryptedKey,
-          password.trim()
-        );
-        setDecryptedKey(derivedKey);
+        
       } else {
         setIsUuidValid(false);
         setMessage("Invalid UUID or password. Please check and try again.");
