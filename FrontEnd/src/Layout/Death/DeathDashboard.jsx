@@ -14,7 +14,7 @@ import {
   FiBox, 
   FiTrendingUp,
 } from 'react-icons/fi';
-import { FaRobot } from "react-icons/fa";
+import { FaRobot, FaVoicemail } from "react-icons/fa";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -96,6 +96,10 @@ const Dashboard = () => {
       console.error("Logout failed:", error.message);
     }
   };
+  //naviage to voice route
+  const handleVoice = () => {
+    navigate("/voice");
+  }
 
   // if (loading) return (
   //   <div className="loading-screen">
@@ -111,6 +115,7 @@ const Dashboard = () => {
     { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
     { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
     { icon: <FaRobot size={24} />, text: "Visite Budddy", path: "/lifebuddy" },
+    { icon : <FaVoicemail size={24} />, text: "Voice", path: "/voice" }
   ];
 
   const adminMenuItems = [
@@ -205,6 +210,7 @@ const Dashboard = () => {
               <p>0</p>
             </div>
           </div>
+         
         </div>
 
         <div className="dashboard-grid">

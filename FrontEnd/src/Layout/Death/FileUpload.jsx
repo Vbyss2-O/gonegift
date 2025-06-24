@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { supabase } from './supabaseClient';
 import axios from "axios";
 import { enc, AES, PBKDF2 } from "crypto-js";
 import CryptoJS from "crypto-js";
 import "./FileUpload.css";
 
-const supabaseUrl = "https://nzdfurdfnrlhgqhhdogd.supabase.co";
-const supabaseKey =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im56ZGZ1cmRmbnJsaGdxaGhkb2dkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDAyOTM2MTYsImV4cCI6MjA1NTg2OTYxNn0.jcUCVUmUCTlvXhASODoeiPo5Gknk7pE2pYSDFrUTP9Q";
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -114,10 +110,8 @@ const FileUpload = () => {
       const hashedToken = await hashWithSalt(input);
       console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken`,
-        {
-          params: { token: hashedToken, userId: currentUser.id },
-        }
+        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`,
+       
       );
       console.log("API Response:", response.data);
       if (response.status === 200) {
@@ -262,6 +256,7 @@ const FileUpload = () => {
         idOfUser: currentUser.id,
         letterFileUrl: bucket === "letters" ? fileUrl : null,
         mediaFileUrl: bucket === "media" ? fileUrl : null,
+        voiceFileUrl: null,
         fileName: file.name,
         usery: {
           userIdX: currentUser.id,

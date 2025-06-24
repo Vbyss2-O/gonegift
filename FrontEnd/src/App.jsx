@@ -15,6 +15,7 @@ import LifeBuddyDashboard from "./Layout/LifeBuddyDashboard";
 import DecryptFile from "./Layout/Death/DecryptFile";
 import LifeBuddyAbout from "./Layout/Death/lifebuddyAbout";
 import ErrorPage from "./Layout/Death/ErrorPage";
+import UploadPage from "./Layout/Death/UploadPage";
 
 function App() {
   return (
@@ -112,6 +113,14 @@ function App() {
         element={
           <ProtectedRoute redirectTo="/login">
             <LifeBuddyAbout />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/voice"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <UploadPage />
           </ProtectedRoute>
         }
       />

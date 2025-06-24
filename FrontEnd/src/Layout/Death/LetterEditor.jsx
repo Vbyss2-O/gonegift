@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
@@ -216,6 +215,7 @@ const LetterEditor = () => {
         idOfUser: currentUser.id,
         letterFileUrl: fileUrl,
         mediaFileUrl: null,
+        voiceFileUrl: null,
         fileName: letterTitle,
         usery: {
           userIdX: currentUser.id,

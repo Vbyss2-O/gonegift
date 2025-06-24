@@ -51,6 +51,8 @@ public class DeathFiles {
 
     private String mediaFileUrl;
 
+    private String voiceFileUrl;
+
     @ManyToOne
     @JoinColumn(name = "file_id", nullable = false)
     @JsonBackReference // Changed file_id to user_id to match the reference in DeathUser
