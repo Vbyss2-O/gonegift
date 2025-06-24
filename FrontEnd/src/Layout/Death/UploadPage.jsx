@@ -284,6 +284,7 @@ const UploadPage = () => {
       });
       const encryptedData = iv.concat(encrypted.ciphertext); // Prepend IV to ciphertext
       const encryptedArray = encryptedData.words;
+      //this is for convert each 32-bit word into 4 bytes, to create a standard binary format.
       const encryptedArray8Bit = new Uint8Array(encryptedArray.length * 4);
       for (let i = 0; i < encryptedArray.length; i++) {
         encryptedArray8Bit[i * 4] = (encryptedArray[i] >> 24) & 0xff;
