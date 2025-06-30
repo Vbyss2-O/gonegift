@@ -1,0 +1,282 @@
+/* SharedSpace.css */
+
+/* General Container Styling */
+.shared-file-upload-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+/* Titles and Headers */
+.title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+}
+
+.section-title {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+}
+
+.list-title {
+    font-size: 1.3rem;
+    font-weight: 500;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+/* Description Text */
+.description {
+    font-size: 1rem;
+    color: #555;
+    text-align: center;
+    margin-bottom: 25px;
+    line-height: 1.6;
+}
+
+/* Form Sections */
+.form-section, .upload-section, .view-files-section {
+    background-color: #f9f9f9;
+    padding: 25px;
+    border-radius: 10px;
+    border: 1px solid #e0e0e0;
+    margin-bottom: 25px;
+    transition: all 0.3s ease;
+}
+
+.form-section:hover, .upload-section:hover, .view-files-section:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+/* Input Group */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-label {
+    display: block;
+    font-size: 0.95rem;
+    color: #4a4a4a;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.text-input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #c0c0c0;
+    border-radius: 8px;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    box-sizing: border-box; /* Ensures padding doesn't add to the width */
+}
+
+.text-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.text-input:disabled {
+    background-color: #e9ecef;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Buttons */
+.action-button {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s, box-shadow 0.3s;
+    margin-top: 15px;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.primary-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: #0056b3;
+}
+
+.upload-button {
+    background-color: #28a745;
+    color: white;
+}
+
+.upload-button:hover:not(:disabled) {
+    background-color: #218838;
+}
+
+.secondary-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.secondary-button:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+/* File Info */
+.file-info {
+    font-size: 0.9rem;
+    color: #555;
+    margin-top: 15px;
+    text-align: center;
+    background-color: #e9f7ef;
+    border: 1px solid #d4edda;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+/* File List */
+.file-list-container {
+    margin-top: 25px;
+    padding: 20px;
+    background-color: #eaf6ff;
+    border: 1px solid #b3d9ff;
+    border-radius: 10px;
+}
+
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px dashed #cce0ff;
+}
+
+.file-list-item:last-child {
+    border-bottom: none;
+}
+
+.file-download-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    word-break: break-all;
+    flex-grow: 1;
+    margin-right: 10px;
+    transition: color 0.2s;
+}
+
+.file-download-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+.file-type-tag {
+    background-color: #007bff;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    flex-shrink: 0; /* Prevents shrinking */
+}
+
+/* Message Box */
+.message-box {
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 500;
+    border-width: 1px;
+    border-style: solid;
+}
+
+.message-success {
+    background-color: #d4edda;
+    color: #155724;
+    border-color: #c3e6cb;
+}
+
+.message-error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+/* Drag N Drop Area Customization (assuming DragNDrop component uses a div with this class) */
+.drag-n-drop-area {
+    border: 2px dashed #007bff !important; /* Override default border if any */
+    background-color: #f0f8ff !important; /* Light blue background */
+    border-radius: 10px !important;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 1.1rem;
+    color: #007bff;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+.drag-n-drop-area:hover {
+    background-color: #e0efff !important;
+    border-color: #0056b3 !important;
+}
+
+/* Optional: Adjust for smaller screens */
+@media (max-width: 768px) {
+    .shared-file-upload-container {
+        margin: 20px auto;
+        padding: 20px;
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .section-title {
+        font-size: 1.4rem;
+    }
+
+    .action-button {
+        font-size: 1rem;
+        padding: 10px 15px;
+    }
+}

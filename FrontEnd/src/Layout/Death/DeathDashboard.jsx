@@ -13,6 +13,7 @@ import {
   FiGrid, 
   FiBox, 
   FiTrendingUp,
+  FiUploadCloud,
 } from 'react-icons/fi';
 import { FaRobot, FaVoicemail } from "react-icons/fa";
 
@@ -115,7 +116,8 @@ const Dashboard = () => {
     { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
     { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
     { icon: <FaRobot size={24} />, text: "Visite Budddy", path: "/lifebuddy" },
-    { icon : <FaVoicemail size={24} />, text: "Voice", path: "/voice" }
+    { icon: <FaVoicemail size={24} />, text: "Voice", path: "/voice" },
+    { icon: <FiUploadCloud size={24} />, text: "Shared Space", path: "/sharedSpace"}
   ];
 
   const adminMenuItems = [
