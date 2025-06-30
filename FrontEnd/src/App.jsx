@@ -16,6 +16,8 @@ import DecryptFile from "./Layout/Death/DecryptFile";
 import LifeBuddyAbout from "./Layout/Death/lifebuddyAbout";
 import ErrorPage from "./Layout/Death/ErrorPage";
 import UploadPage from "./Layout/Death/UploadPage";
+import SharedSpace from "./Layout/Death/SharedSpace";
+import SharedFileUpload from "./Layout/Death/SharedFileUpload";
 
 function App() {
   return (
@@ -121,6 +123,23 @@ function App() {
         element={
           <ProtectedRoute redirectTo="/login">
             <UploadPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/sharedSpace"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <SharedSpace />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/sharedSpace/upload/:token"
+        element={
+          <ProtectedRoute redirectTo="/login">
+          <SharedFileUpload />
           </ProtectedRoute>
         }
       />

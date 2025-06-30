@@ -92,5 +92,9 @@ public class DeathUser {
     @OneToMany(mappedBy = "usery" , fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference 
     private List<DeathFiles> files;
+
+    @OneToMany(mappedBy = "userz" , fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference 
+    private List<SharedFile> sharedFiles;
 }
 
