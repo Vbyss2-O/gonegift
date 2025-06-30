@@ -66,15 +66,21 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-    if (userData) { 
-      fetch(`http://localhost:8080/api/deathusers/filesize/${userData.userIdX}`)
-        .then((response) => response.text()) 
-        .then((data) => {
-          setCountFile(parseInt(data, 10)); 
-        })
-        .catch((error) => console.error("Error fetching file count:", error));
-    }
-  }, [userData]); 
+  if (userData) {
+    Promise.all([
+      fetch(`http://localhost:8080/api/deathusers/filesize/${userData.userIdX}`).then(res => res.text()),
+      fetch(`http://localhost:8080/api/deathusers/sharedfilesize/${userData.userIdX}`).then(res => res.text()),
+    ])
+    .then(([fileSizeText, sharedSizeText]) => {
+      const fileSize = parseInt(fileSizeText, 10) || 0;
+      const sharedSize = parseInt(sharedSizeText, 10) || 0;
+
+      setCountFile(fileSize+ sharedSize);
+    })
+    .catch(error => console.error("Error fetching file counts:", error));
+  }
+}, [userData]);
+
   
   useEffect(() => {
     if (userData) { 

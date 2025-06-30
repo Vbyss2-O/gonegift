@@ -59,6 +59,10 @@ public class DeathUserController {
     public int getFileSize(@PathVariable UUID id) {
         return deathUserService.getFileSize(id);
     }
+    @GetMapping("/sharedfilesize/{id}")
+    public int getSharedFileSize(@PathVariable UUID id) {
+        return deathUserService.getSharedFileSize(id);
+    }
    @GetMapping("/beneficiarysize/{id}")
     public int getBeneficiarySize(@PathVariable UUID id) {
         return deathUserService.getSizeOfBeneficiary(id);

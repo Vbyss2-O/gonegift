@@ -197,9 +197,7 @@ const FileList = () => {
       <hr className="filelist-separator" /> 
 
       <h3 className="filelist-files-header">Files from Shared Space:</h3>
-      <p className="filelist-note">
-        These files were uploaded via shared links.
-      </p>
+     
 
       {
         !Array.isArray(sharedFiles) || sharedFiles.length === 0 ? (

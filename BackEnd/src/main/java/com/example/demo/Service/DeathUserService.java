@@ -133,6 +133,18 @@ public class DeathUserService {
     public UUID findUserIdXByHashuuid(String hashtoken) {
         return deathUserRepository.findUserIdXByHashuuid(hashtoken);
     }
+
+    public int getSharedFileSize(UUID id) {
+        DeathUser user = deathUserRepository.findById(id).orElse(null);
+        List<SharedFile> list = user.getSharedfiles();
+        int count=0;
+        for(int i=0; i<list.size(); i++){
+            if(list.get(i).getUploadFileUrl() != null){
+                count++;
+            }
+        }
+        return count;
+    }
     
     
 }
