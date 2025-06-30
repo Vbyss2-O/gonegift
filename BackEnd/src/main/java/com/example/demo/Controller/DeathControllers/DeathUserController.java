@@ -4,6 +4,8 @@ import com.example.demo.Service.DeathUserService;
 import com.example.demo.model.DeathProject.Beneficiary;
 import com.example.demo.model.DeathProject.DeathFiles;
 import com.example.demo.model.DeathProject.DeathUser;
+import com.example.demo.model.DeathProject.SharedFile;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -71,6 +73,11 @@ public class DeathUserController {
     public List<DeathFiles> getFileList(@PathVariable UUID id) {
         return deathUserService.getFileList(id);
     }
+    @GetMapping("/listOfSharedFile/{id}")
+    public List<SharedFile> getSharedFile(@PathVariable UUID id) {
+        return deathUserService.getSharedFileList(id);
+    }
+
     @PostMapping("/storeSecretKey/{useruid}")
     public void storeSerectKey(@RequestBody String id, @PathVariable UUID useruid) {
         deathUserService.storeSecretKey(id , useruid);

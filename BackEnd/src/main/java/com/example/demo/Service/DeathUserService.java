@@ -9,6 +9,7 @@ import com.example.demo.Repo.DeathUserRepository;
 import com.example.demo.model.DeathProject.Beneficiary;
 import com.example.demo.model.DeathProject.DeathFiles;
 import com.example.demo.model.DeathProject.DeathUser;
+import com.example.demo.model.DeathProject.SharedFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -92,6 +93,14 @@ public class DeathUserService {
         DeathUser user = deathUserRepository.findById(id).orElse(null);
         if (user!= null) {
             return user.getFiles();
+        } else {
+            throw new RuntimeException("User not found with ID: " + id);
+        }
+    }
+    public List<SharedFile> getSharedFileList(UUID id) {
+        DeathUser user = deathUserRepository.findById(id).orElse(null);
+        if (user != null) {
+            return user.getSharedfiles();
         } else {
             throw new RuntimeException("User not found with ID: " + id);
         }

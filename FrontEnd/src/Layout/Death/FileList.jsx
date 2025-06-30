@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
-//here basic fix i want to impliment that i can store the uuid key in amazon sdk or somekind of localstorage flag i am going to store in localstorage
-//that for uuid exist
+import "./FileList.css"; // Import the CSS file
 
 const FileList = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
+  const [sharedFiles, setSharedFiles] = useState([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -36,7 +36,7 @@ const FileList = () => {
         if (fetchError || !existingUser) {
           console.error(
             "Error fetching user data:",
-            fetchError || "User not found in death_user table"
+            fetchError?.message || "User not found in death_user table"
           );
           navigate("/login");
           return;
@@ -49,8 +49,11 @@ const FileList = () => {
           lastname: existingUser.lastname,
         });
 
+
+
         // Fetch files using the user ID
         await fetchFiles(user.id);
+        await fetchSharedFiles(user.id);
       } catch (error) {
         console.error("Error in fetchUserData:", error.message);
         navigate("/login");
@@ -69,16 +72,33 @@ const FileList = () => {
       );
       const data = await response.json();
 
-      // Ensure data is an array
       if (Array.isArray(data)) {
         setFiles(data);
       } else {
-        console.error("Received non-array data:", data);
-        setFiles([]); //empty array set
+        console.error("Received non-array data for user files:", data);
+        setFiles([]);
       }
     } catch (error) {
-      console.error("Error fetching files:", error);
-      setFiles([]); // Set empty array on error
+      console.error("Error fetching user files:", error);
+      setFiles([]);
+    }
+  };
+
+  const fetchSharedFiles = async (userId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/api/deathusers/listOfSharedFile/${userId}`
+      );
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        setSharedFiles(data);
+      } else {
+        console.error("Received non-array data for shared files:", data);
+        setSharedFiles([]);
+      }
+    } catch (error) {
+      console.error("Error fetching shared files:", error);
+      setSharedFiles([]);
     }
   };
 
@@ -93,7 +113,9 @@ const FileList = () => {
       console.log("Delete response:", response);
 
       if (response.ok) {
+        // Filter out the deleted file from both lists
         setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
+        setSharedFiles((prevSharedFiles) => prevSharedFiles.filter((file) => file.id !== fileId));
       } else {
         console.error("Failed to delete file");
       }
@@ -102,235 +124,112 @@ const FileList = () => {
     }
   };
 
+  const getFileTypeFromUrl = (url) => {
+    if (!url) return "unknown";
+    try {
+      const urlObj = new URL(url);
+      const pathSegments = urlObj.pathname.split('/');
+      const filenameWithEnc = pathSegments[pathSegments.length - 1]; 
+
+      const parts = filenameWithEnc.split('.');
+      if (parts.length < 2) {
+        return "unknown";
+      }
+      // if the last part is "enc", then the actual extension is the second to last part
+      if (parts[parts.length - 1] === 'enc' && parts.length >= 2) {
+        return parts[parts.length - 2];
+      }
+      // otherwise, return the last part as the extension
+      return parts[parts.length - 1];
+    } catch (e) {
+      console.error("Error parsing file URL:", e);
+      return "unknown";
+    }
+  };
+
+
   if (loading) {
     return (
-      <div className="loading-container">
+      <div className="filelist-loading-container">
         <p>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="file-list-container">
-      <h2 className="welcome-header">
+    <div className="filelist-list-container">
+      <h2 className="filelist-welcome-header">
         Welcome, {userData?.firstName} {userData?.lastname}
       </h2>
-      <h3 className="files-header">Your Uploaded Files:</h3>
-      <h4>
-        Note : Your all files are Encrypted and Stored securly so Delete files
-        from there names only
-      </h4>
-      <br />
+
+      <h3 className="filelist-files-header">Your Uploaded Files:</h3>
+      <p className="filelist-note">
+        Note: Your all files are Encrypted and Stored securely so Delete files
+        from their names only.
+      </p>
 
       {!Array.isArray(files) || files.length === 0 ? (
-        <p className="no-files">No files found.</p>
+        <p className="filelist-no-files">No files uploaded by you yet.</p>
       ) : (
-        <ul className="file-list">
+        <ul className="filelist-file-list">
           {files.map((file) => (
-            <li key={file.id || Math.random()} className="file-item">
-              <div className="file-info">
-                <div className="file-type">
+            <li key={file.id || Math.random()} className="filelist-file-item">
+              <div className="filelist-file-info">
+                <div className="filelist-file-name">
                   <strong>File Name:</strong> {file.fileName}
-                  <br />
-                  <strong>File Type:</strong> {file.letterFileUrl != null ? "Letter File" : "Media File"}
                 </div>
-                {/* <div className="file-url">
-                  <strong>File URL:</strong>
-
-                  {file.letterFileUrl && !file.mediaFileUrl && (
-                    <a
-                      href={file.letterFileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="file-link"
-                    >
-                      View Letter File
-                    </a>
-                  )}
-
-                  {file.mediaFileUrl && !file.letterFileUrl && (
-                    <a
-                      href={file.mediaFileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="file-link"
-                    >
-                      View Media File
-                    </a>
-                  )}
-
-                  {file.letterFileUrl && file.mediaFileUrl && (
-                    <>
-                      <div>
-                        <a
-                          href={file.letterFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="file-link"
-                        >
-                          View Letter File
-                        </a>
-                      </div>
-                      <div>
-                        <a
-                          href={file.mediaFileUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="file-link"
-                        >
-                          View Media File
-                        </a>
-                      </div>
-                    </>
-                  )}
-                </div> */}
+                <div className="filelist-file-type-display">
+                  <strong>File Type:</strong>{" "}
+                  {file.letterFileUrl != null ? "Letter File" : "Media File"}
+                </div>
               </div>
               <button
                 onClick={() => deleteFile(file.id)}
-                className="delete-button"
+                className="filelist-delete-button"
               >
                 Delete
               </button>
-              
             </li>
-            
           ))}
         </ul>
       )}
-      <style jsx>{`
-        .loading-container {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 200px;
-        }
 
-        .file-list-container {
-          max-width: 900px;
-          margin: 40px auto;
-          padding: 30px;
-          background-color: var(--bg-glass, #ffffff);
-          border-radius: 16px;
-          box-shadow: var(--shadow-rainbow, 0 8px 20px rgba(0, 0, 0, 0.08));
-          font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+      <hr className="filelist-separator" /> 
 
-        .welcome-header {
-          color: var(--text-primary, #2c3e50);
-          font-size: 28px;
-          font-weight: 600;
-          margin-bottom: 24px;
-          padding-bottom: 12px;
-          border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-        }
+      <h3 className="filelist-files-header">Files from Shared Space:</h3>
+      <p className="filelist-note">
+        These files were uploaded via shared links.
+      </p>
 
-        .files-header {
-          color: var(--text-primary, #34495e);
-          font-size: 22px;
-          margin: 24px 0 12px;
-        }
-
-        .no-files {
-          color: var(--text-secondary, #7f8c8d);
-          font-style: italic;
-          padding: 24px;
-          text-align: center;
-          background: var(--bg-glass, #f8f9fa);
-          border-radius: 10px;
-          font-size: 16px;
-        }
-
-        .file-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-        }
-
-        .file-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 18px;
-          margin: 12px 0;
-          background: var(--bg-glass, #f9f9f9);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 10px;
-          box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.05));
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .file-item:hover {
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-lg, 0 6px 12px rgba(0, 0, 0, 0.12));
-        }
-
-        .file-info {
-          flex: 1;
-          color: var(--text-primary, #2c3e50);
-        }
-
-        .file-type,
-        .file-url {
-          margin: 4px 0;
-          font-size: 15px;
-          word-break: break-word;
-        }
-
-        .file-link {
-          color: var(--primary, #3498db);
-          text-decoration: none;
-          margin-left: 12px;
-          padding: 6px 12px;
-          border-radius: 6px;
-          background-color: rgba(0, 123, 255, 0.1);
-          font-weight: 500;
-          transition: background-color 0.2s ease;
-        }
-
-        .file-link:hover {
-          background-color: rgba(0, 123, 255, 0.2);
-          text-decoration: underline;
-        }
-
-        .delete-button {
-          background-color: var(--accent5, #e74c3c);
-          color: white;
-          border: none;
-          padding: 8px 18px;
-          border-radius: 6px;
-          cursor: pointer;
-          font-weight: 500;
-          font-size: 14px;
-          transition: background-color 0.2s ease;
-        }
-
-        .delete-button:hover {
-          background-color: #c0392b;
-        }
-
-        @media (max-width: 768px) {
-          .file-item {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .delete-button {
-            margin-top: 10px;
-            align-self: flex-end;
-          }
-
-          .file-link {
-            margin-left: 0;
-            margin-top: 8px;
-          }
-
-          .file-info {
-            width: 100%;
-          }
-        }
-      `}</style>
+      {
+        !Array.isArray(sharedFiles) || sharedFiles.length === 0 ? (
+          <p className="filelist-no-files">No files found in shared spaces.</p>
+        ) : (
+          <ul className="filelist-file-list">
+            {sharedFiles
+              .filter(file => file.uploadFileUrl != null) // This is the crucial change
+              .map((file) => (
+                <li key={file.id || Math.random()} className="filelist-file-item">
+                  <div className="filelist-file-info">
+                    <div className="filelist-file-name">
+                      <strong>File Name:</strong> {file.fileName}
+                    </div>
+                    <div className="filelist-file-type-display">
+                      <strong>File Type:</strong>{" "}
+                      {getFileTypeFromUrl(file.uploadFileUrl)}
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => deleteFile(file.id)}
+                    className="filelist-delete-button"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+          </ul>
+        )
+      }
     </div>
   );
 };

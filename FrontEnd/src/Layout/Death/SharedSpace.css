@@ -34,7 +34,7 @@
 .shared-container h2 {
   margin-bottom: 2rem;
   background: linear-gradient(135deg, var(--primary, #a855f7), var(--secondary, #ec4899), var(--accent, #10b981));
-  -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   font-size: 2.25rem;
   font-weight: 700;

@@ -392,6 +392,7 @@ const SharedFileUpload = () => {
                 token: token,
                 spaceHashPass: hashReadableKey(input.trim()),
                 uploadFileUrl: publicUrlData.publicUrl,
+                fileName : file.name, // Original file name
                 userz: {
                     userIdX: currentAuthorId, // Redundant but kept for existing backend structure
                 },

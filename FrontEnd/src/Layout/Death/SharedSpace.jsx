@@ -220,6 +220,7 @@ const SharedSpace = () => {
         token: generatedToken, // Use the newly generated token
         spaceHashPass: hashReadableKey(readableKey), // Use the newly generated readableKey
         uploadFileUrl: null, // Will be set on actual file upload
+        fileName : null, 
         userz: {
           userIdX: currentUser.id,
         },

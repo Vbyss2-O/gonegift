@@ -40,6 +40,7 @@ public class SharedFile {
     private String token;
     private String spaceHashPass;
     private String uploadFileUrl;
+    private String fileName; 
 
     @ManyToOne
     @JoinColumn(name = "shared_file_id", nullable = false)
