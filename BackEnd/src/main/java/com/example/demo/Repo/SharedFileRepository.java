@@ -21,5 +21,5 @@ public interface SharedFileRepository extends JpaRepository<SharedFile, String> 
 
     @Query("SELECT COUNT(DISTINCT sf.spaceHashPass) FROM SharedFile sf WHERE sf.authorId = :authorId")
     Long countDistinctSpacesByAuthor(@Param("authorId") UUID authorId);
-
+     
 }

@@ -42,7 +42,7 @@ const SharedSpace = () => {
         // Ensure currentUser.id is available before making the request
         if (currentUser && currentUser.id) {
           const response = await axios.get(
-            `http://localhost:8080/api/shared-file/totalSpaces/${currentUser.id}`
+            `http://localhost:8080/shared-file/totalSpaces/${currentUser.id}`
           );
           setTotalSharedSpace(response.data);
         }

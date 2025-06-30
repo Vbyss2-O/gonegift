@@ -398,7 +398,7 @@ const SharedFileUpload = () => {
             };
 
             await axios.post(
-                "http://localhost:8080/api/filemetadata",
+                "http://localhost:8080/shared-file/addFile",
                 fileMetadata,
                 {
                     headers: {
