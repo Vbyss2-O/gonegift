@@ -6,6 +6,10 @@ import org.springframework.stereotype.Service;
 
 import com.example.demo.Repo.BeneficiaryRepository;
 import com.example.demo.model.DeathProject.Beneficiary;
+import com.example.demo.model.DeathProject.DeathFiles;
+import com.example.demo.model.DeathProject.DeathUser;
+
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +32,7 @@ public class BeneficiaryService {
     }
 
     // Get Beneficiary by ID
-    @Cacheable(value = "beneficiaries", key = "#id")
+    // @Cacheable(value = "beneficiaries", key = "#id")
     public Optional<Beneficiary> getBeneficiaryById(Long id) {
         try {
             return beneficiaryRepository.findById(id);
@@ -56,13 +60,17 @@ public class BeneficiaryService {
 
     // Delete Beneficiary by ID
     public void deleteBeneficiary(Long id) {
-        try {
-            beneficiaryRepository.deleteById(id);
-        } catch (Exception e) {
-            // Log the exception and throw a custom error
-            System.err.println("Error deleting beneficiary: " + e.getMessage());
-            throw new RuntimeException("Failed to delete beneficiary.");
+       Beneficiary BeniToDelete = beneficiaryRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("File not found with id: " + id));
+
+        // 2. Get the parent entity.
+        DeathUser parentUser = BeniToDelete.getUserx();
+        if(parentUser != null) {
+            // 3. Remove the child from the parent's collection.
+            parentUser.getBeneficiaries().remove(BeniToDelete);
         }
+        // 4. Delete the child entity.
+        beneficiaryRepository.delete(BeniToDelete);
     }
 
     // Get all Beneficiaries

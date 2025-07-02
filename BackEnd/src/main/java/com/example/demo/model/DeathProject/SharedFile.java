@@ -43,7 +43,7 @@ public class SharedFile {
     private String fileName; 
 
     @ManyToOne
-    @JoinColumn(name = "shared_file_id", nullable = false)
+    @JoinColumn(name = "userid",referencedColumnName ="userIDX", nullable = false)
     @JsonBackReference 
     private DeathUser userz; 
     

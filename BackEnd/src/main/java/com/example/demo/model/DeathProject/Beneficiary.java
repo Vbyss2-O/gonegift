@@ -33,8 +33,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+// @Cacheable
+// @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Beneficiary {
 
     @Id
@@ -53,7 +53,7 @@ public class Beneficiary {
 
     // Implementing Many-to-One mapping correctly
     @ManyToOne
-    @JoinColumn(name = "relative_id", nullable = false)
+    @JoinColumn(name = "userid",referencedColumnName="userIDX", nullable = false)
     @JsonBackReference
     private DeathUser userx; // this references the DeathUser entity
 }

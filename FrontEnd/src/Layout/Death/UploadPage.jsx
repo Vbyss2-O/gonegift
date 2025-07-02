@@ -331,15 +331,13 @@ const UploadPage = () => {
 
       setMessage(" Upload successful!");
 
-      const { data: urlData } = supabase.storage
-        .from("voice")
-        .getPublicUrl(`${currentUser.id}/${fileName}`);
+     const filePath = `${currentUser.id}/${fileName}`;
 
         const fileMetadata = {
         idOfUser: currentUser.id,
         letterFileUrl: null,
         mediaFileUrl: null,
-        voiceFileUrl: urlData.publicUrl,
+        voiceFileUrl: filePath,
         fileName: fileName,
         usery: {
           userIdX: currentUser.id,

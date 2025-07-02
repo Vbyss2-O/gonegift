@@ -186,9 +186,9 @@ const DecryptFile = () => {
         for (let i = 0; i < encryptedArray.length; i += 4) {
           const word =
             ((encryptedArray[i] << 24) |
-             (encryptedArray[i + 1] << 16) |
-             (encryptedArray[i + 2] << 8) |
-             encryptedArray[i + 3]) >>>
+              (encryptedArray[i + 1] << 16) |
+              (encryptedArray[i + 2] << 8) |
+              encryptedArray[i + 3]) >>>
             0;
           wordArray.words.push(word);
         }
@@ -250,28 +250,41 @@ const DecryptFile = () => {
       const decryptedFileList = await Promise.all(
         encryptedFileUrls.map(async (fileUrl, index) => {
           try {
-            let fileType, url, fileName;
+            let fileType, url, fileName, bucketName;
             if (fileUrl.letterFileUrl) {
               fileType = "letter";
               url = fileUrl.letterFileUrl;
+              bucketName = "letters";
               fileName = fileUrl.fileName;
             } else if (fileUrl.mediaFileUrl) {
               fileType = "media";
               url = fileUrl.mediaFileUrl;
+              bucketName = "media";
               fileName = fileUrl.fileName;
             } else if (fileUrl.voiceFileUrl) {
               fileType = "voice";
               url = fileUrl.voiceFileUrl;
+              bucketName = "voice";
               fileName = fileUrl.fileName;
             } else {
               throw new Error("No valid file URL provided.");
             }
+            const { data: signedUrlData, error: signedUrlError } = await supabase
+              .storage
+              .from(bucketName)
+              .createSignedUrl(filePath, 60);
 
-            const fileResponse = await axios.get(url, { responseType: fileType === "voice" ? "arraybuffer" : "blob" });
+            if (signedUrlError) {
+              console.error("Error generating signed URL:", signedUrlError);
+              throw signedUrlError;
+            }
+
+            const signedUrl = signedUrlData.signedUrl;
+            const fileResponse = await axios.get(signedUrl, { responseType: fileType === "voice" ? "arraybuffer" : "blob" });
             const encryptedData = fileType === "voice" ? fileResponse.data : fileResponse.data;
             const reader = new FileReader();
 
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve, reject) => { 
               if (fileType === "voice") {
                 // Handle voice file directly as ArrayBuffer
                 try {
@@ -313,8 +326,8 @@ const DecryptFile = () => {
                       const mimeType = fileName?.endsWith(".mp4.enc")
                         ? "video/mp4"
                         : fileName?.endsWith(".png.enc")
-                        ? "image/png"
-                        : "image/jpeg";
+                          ? "image/png"
+                          : "image/jpeg";
                       const decryptedBlob = new Blob([decryptedContent], { type: mimeType });
                       resolve({
                         type: "media",

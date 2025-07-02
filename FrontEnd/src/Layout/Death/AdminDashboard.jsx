@@ -6,7 +6,7 @@ const AdminDashboard = () => {
   const [reports, setReports] = useState([]);
   const [message, setMessage] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true); // Track loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const checkAdminRole = async () => {
@@ -49,10 +49,32 @@ const AdminDashboard = () => {
   const fetchReports = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:8080/api/admin/death-reports");
+
+      const response = await axios.get(
+        "http://localhost:8080/api/admin/death-reports"
+      );
 
       if (response.data && Array.isArray(response.data)) {
-        setReports(response.data);
+        const reportsWithSignedUrls = await Promise.all(
+          response.data.map(async (report) => {
+            if (report.bucket_url) {
+              const { data, error } = await supabase
+                .storage
+                .from("report")
+                .createSignedUrl(report.bucket_url, 60*60*12); // 12 hour validity
+
+              if (error) {
+                console.error(`Error generating signed URL for ${report.bucket_url}:`, error);
+                return { ...report, signedEvidenceUrl: null };
+              }
+
+              return { ...report, signedEvidenceUrl: data.signedUrl };
+            }
+            return { ...report, signedEvidenceUrl: null };
+          })
+        );
+
+        setReports(reportsWithSignedUrls);
       } else {
         setMessage("Invalid response format.");
       }
@@ -67,7 +89,7 @@ const AdminDashboard = () => {
     try {
       await axios.post(`http://localhost:8080/api/admin/death-reports/trigger/${reportId}`);
       setMessage("Report triggered successfully!");
-      fetchReports(); // Refresh reports after triggering
+      fetchReports();
     } catch (error) {
       setMessage("Failed to trigger report: " + error.message);
     }
@@ -89,10 +111,16 @@ const AdminDashboard = () => {
             <p>Name: {report.name}</p>
             <p>Surname: {report.surname}</p>
             <p>Details: {report.reportDetails || "None"}</p>
-            {report.evidenceUrl && (
-              <a href={report.evidenceUrl} target="_blank" rel="noopener noreferrer">
+            {report.signedEvidenceUrl ? (
+              <a
+                href={report.signedEvidenceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Evidence
               </a>
+            ) : (
+              <p>No evidence file available.</p>
             )}
             <p>Status: {report.status}</p>
             <div style={styles.buttonContainer}>
@@ -108,7 +136,6 @@ const AdminDashboard = () => {
                 Trigger
               </button>
             </div>
-
           </div>
         ))
       )}

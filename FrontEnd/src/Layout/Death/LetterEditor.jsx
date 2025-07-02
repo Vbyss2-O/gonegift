@@ -203,17 +203,12 @@ const LetterEditor = () => {
       console.log("Encrypted letter uploaded successfully:", uploadData);
 
       // Get public URL for the uploaded file
-      const { data: publicUrlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-
-      const fileUrl = publicUrlData.publicUrl;
-      console.log("Public URL:", fileUrl);
+     
 
       // Prepare metadata for backend
       const fileMetadata = {
         idOfUser: currentUser.id,
-        letterFileUrl: fileUrl,
+        letterFileUrl: filePath,
         mediaFileUrl: null,
         voiceFileUrl: null,
         fileName: letterTitle,

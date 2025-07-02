@@ -36,7 +36,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Cacheable
+// @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DeathUser {
 
@@ -89,7 +89,7 @@ public class DeathUser {
     private List<Beneficiary> beneficiaries;
 
     // Corrected the mapping for files
-    @OneToMany(mappedBy = "usery" , fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "usery" , fetch = FetchType.EAGER, cascade = CascadeType.ALL , orphanRemoval = true)
     @JsonManagedReference 
     private List<DeathFiles> files;
 

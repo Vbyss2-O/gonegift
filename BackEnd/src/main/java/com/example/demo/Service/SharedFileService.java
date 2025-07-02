@@ -6,14 +6,21 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Repo.SharedFileRepository;
 import com.example.demo.Repo.SharedTokenRepository;
+import com.example.demo.model.DeathProject.DeathUser;
+import com.example.demo.model.DeathProject.SharedFile;
 import com.example.demo.model.DeathProject.SharedToken;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class SharedFileService {
     @Autowired
     private SharedTokenRepository sharedTokenRepository;
 
+    @Autowired
+    private SharedFileRepository sharedFileRepository;
     public boolean validateSharedFileToken(String token){
      Optional<SharedToken> tokenx = sharedTokenRepository.findByToken(token);
      if (tokenx.isPresent()) {
@@ -26,5 +33,16 @@ public class SharedFileService {
     }
         return true;
 
+    }
+    public void deleteSharedFile(Long id){
+        SharedFile sharedFileTODelete = sharedFileRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Shared file not found with id: " + id));
+
+        DeathUser parentUser = sharedFileTODelete.getUserz();
+        if(parentUser!=null){
+            parentUser.getSharedfiles().remove(sharedFileTODelete);
+        }
+        sharedFileRepository.delete(sharedFileTODelete);
+                
     }
 }

@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 @Repository
-public interface SharedFileRepository extends JpaRepository<SharedFile, String> {
+public interface SharedFileRepository extends JpaRepository<SharedFile, Long> {
     @Query("SELECT s.spaceHashPass FROM SharedFile s WHERE s.token = :token")
     Optional<String>  findSpaceHashPassByToken(@Param("token") String token);
 

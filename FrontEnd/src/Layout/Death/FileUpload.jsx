@@ -229,14 +229,11 @@ const FileUpload = () => {
       const encryptedBlob = new Blob([encryptedData], {
         type: file.type,
       });
-      const bucket =
-        file.type && (file.type.startsWith("image/") || file.type.startsWith("video/"))
-          ? "media"
-          : "letters";
+     
       const uniqueFileName = `${currentUser.id}_${Date.now()}_${file.name}.enc`;
       const filePath = `${currentUser.id}/${uniqueFileName}`;
       const { error: uploadError } = await supabase.storage
-        .from(bucket)
+        .from("media")
         .upload(filePath, encryptedBlob, {
           cacheControl: "3600",
           upsert: false,
@@ -245,17 +242,12 @@ const FileUpload = () => {
       if (uploadError) {
         throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
-      const { data: publicUrlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-      const fileUrl = publicUrlData?.publicUrl;
-      if (!fileUrl) {
-        throw new Error("Failed to retrieve file URL from Supabase");
-      }
+      
+      
       const fileMetadata = {
         idOfUser: currentUser.id,
-        letterFileUrl: bucket === "letters" ? fileUrl : null,
-        mediaFileUrl: bucket === "media" ? fileUrl : null,
+        letterFileUrl: null,
+        mediaFileUrl: filePath,
         voiceFileUrl: null,
         fileName: file.name,
         usery: {

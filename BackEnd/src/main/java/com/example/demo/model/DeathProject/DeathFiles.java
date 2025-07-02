@@ -31,8 +31,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+// @Cacheable
+// @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DeathFiles {
 
     @Id
@@ -54,7 +54,7 @@ public class DeathFiles {
     private String voiceFileUrl;
 
     @ManyToOne
-    @JoinColumn(name = "file_id", nullable = false)
+    @JoinColumn(name = "userid",referencedColumnName = "userIdX",nullable = false)
     @JsonBackReference // Changed file_id to user_id to match the reference in DeathUser
     private DeathUser usery; // This references the DeathUser entity
 

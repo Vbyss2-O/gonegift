@@ -1,6 +1,5 @@
 package com.example.demo.Controller.DeathControllers;
 
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -8,10 +7,12 @@ import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.Service.FileMeataDataService;
 import com.example.demo.model.DeathProject.DeathFiles;
+
 
 @RestController
 @RequestMapping("/api/filemetadata")
@@ -46,11 +47,10 @@ public class FileMetadataController {
         }
     }
 
+    // This is tentive controller structure
 
-    //This is tentive controller structure 
-    
     @GetMapping("/getAllFiles/{userId}")
-    public List<DeathFiles> getAllUserByID(@PathVariable UUID userId){
+    public List<DeathFiles> getAllUserByID(@PathVariable UUID userId) {
         // implement logic to get all files by specific user ID
         // return fileMetadataList;
         return fileMetadataService.getAllFilesBySpecifiUserId(userId);
@@ -74,28 +74,15 @@ public class FileMetadataController {
             return ResponseEntity.ok(savedFileMetadata);
         } catch (Exception e) {
             e.printStackTrace();
-            return new ResponseEntity<>("An unexpected error occurred while saving the metadata.", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("An unexpected error occurred while saving the metadata.",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    /**
-     * Delete file metadata by ID
-     *
-     * @param id The ID of the file metadata to delete
-     * @return ResponseEntity with a success or error status
-     */
+ 
+    @Transactional
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFileMetadataById(@PathVariable Long id) {
-        try {
-            if (id == null || id <= 0) {
-                return new ResponseEntity<>("Invalid file ID provided.", HttpStatus.BAD_REQUEST);
-            }
-
-            fileMetadataService.deleteFileMetaDataRepo(id);
-            return new ResponseEntity<>("File metadata deleted successfully.", HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("An unexpected error occurred while deleting the metadata.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<Void> deleteFile(@PathVariable Long id) {
+        fileMetadataService.deleteFileMetaDataRepo(id);
+        return ResponseEntity.noContent().build();
     }
 }

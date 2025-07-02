@@ -109,18 +109,13 @@ const DeathReportForm = () => {
         throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
 
-      const { data: publicUrlData } = supabase.storage
-        .from(bucket)
-        .getPublicUrl(filePath);
-      const fileUrl = publicUrlData?.publicUrl;
-      if (!fileUrl) {
-        throw new Error("Failed to retrieve file URL from Supabase");
-      }
+     
+    
 
       const reportData = {
         secretId,
         password,
-        fileUrl,
+        filePath,
         name,
         surname,
         reportDetails: reportDetails || null,
