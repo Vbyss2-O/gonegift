@@ -450,7 +450,7 @@ const UploadPage = () => {
             onClick={validateUuid}
             disabled={loading || isUuidValid}
             style={{
-              background: isUuidValid ? "#6b7280" : "#7c3aed",
+              background: isUuidValid ? "green" : "green",
               color: "white",
               padding: "0.8rem 1rem",
               borderRadius: "1rem",

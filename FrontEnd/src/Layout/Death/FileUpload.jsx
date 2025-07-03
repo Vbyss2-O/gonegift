@@ -111,7 +111,7 @@ const FileUpload = () => {
       console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`,
-       
+
       );
       console.log("API Response:", response.data);
       if (response.status === 200) {
@@ -229,7 +229,7 @@ const FileUpload = () => {
       const encryptedBlob = new Blob([encryptedData], {
         type: file.type,
       });
-     
+
       const uniqueFileName = `${currentUser.id}_${Date.now()}_${file.name}.enc`;
       const filePath = `${currentUser.id}/${uniqueFileName}`;
       const { error: uploadError } = await supabase.storage
@@ -242,8 +242,8 @@ const FileUpload = () => {
       if (uploadError) {
         throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
-      
-      
+
+
       const fileMetadata = {
         idOfUser: currentUser.id,
         letterFileUrl: null,
@@ -325,7 +325,13 @@ const FileUpload = () => {
       </div>
       <div className="upload-section">
         <div className="upload-zone">
-          <span className="upload-zone-icon">📤</span>
+          <span className="upload-zone-icon">
+            <img
+              src="/logo.png"
+              alt="Upload Icon"
+              style={{ width: "40px", height: "40px" }}
+            />
+          </span>
           <p className="upload-zone-text">
             {file
               ? `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`
@@ -350,9 +356,8 @@ const FileUpload = () => {
       </div>
       {message.text && (
         <p
-          className={`status-message ${
-            message.isSuccess ? "success" : "error"
-          }`}
+          className={`status-message ${message.isSuccess ? "success" : "error"
+            }`}
         >
           {message.text}
         </p>

@@ -1,73 +1,91 @@
-/* AudioRecorder.css - Themed to match FileUpload.css, now larger for better page utilization */
+/* AudioRecorder.css - Professional Formal Design */
+
+/* CSS Variables */
+:root {
+  --primary: #a855f7;
+  --secondary: #ec4899;
+  --accent: #10b981;
+  --accent3: #10b981;
+  --accent4: #ef4444;
+  --text-primary: #333;
+  --text-gray: #bbb;
+  --bg-glass: rgba(255, 255, 255, 0.7);
+  --radius-xl: 1.5rem;
+  --radius-lg: 1rem;
+  --shadow-rainbow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 4px 16px rgba(76, 175, 80, 0.15);
+  --blur-light: blur(8px);
+  --border-gradient: linear-gradient(90deg, #a855f7, #ec4899, #10b981);
+  --transition: all 0.3s ease;
+  --green-primary: #4CAF50;
+  --green-secondary: #66BB6A;
+  --green-light: #A5D6A7;
+}
 
 /* Recorder Container */
 .recorder-box {
-  max-width: 700px;
-  min-height: 600px;
+  max-width: 600px;
+  /* Increased max-width for a wider box */
+  min-height: 800px;
   width: 100%;
   margin: 3rem auto;
   padding: 40px;
-  background: var(--bg-glass, rgba(255,255,255,0.7));
-  border-radius: var(--radius-xl, 1.5rem);
-  box-shadow: var(--shadow-rainbow, 0 5px 20px rgba(0,0,0,0.08));
-  border: 1px solid rgba(255,255,255,0.2);
+  background: var(--bg-glass);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-rainbow);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  backdrop-filter: var(--blur-light, blur(8px));
+  backdrop-filter: var(--blur-light);
   position: relative;
   overflow: hidden;
   top: 5vh;
-  transition: var(--transition spring, box-shadow 0.3s cubic-bezier(.4,2,.6,1));
-}
-
-.recorder-box::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 6px;
-  background: var(--border-gradient, linear-gradient(90deg, #a855f7, #ec4899, #10b981));
-  background-size: 200% 200%;
-  animation: gradientMove 3s linear infinite;
+  transition: var(--transition);
 }
 
 /* Header */
+.recorder-header {
+  margin-bottom: 2rem;
+}
+
 .recorder-header h2 {
   margin-bottom: 2rem;
-  background: linear-gradient(135deg, var(--primary, #a855f7), var(--secondary, #ec4899), var(--accent, #10b981));
+  background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  background-clip: text;
   font-size: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .recorder-header p {
-  color: var(--text-primary, #555);
+  color: var(--text-primary);
   font-size: 1.125rem;
   margin-bottom: 2rem;
 }
 
-/* Icon */
+/* Professional Microphone Icon */
 .icon-circle {
   width: 96px;
   height: 96px;
   border-radius: 50%;
-  background: var(--primary, #7c3aed);
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 2rem;
   color: white;
-  box-shadow: 0 0 20px rgba(124,58,237,0.7);
-  transition: box-shadow 0.3s;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3);
+  transition: var(--transition);
   font-size: 2.5rem;
 }
 
 .icon-circle:hover {
-  box-shadow: 0 0 32px rgba(124,58,237,0.9);
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+  transform: translateY(-2px);
 }
 
 /* Recording Indicator */
@@ -84,94 +102,81 @@
 
 .audio-bar {
   width: 6px;
-  background: var(--accent4, #ef4444);
+  background: var(--accent4);
   border-radius: 6px;
   transition: height 0.2s;
 }
 
 .recording-text {
-  color: var(--accent4, #ef4444);
+  color: var(--accent4);
   font-weight: bold;
   font-size: 1.25rem;
 }
 
 .recording-time {
-  font-family: monospace;
+  font-family: 'Courier New', monospace;
   font-size: 1.5rem;
   margin-top: 0.5rem;
+  color: var(--text-primary);
 }
 
-/* Controls */
+/* Controls - Professional Green Buttons */
+.controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
 .controls .btn {
-  padding: 1.25rem 3rem;
-  margin: 1.25rem 0.75rem;
+  padding: 1rem 2.5rem;
   border: none;
-  border-radius: var(--radius-lg, 1rem);
+  border-radius: var(--radius-lg);
   font-weight: 600;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
-  box-shadow: var(--shadow-md, 0 2px 8px rgba(0,0,0,0.08));
-  transition: var(--transition spring, box-shadow 0.3s cubic-bezier(.4,2,.6,1));
+  transition: var(--transition);
   position: relative;
-  overflow: hidden;
-}
+  min-width: 140px;
 
-.controls .btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: var(--transition, left 0.3s);
+  /* All buttons are green - professional style */
+  background: var(--green-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.3);
 }
 
 .controls .btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--primary-light, #c084fc), var(--secondary-light, #f472b6));
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-xl, 0 4px 16px rgba(168,85,247,0.15));
+  background: var(--green-secondary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
 }
 
-.controls .btn:hover:not(:disabled)::before {
-  left: 100%;
+.controls .btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
 }
 
 .controls .btn:disabled {
-  background: linear-gradient(135deg, var(--text-gray, #bbb), #999);
+  background: var(--text-gray);
   cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.btn.start {
-  background: linear-gradient(135deg, var(--accent4, #ef4444), #f87171);
-  color: white;
-}
-
-.btn.stop {
-  background: linear-gradient(135deg, #333, #555);
-  color: white;
-}
-
-.btn.cancel {
-  background: linear-gradient(135deg, #999, #bbb);
-  color: white;
-}
-
-.btn.upload {
-  background: linear-gradient(135deg, var(--accent3, #10b981), #34d399);
-  color: white;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Preview */
 .preview-box {
   margin-top: 2rem;
-  background: var(--bg-glass, #f3f4f6);
+  background: rgba(243, 244, 246, 0.8);
   padding: 1.5rem;
-  border-radius: var(--radius-lg, 1rem);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .preview-controls {
@@ -182,7 +187,7 @@
 
 .progress-bar {
   height: 12px;
-  background: linear-gradient(to right, var(--primary, #a855f7), var(--secondary, #ec4899));
+  background: linear-gradient(to right, var(--primary), var(--secondary));
   border-radius: 8px;
   width: 50%;
   margin: 0 auto;
@@ -193,6 +198,48 @@
   margin-top: 1.5rem;
   display: flex;
   justify-content: space-between;
+  gap: 1rem;
+}
+
+.actions .btn {
+  padding: 1rem 2.5rem;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  position: relative;
+  min-width: 140px;
+
+  /* All buttons are green - including validate button */
+  background: var(--green-primary);
+  color: white;
+  box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.actions .btn:hover:not(:disabled) {
+  background: var(--green-secondary);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.actions .btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(76, 175, 80, 0.2);
+}
+
+.actions .btn:disabled {
+  background: var(--text-gray);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
 }
 
 /* Uploading Message */
@@ -202,38 +249,38 @@
   justify-content: center;
   align-items: center;
   gap: 0.75rem;
-  color: var(--text-primary, #333);
+  color: var(--text-primary);
 }
 
 /* Spinner */
 .spinner {
   width: 2.5rem;
   height: 2.5rem;
-  border: 4px solid var(--primary-ultra-light, #e9d5ff);
-  border-top-color: var(--primary, #a855f7);
+  border: 4px solid rgba(168, 85, 247, 0.2);
+  border-top-color: var(--primary);
   border-radius: 50%;
-  animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
+  animation: spin 1s linear infinite;
   display: inline-block;
 }
 
 /* Success/Error Messages */
 .recorder-box p.success {
-  background: linear-gradient(135deg, rgba(16,185,129,0.15), rgba(16,185,129,0.25));
-  color: var(--accent3, #10b981);
-  border: 1px solid rgba(16,185,129,0.3);
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--accent3);
+  border: 1px solid rgba(16, 185, 129, 0.3);
   font-weight: 600;
-  border-radius: var(--radius-lg, 1rem);
+  border-radius: var(--radius-lg);
   margin-top: 1.5rem;
   padding: 1.25rem;
   font-size: 1.125rem;
 }
 
 .recorder-box p.error {
-  background: linear-gradient(135deg, rgba(239,68,68,0.15), rgba(239,68,68,0.25));
-  color: var(--accent4, #ef4444);
-  border: 1px solid rgba(239,68,68,0.3);
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--accent4);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   font-weight: 600;
-  border-radius: var(--radius-lg, 1rem);
+  border-radius: var(--radius-lg);
   margin-top: 1.5rem;
   padding: 1.25rem;
   font-size: 1.125rem;
@@ -241,61 +288,267 @@
 
 /* Animations */
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+
+  100% {
+    background-position: 100% 50%;
+  }
 }
 
-/* Responsive Styles */
-@media (max-width: 1200px) {
+/* Responsive Design */
+
+/* Desktop Large (1400px and up) */
+@media (min-width: 1400px) {
   .recorder-box {
-    max-width: 90vw;
-    min-height: 500px;
-    padding: 32px;
+    max-width: 650px;
+    /* Adjusted for even wider desktop view */
+    min-height: 700px;
+    padding: 3rem;
   }
+
+  .recorder-header h2 {
+    font-size: 2.5rem;
+  }
+
+  .icon-circle {
+    width: 110px;
+    height: 110px;
+    font-size: 2.75rem;
+  }
+
+  .controls .btn {
+    padding: 1.25rem 3rem;
+    font-size: 1.2rem;
+  }
+}
+
+/* Desktop (1200px to 1399px) */
+@media (max-width: 1399px) and (min-width: 1200px) {
+  .recorder-box {
+    max-width: 550px;
+    /* Adjusted */
+    min-height: 600px;
+    padding: 2.5rem;
+  }
+}
+
+/* Laptop (992px to 1199px) */
+@media (max-width: 1199px) and (min-width: 992px) {
+  .recorder-box {
+    max-width: 500px;
+    /* Adjusted */
+    min-height: 550px;
+    padding: 2rem;
+  }
+
   .recorder-header h2 {
     font-size: 2rem;
   }
+
+  .icon-circle {
+    width: 90px;
+    height: 90px;
+    font-size: 2.25rem;
+  }
+
+  .controls .btn {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    min-width: 120px;
+  }
 }
 
-@media (max-width: 900px) {
+/* Tablet (768px to 991px) */
+@media (max-width: 991px) and (min-width: 768px) {
   .recorder-box {
-    max-width: 98vw;
-    min-height: 400px;
-    padding: 24px;
+    max-width: 80%;
+    /* Slightly more constrained for tablet */
+    min-height: 500px;
+    padding: 2rem;
+    margin: 2rem auto;
   }
+
+  .recorder-header h2 {
+    font-size: 1.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .icon-circle {
+    width: 85px;
+    height: 85px;
+    font-size: 2rem;
+  }
+
+  .controls {
+    gap: 0.75rem;
+  }
+
+  .controls .btn {
+    padding: 0.875rem 1.75rem;
+    font-size: 1rem;
+    min-width: 110px;
+  }
+}
+
+/* Mobile Large (480px to 767px) - Refined breakpoint */
+@media (max-width: 767px) and (min-width: 480px) {
+  .recorder-box {
+    max-width: 90%;
+    min-height: 450px;
+    padding: 1.5rem;
+    margin: 1.5rem auto;
+    top: 2vh;
+  }
+
   .recorder-header h2 {
     font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .recorder-header p {
+    font-size: 1rem;
+  }
+
+  .icon-circle {
+    width: 80px;
+    height: 80px;
+    font-size: 1.875rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .controls {
+    gap: 0.75rem;
+    /* Adjusted for better spacing */
+  }
+
+  .controls .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    min-width: 110px;
+  }
+
+  .recording-time {
+    font-size: 1.25rem;
   }
 }
 
-@media (max-width: 600px) {
+
+/* Mobile (up to 479px) - Combined and refined for a beautiful mobile experience */
+@media (max-width: 479px) {
   .recorder-box {
-    max-width: 100vw;
-    min-height: 300px;
-    padding: 12px;
-    margin: 0.5rem auto;
+    padding: 1.25rem;
+    /* Slightly more padding for better look */
+    min-height: 380px;
+    margin-top: 1rem;
+    /* Reduced top margin for better screen utilization */
+    top: 0;
+    max-width: 95%;
+    /* Allow it to take more width on very small screens */
+    border-radius: var(--radius-lg);
+    /* Slightly smaller border radius for smaller screens */
   }
+
+  .recorder-header {
+    margin-bottom: 1.5rem;
+    /* Reduced margin */
+  }
+
   .recorder-header h2 {
-    font-size: 1.25rem;
+    font-size: 1.6rem;
+    /* Slightly larger for better readability */
     margin-bottom: 1rem;
   }
-  .controls .btn {
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    margin: 0.75rem 0.25rem;
+
+  .recorder-header p {
+    font-size: 0.95rem;
+    /* Slightly smaller for compactness */
+    margin-bottom: 1rem;
   }
+
+  .icon-circle {
+    width: 75px;
+    /* Slightly larger icon */
+    height: 75px;
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .controls {
+    flex-direction: column;
+    /* Stack buttons vertically */
+    align-items: stretch;
+    /* Stretch buttons to full width */
+    gap: 0.75rem;
+    /* Consistent gap */
+    margin: 1.5rem 0;
+    /* Adjusted margin */
+  }
+
+  .controls .btn {
+    padding: 0.8rem 1rem;
+    /* Comfortable padding */
+    font-size: 1rem;
+    /* Readable font size */
+    width: auto;
+    /* Allow auto width due to stretch */
+    min-width: unset;
+    /* Remove min-width constraint */
+  }
+
+  .recording-text {
+    font-size: 1.1rem;
+    /* Slightly larger for readability */
+  }
+
+  .recording-time {
+    font-size: 1.3rem;
+    /* Enhanced visibility */
+  }
+
+  .preview-box {
+    padding: 1rem;
+    /* More compact */
+    margin-top: 1.5rem;
+  }
+
+  .actions {
+    flex-direction: column;
+    /* Stack action buttons vertically */
+    align-items: stretch;
+    /* Stretch action buttons to full width */
+    gap: 0.75rem;
+    /* Consistent gap */
+    margin-top: 1.5rem;
+  }
+
+  .actions .btn {
+    padding: 0.8rem 1rem;
+    /* Comfortable padding */
+    font-size: 1rem;
+    /* Readable font size */
+    width: auto;
+    /* Allow auto width due to stretch */
+    min-width: unset;
+    /* Remove min-width constraint */
+  }
+
   .recorder-box p.success,
   .recorder-box p.error {
+    padding: 1rem;
+    /* More compact messages */
     font-size: 1rem;
-    padding: 0.75rem;
   }
-  .icon-circle {
-    width: 64px;
-    height: 64px;
-    font-size: 1.5rem;
+
+  .spinner {
+    width: 2rem;
+    height: 2rem;
   }
 }

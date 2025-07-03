@@ -211,7 +211,6 @@ const SharedSpace = () => {
       setGeneratedPassword(readableKey); // Set the readable password
       setCopiedToken(false); // Reset copied flag when new token is generated
       setCopiedPassword(false); // Reset copied password flag as well
-      setMessage("Token generated successfully. Attempting to save metadata...");
 
       // Now, proceed with saving the metadata
       const metaData = {
@@ -236,7 +235,6 @@ const SharedSpace = () => {
             },
           }
         );
-        setMessage((prev) => prev + "\nShared space metadata added successfully.");
       } catch (error) {
         console.error(
           "Error uploading metadata:",
@@ -325,12 +323,12 @@ const SharedSpace = () => {
   return (
     <div className="shared-container">
       <h2>Secure Shared Space</h2>
-      <div className="total-space">
+      <div className="total-space" style={{ color: "Black" }}>
         Total Spaces: <strong>{totalSharedSpace ?? "..."}</strong>
       </div>
       <br />
       <div className="form-box">
-        <label>UUID</label>
+        <label style={{color : "Black"}}>UUID</label>
         <input
           type="text"
           placeholder="Enter UUID"
@@ -339,7 +337,7 @@ const SharedSpace = () => {
           disabled={loading || isValidated} // Disable after validation
         />
 
-        <label>Password</label>
+        <label style={{color : "black"}}>Password</label>
         <input
           type="password"
           placeholder="Enter Password"
@@ -361,7 +359,7 @@ const SharedSpace = () => {
 
       <div className="token-section">
         {isValidated && ( // Only show "Generate Token and Save" button after validation
-          <button onClick={generateTokenAndSave} disabled={!currentUser}>
+          <button onClick={generateTokenAndSave} disabled={!currentUser} style={{ background: "green", color: "white" }}>
             Generate Token & Save Shared Space
           </button>
         )}

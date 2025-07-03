@@ -1,40 +1,148 @@
-/* FileUpload.css */
+:root {
+  /* Primary Colors - Professional Blues */
+  --primary: #2563eb;
+  --primary-light: #60a5fa;
+  --primary-dark: #1d4ed8;
+  --primary-ultra-light: #eff6ff;
+  
+  /* Secondary Colors - Neutral Grays */
+  --secondary: #475569;
+  --secondary-light: #94a3b8;
+  --secondary-dark: #334155;
+  
+  /* Accent Colors - Professional Palette */
+  --accent: #059669; /* Green for success */
+  --accent2: #dc2626; /* Red for danger/error */
+  --accent3: #d97706; /* Orange/Warning */
+  --accent4: #7c3aed; /* Purple */
+  --accent5: #0891b2; /* Cyan */
+  --accent6: #be123c; /* Dark Red */
+  
+  /* Background Colors - Clean and Professional */
+  --bg-main: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%, #f8fafc 100%);
+  --bg-white: #ffffff;
+  --bg-glass: rgba(255, 255, 255, 0.9);
+  --bg-glass-dark: rgba(255, 255, 255, 0.8);
+  --bg-light: #f8fafc;
+  --bg-neutral: #f1f5f9;
+  --bg-gradient-1: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  --bg-gradient-2: linear-gradient(135deg, var(--accent) 0%, #047857 100%);
+  --bg-gradient-3: linear-gradient(135deg, var(--accent5) 0%, #0e7490 100%);
+  --bg-gradient-4: linear-gradient(135deg, var(--accent2) 0%, #b91c1c 100%);
+  --bg-gradient-5: linear-gradient(135deg, var(--accent3) 0%, #c2410c 100%);
+  --bg-gradient-6: linear-gradient(135deg, var(--accent4) 0%, #6d28d9 100%);
+  
+  /* Text Colors - Professional Typography */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --text-white: #ffffff;
+  --text-accent: #2563eb;
+  
+  /* Border Colors - Subtle and Clean */
+  --border-light: #e2e8f0;
+  --border-medium: #cbd5e1;
+  --border-dark: #94a3b8;
+  --border-primary: #2563eb;
+  
+  /* Shadows - Professional and Subtle */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-blue: 0 4px 14px rgba(37, 99, 235, 0.15);
+  --shadow-green: 0 4px 14px rgba(5, 150, 105, 0.15);
+  --shadow-red: 0 4px 14px rgba(220, 38, 38, 0.15);
+  --shadow-glow: 0 0 0 3px var(--primary-light); /* Defined for consistent glow effect */
+  
+  /* Transitions - Smooth and Professional */
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  
+  /* Spacing Scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+  --space-3xl: 4rem;
+  
+  /* Border Radius - Consistent and Clean */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-full: 50%;
 
-.file-upload {
-  max-width: 700px; /* Increased width */
-  min-height: 600px; /* Added height for spaciousness */
-  margin: 3rem auto; /* More margin for centering */
-  padding: 40px; /* Increased padding */
-  background: var(--bg-glass); /* Glassmorphism background */
-  border-radius: var(--radius-xl); /* Smooth corners */
-  box-shadow: var(--shadow-rainbow); /* Theme shadow */
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  text-align: center;
-  backdrop-filter: var(--blur-light); /* Glass effect */
-  border: 1px solid rgba(255, 255, 255, 0.2); /* Subtle border */
-  transition: var(--transition spring); /* Smooth transition */
-  position: relative;
-  overflow: hidden;
+  /* Typography Scale */
+  --font-xs: 0.75rem;
+  --font-sm: 0.875rem;
+  --font-base: 1rem;
+  --font-lg: 1.125rem;
+  --font-xl: 1.25rem;
+  --font-2xl: 1.5rem;
+  --font-3xl: 1.875rem;
+  --font-4xl: 2.25rem;
+
+  /* Custom variables for FileUpload.css */
+  --border-gradient: linear-gradient(90deg, var(--primary), var(--accent));
+  --bg-sky-light: var(--primary-ultra-light); /* Using primary-ultra-light for sky effect */
+
+  /* Add RGB values for transparent gradients if not already in :root */
+  --primary-rgb: 37, 99, 235; /* RGB for #2563eb */
+  --accent-rgb: 5, 150, 105; /* RGB for #059669 */
+  --accent2-rgb: 220, 38, 38; /* RGB for #dc2626 */
 }
 
-.file-upload::before {
+.file-upload {
+  max-width: 700px; /* Reverted to a defined max-width */
+  min-height: 600px; /* Added height for spaciousness */
+  margin: var(--space-2xl) auto; /* Centered with margin */
+  padding: var(--space-2xl); /* Increased padding */
+  background: var(--bg-glass); /* Glassmorphism background */
+  border-radius: var(--radius-xl); /* Smooth corners for the main box */
+  box-shadow: var(--shadow-xl); /* Reintroduced box-shadow */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  backdrop-filter: blur(8px); /* Glass effect, using direct blur value */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Reintroduced border */
+  transition: var(--transition-smooth); /* Smooth transition, using transition-smooth */
+  position: relative;
+  /* Removed overflow: hidden; to allow content to scroll if needed on mobile */
+}
+
+/* Removed the ::before pseudo-element and its animation for the top gradient line */
+/* .file-upload::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
-  height: 6px; /* Gradient bar */
+  height: 6px;
   background: var(--border-gradient);
   background-size: 200% 200%;
   animation: gradientMove 3s linear infinite;
 }
 
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+} */
+
 .file-upload h2 {
-  margin-bottom: 2rem; /* More spacing */
+  margin-bottom: var(--space-2xl); /* More spacing */
   background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent)); /* Theme gradient */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 2.25rem; /* Larger header */
+  font-size: var(--font-4xl); /* Larger header */
   font-weight: 700;
   letter-spacing: -0.5px;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle depth */
@@ -42,13 +150,13 @@
 
 .file-upload input[type="text"] {
   width: 100%; /* Full width */
-  padding: 1rem 1.25rem; /* Comfortable padding */
+  padding: var(--space-md) var(--space-lg); /* Comfortable padding */
   height: 3.5rem; /* Taller input */
-  margin-bottom: 1.5rem; /* Increased spacing */
+  margin-bottom: var(--space-lg); /* Increased spacing */
   background: var(--bg-white); /* White background */
   border: 2px solid var(--border-light); /* Theme border */
-  border-radius: var(--radius-lg); /* Smooth corners */
-  font-size: 1.125rem; /* Larger font */
+  border-radius: var(--radius-sm); /* Sharper corners for inputs */
+  font-size: var(--font-lg); /* Larger font */
   color: var(--text-primary); /* Theme text */
   outline: none;
   transition: var(--transition); /* Smooth transition */
@@ -56,39 +164,39 @@
 }
 
 .file-upload input[type="text"]:focus {
-  border-color: var(--primary); /* Sky blue focus */
-  box-shadow: var(--shadow-glow); /* Glow effect */
+  border-color: var(--primary); /* Primary color focus */
+  box-shadow: var(--shadow-glow); /* Glow effect, using theme variable */
   transform: translateY(-2px); /* Subtle lift */
 }
 
 .file-upload input[type="text"]:hover {
-  border-color: var(--primary-light); /* Lighter blue hover */
+  border-color: var(--primary-light); /* Lighter primary hover */
 }
 
 .file-upload .upload-zone {
   width: 100%;
   height: 250px; /* Spacious upload area */
-  padding: 2rem; /* Comfortable padding */
+  padding: var(--space-xl); /* Comfortable padding */
   border: 3px dashed var(--primary-light); /* Theme dashed border */
-  border-radius: var(--radius-lg); /* Smooth corners */
-  margin: 1.5rem 0; /* Spacing */
+  border-radius: var(--radius-sm); /* Sharper corners for upload zone */
+  margin: var(--space-lg) 0; /* Spacing */
   background: var(--bg-glass); /* Glass background */
-  backdrop-filter: var(--blur-light); /* Glass effect */
+  backdrop-filter: blur(8px); /* Glass effect, using direct blur value */
   text-align: center;
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem; /* Spacing between elements */
-  transition: var(--transition spring); /* Smooth transition */
+  gap: var(--space-md); /* Spacing between elements */
+  transition: var(--transition-smooth); /* Smooth transition, using transition-smooth */
 }
 
 .file-upload .upload-zone:hover {
-  border-color: var(--primary); /* Solid blue on hover */
-  background: var(--bg-sky-light); /* Sky blue hover */
+  border-color: var(--primary); /* Solid primary on hover */
+  background: var(--bg-sky-light); /* Sky blue hover, using theme variable */
   transform: translateY(-4px); /* Lift effect */
-  box-shadow: var(--shadow-glow); /* Glow effect */
+  box-shadow: var(--shadow-glow); /* Glow effect, using theme variable */
 }
 
 .file-upload .upload-zone input[type="file"] {
@@ -102,23 +210,23 @@
 }
 
 .file-upload .upload-zone-text {
-  font-size: 1.125rem; /* Readable text */
+  font-size: var(--font-lg); /* Readable text */
   color: var(--text-primary); /* Theme text */
   line-height: 1.6;
 }
 
 .file-upload button {
   display: inline-block;
-  margin: 1rem 0.5rem; /* Adjusted spacing */
-  padding: 1rem 2.5rem; /* Larger click area */
-  font-size: 1.125rem; /* Larger font */
+  margin: var(--space-md) var(--space-sm); /* Adjusted spacing */
+  padding: var(--space-md) var(--space-2xl); /* Larger click area */
+  font-size: var(--font-lg); /* Larger font */
   font-weight: 600; /* Bold text */
-  color: var(--text-light); /* White text */
+  color: var(--text-white); /* White text */
   background: linear-gradient(135deg, var(--primary), var(--secondary)); /* Theme gradient */
   border: none;
-  border-radius: var(--radius-lg); /* Smooth corners */
+  border-radius: var(--radius-sm); /* Sharper corners for buttons */
   cursor: pointer;
-  transition: var(--transition spring); /* Smooth transition */
+  transition: var(--transition-smooth); /* Smooth transition, using transition-smooth */
   box-shadow: var(--shadow-md); /* Subtle shadow */
   position: relative;
   overflow: hidden;
@@ -146,29 +254,29 @@
 }
 
 .file-upload button:disabled {
-  background: linear-gradient(135deg, var(--text-gray), #999); /* Disabled gradient */
+  background: linear-gradient(135deg, var(--text-light), var(--text-muted)); /* Disabled gradient, using theme grays */
   cursor: not-allowed;
   opacity: 0.7;
 }
 
 .file-upload p {
-  font-size: 1rem; /* Slightly larger */
-  margin-top: 1.25rem; /* More spacing */
-  padding: 1rem; /* Padding for messages */
-  border-radius: var(--radius-lg); /* Smooth corners */
+  font-size: var(--font-base); /* Slightly larger */
+  margin-top: var(--space-md); /* More spacing */
+  padding: var(--space-md); /* Padding for messages */
+  border-radius: var(--radius-sm); /* Sharper corners for paragraphs */
   font-weight: 600; /* Bold text */
 }
 
 .file-upload p.success {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(16, 185, 129, 0.25)); /* Success gradient */
-  color: var(--accent3); /* Theme success color */
-  border: 1px solid rgba(16, 185, 129, 0.3); /* Subtle border */
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.15), rgba(var(--accent-rgb), 0.25)); /* Success gradient */
+  color: var(--accent); /* Theme success color */
+  border: 1px solid rgba(var(--accent-rgb), 0.3); /* Subtle border */
 }
 
 .file-upload p.error {
-  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15), rgba(239, 68, 68, 0.25)); /* Error gradient */
-  color: var(--accent4); /* Theme error color */
-  border: 1px solid rgba(239, 68, 68, 0.3); /* Subtle border */
+  background: linear-gradient(135deg, rgba(var(--accent2-rgb), 0.15), rgba(var(--accent2-rgb), 0.25)); /* Error gradient */
+  color: var(--accent2); /* Theme error color */
+  border: 1px solid rgba(var(--accent2-rgb), 0.3); /* Subtle border */
 }
 
 /* Loading State */
@@ -183,11 +291,11 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: var(--space-lg); /* Use theme spacing */
+  height: var(--space-lg); /* Use theme spacing */
   border: 3px solid var(--primary-ultra-light);
   border-top-color: var(--primary);
-  border-radius: 50%;
+  border-radius: var(--radius-full);
   animation: spin 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite;
   transform: translate(-50%, -50%);
 }
@@ -199,90 +307,216 @@
 /* Responsive Styles */
 @media (max-width: 1024px) {
   .file-upload {
-    max-width: 600px;
+    max-width: 600px; /* Adjusted max-width for smaller desktops/laptops */
     min-height: 550px;
-    padding: 30px;
-    margin: 2rem auto;
+    padding: var(--space-2xl);
+    margin: var(--space-xl) auto; /* Centered with margin */
   }
 
   .file-upload h2 {
-    font-size: 2rem;
+    font-size: var(--font-3xl); /* Adjusted for tablets */
+  }
+
+  .file-upload input[type="text"] {
+    border-radius: var(--radius-sm); /* Sharper corners */
   }
 
   .file-upload .upload-zone {
     height: 220px;
+    padding: var(--space-xl);
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload button {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload p {
+    border-radius: var(--radius-sm); /* Sharper corners */
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) { /* Targeting mobile phones specifically */
   .file-upload {
-    max-width: 90%;
-    min-height: 500px;
-    padding: 25px;
-    margin: 1.5rem auto;
+    max-width: 100%; /* Utilize full width on mobile */
+    min-height: 100vh; /* Utilize full viewport height on mobile */
+    padding: var(--space-lg); /* More generous padding */
+    margin: 0; /* Remove margin to utilize full page */
+    border-radius: 0; /* No border-radius for full page */
+    box-shadow: none; /* Remove shadow for full page */
+    border: none; /* Remove border for full page */
   }
 
   .file-upload h2 {
-    font-size: 1.75rem;
+    font-size: var(--font-2xl); /* Readable header on mobile */
+    margin-bottom: var(--space-lg);
   }
 
   .file-upload input[type="text"] {
-    height: 3rem;
-    font-size: 1rem;
-    padding: 0.875rem 1rem;
+    height: 3rem; /* Slightly shorter input */
+    font-size: var(--font-base); /* Standard font size */
+    padding: var(--space-sm) var(--space-md); /* Adjusted padding */
+    margin-bottom: var(--space-md); /* Adjusted margin */
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload .upload-zone {
+    height: 180px; /* More compact upload area */
+    padding: var(--space-md); /* Adjusted padding */
+    margin: var(--space-md) 0; /* Adjusted margin */
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload .upload-zone-text {
+    font-size: var(--font-base); /* Readable text */
+  }
+
+  .file-upload button {
+    padding: var(--space-md) var(--space-xl); /* Adjusted padding */
+    font-size: var(--font-base); /* Standard font size */
+    margin: var(--space-md) var(--space-xs); /* Adjusted spacing */
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload p {
+    font-size: var(--font-sm); /* Smaller text for messages */
+    padding: var(--space-sm); /* Adjusted padding */
+    margin-top: var(--space-md);
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+}
+
+/* Tablet Screens (min-width: 768px and max-width: 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .file-upload {
+    max-width: 80%; /* Adjusted for tablets */
+    min-height: 500px;
+    padding: var(--space-2xl);
+    margin: var(--space-xl) auto; /* Centered with margin */
+    border-radius: var(--radius-xl); /* Smooth corners for tablet main box */
+  }
+
+  .file-upload h2 {
+    font-size: var(--font-3xl);
+  }
+
+  .file-upload input[type="text"] {
+    height: 3.25rem;
+    font-size: var(--font-lg);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-sm); /* Sharper corners */
   }
 
   .file-upload .upload-zone {
     height: 200px;
-    padding: 1.5rem;
+    padding: var(--space-lg);
+    border-radius: var(--radius-sm); /* Sharper corners */
   }
 
   .file-upload .upload-zone-text {
-    font-size: 1rem;
+    font-size: var(--font-lg);
   }
 
   .file-upload button {
-    padding: 0.875rem 2rem;
-    font-size: 1rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .file-upload {
-    max-width: 95%;
-    min-height: 450px;
-    padding: 20px;
-    margin: 1rem auto;
-  }
-
-  .file-upload h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .file-upload input[type="text"] {
-    height: 2.75rem;
-    font-size: 0.875rem;
-    padding: 0.75rem;
-  }
-
-  .file-upload .upload-zone {
-    height: 180px;
-    padding: 1.25rem;
-  }
-
-  .file-upload .upload-zone-text {
-    font-size: 0.875rem;
-  }
-
-  .file-upload button {
-    padding: 0.75rem 1.5rem;
-    font-size: 0.875rem;
-    margin: 0.75rem 0.25rem;
+    padding: var(--space-md) var(--space-xl);
+    font-size: var(--font-lg);
+    border-radius: var(--radius-sm); /* Sharper corners */
   }
 
   .file-upload p {
-    font-size: 0.875rem;
-    padding: 0.75rem;
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+}
+
+/* Laptop Screens (min-width: 1024px and max-width: 1439px) */
+@media (min-width: 1024px) and (max-width: 1439px) {
+  .file-upload {
+    max-width: 650px; /* Slightly smaller for consistency */
+    min-height: 580px;
+    padding: var(--space-2xl);
+    margin: var(--space-2xl) auto; /* Centered with margin */
+    border-radius: var(--radius-xl); /* Smooth corners for laptop main box */
+  }
+
+  .file-upload h2 {
+    font-size: var(--font-4xl);
+  }
+
+  .file-upload input[type="text"] {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload .upload-zone {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload button {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload p {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+}
+
+/* Standard Desktop (min-width: 1440px and max-width: 1919px) */
+@media (min-width: 1440px) and (max-width: 1919px) {
+  .file-upload {
+    max-width: 700px;
+    min-height: 600px;
+    padding: var(--space-3xl); /* More generous padding */
+    margin: var(--space-3xl) auto; /* Centered with margin */
+    border-radius: var(--radius-xl); /* Smooth corners for desktop main box */
+  }
+
+  .file-upload h2 {
+    font-size: var(--font-4xl);
+  }
+
+  .file-upload input[type="text"] {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload .upload-zone {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload button {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload p {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+}
+
+/* Large Desktop Screens (min-width: 1920px) */
+@media (min-width: 1920px) {
+  .file-upload {
+    max-width: 800px; /* Even larger for very big screens */
+    min-height: 650px;
+    padding: var(--space-3xl);
+    margin: var(--space-3xl) auto; /* Centered with margin */
+    border-radius: var(--radius-xl); /* Smooth corners for large desktop main box */
+  }
+
+  .file-upload h2 {
+    font-size: var(--font-4xl);
+  }
+
+  .file-upload input[type="text"] {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload .upload-zone {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload button {
+    border-radius: var(--radius-sm); /* Sharper corners */
+  }
+
+  .file-upload p {
+    border-radius: var(--radius-sm); /* Sharper corners */
   }
 }

@@ -176,7 +176,7 @@ const DeathReportForm = () => {
             type="button"
             onClick={validateUuid}
             disabled={loading}
-            style={{ ...styles.button, background: "#4f46e5" }}
+            style={{ ...styles.button, background: "green" }}
           >
             {loading ? "Validating..." : "Validate UUID"}
           </button>
@@ -284,7 +284,7 @@ const styles = {
   },
   button: {
     padding: "1rem 2rem",
-    background: "linear-gradient(135deg, #8b5cf6, #7c3aed)",
+    background: "linear-gradient(135deg,rgb(45, 126, 49),rgb(45, 126, 49))",
     color: "#fff",
     border: "none",
     borderRadius: "10px",
