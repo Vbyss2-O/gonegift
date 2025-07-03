@@ -18,7 +18,12 @@ const SharedSpace = () => {
   const [token, setToken] = useState("");
   const [totalSharedSpace, setTotalSharedSpace] = useState(0);
   const [message, setMessage] = useState("");
+  const [isGenerateDisabled, setIsGenerateDisabled] = useState(false);
+  const [cooldownTime, setCooldownTime] = useState(0);
   const navigate = useNavigate();
+
+  // Cooldown duration in milliseconds (60 seconds)
+  const COOLDOWN_DURATION = 60 * 1000*60*24;
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -34,7 +39,7 @@ const SharedSpace = () => {
       setCurrentUser(user);
     };
     fetchUser();
-  }, [navigate]); // Added navigate to dependency array
+  }, [navigate]);
 
   useEffect(() => {
     const fetchCount = async () => {
@@ -54,6 +59,35 @@ const SharedSpace = () => {
       fetchCount();
     }
   }, [currentUser]);
+
+  // Check cooldown on component mount
+  useEffect(() => {
+    const checkCooldown = () => {
+      const cooldownEnd = localStorage.getItem("generateTokenCooldown");
+      if (cooldownEnd) {
+        const timeLeft = parseInt(cooldownEnd, 10) - Date.now();
+        if (timeLeft > 0) {
+          setIsGenerateDisabled(true);
+          setCooldownTime(Math.ceil(timeLeft / 1000));
+          const timer = setInterval(() => {
+            const remaining = parseInt(cooldownEnd, 10) - Date.now();
+            if (remaining <= 0) {
+              setIsGenerateDisabled(false);
+              setCooldownTime(0);
+              localStorage.removeItem("generateTokenCooldown");
+              clearInterval(timer);
+            } else {
+              setCooldownTime(Math.ceil(remaining / 1000));
+            }
+          }, 1000);
+          return () => clearInterval(timer);
+        } else {
+          localStorage.removeItem("generateTokenCooldown");
+        }
+      }
+    };
+    checkCooldown();
+  }, []);
 
   const getEncryptedKey = async (userId) => {
     try {
@@ -180,17 +214,35 @@ const SharedSpace = () => {
       // Return Base64-encoded combined IV + ciphertext
       return CryptoJS.enc.Base64.stringify(combined);
     } catch (error) {
-      throw new Error("Encryption failed: " + error.message);
+      throw new Error("Encryption failededitor: Encryption failed: " + error.message);
     }
   };
 
-  // This function will now generate the token AND save the metadata
+  // Modified generateTokenAndSave to include cooldown
   const generateTokenAndSave = async () => {
     try {
       if (!currentUser || !encryptedAESKeyData) {
         setMessage("Please validate UUID and ensure key data is fetched.");
         return;
       }
+
+      // Start cooldown
+      const cooldownEnd = Date.now() + COOLDOWN_DURATION;
+      localStorage.setItem("generateTokenCooldown", cooldownEnd.toString());
+      setIsGenerateDisabled(true);
+      setCooldownTime(Math.ceil(COOLDOWN_DURATION / 1000));
+
+      const timer = setInterval(() => {
+        const timeLeft = cooldownEnd - Date.now();
+        if (timeLeft <= 0) {
+          setIsGenerateDisabled(false);
+          setCooldownTime(0);
+          localStorage.removeItem("generateTokenCooldown");
+          clearInterval(timer);
+        } else {
+          setCooldownTime(Math.ceil(timeLeft / 1000));
+        }
+      }, 1000);
 
       // Decrypt the AES key
       const decryptedAESKey = await decryptKey(
@@ -359,8 +411,17 @@ const SharedSpace = () => {
 
       <div className="token-section">
         {isValidated && ( // Only show "Generate Token and Save" button after validation
-          <button onClick={generateTokenAndSave} disabled={!currentUser} style={{ background: "green", color: "white" }}>
-            Generate Token & Save Shared Space
+          <button 
+            onClick={generateTokenAndSave} 
+            disabled={!currentUser || isGenerateDisabled} 
+            style={{ 
+              background: isGenerateDisabled ? "grey" : "green", 
+              color: "white" 
+            }}
+          >
+            {isGenerateDisabled 
+              ? `Wait ${cooldownTime}s to Generate Token & Save`
+              : "Generate Token & Save Shared Space"}
           </button>
         )}
 
