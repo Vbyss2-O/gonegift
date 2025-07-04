@@ -356,8 +356,6 @@ const UploadPage = () => {
       );
       if(response.status === 200 || response.status === 201) {
         setMessage("Letter saved successfully!");
-        setLetterTitle("");
-        setLetterContent("");
         setUuid("");
         setPassword("");
       } else {
