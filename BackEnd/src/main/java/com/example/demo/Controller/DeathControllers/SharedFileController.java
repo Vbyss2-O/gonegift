@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -37,9 +38,21 @@ public class SharedFileController {
     @Autowired
     private SharedTokenRepository sharedTokenRepository;
 
+
+
     @PostMapping("/add-file")
     public ResponseEntity<Void> addSharedFile(@RequestBody SharedFile file) {
         sharedFileRepository.save(file);
+        return ResponseEntity.ok().build();
+    }
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteSharedFile(@RequestBody UUID authorId) {
+        sharedFileService.delteAll(authorId);
+        return ResponseEntity.ok().build();
+    }
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Void> deleteSharedFileById(@PathVariable Long id) {
+        sharedFileService.deleteSharedFile(id);
         return ResponseEntity.ok().build();
     }
 

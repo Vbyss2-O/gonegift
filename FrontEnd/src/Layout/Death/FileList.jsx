@@ -124,6 +124,25 @@ const FileList = () => {
       console.error("Error deleting file:", error);
     }
   };
+  const delteSharedFile = async (fileId) => {
+    try {
+      const response = await fetch(
+        `http://localhost:8080/shared-file/delete/${fileId}`,
+        {
+          method: "DELETE",
+        }
+      );
+      console.log("Delete response:", response);
+      if (response.ok) {
+        // Filter out the deleted file from both lists
+        setSharedFiles((prevSharedFiles) => prevSharedFiles.filter((file) => file.id!== fileId));
+      } else {
+        console.error("Failed to delete shared file");
+      }
+    } catch (error) {
+      console.error("Error deleting shared file:", error);
+    }
+  }
 
   const getFileTypeFromUrl = (url) => {
     if (!url) return "unknown";
@@ -220,7 +239,7 @@ const FileList = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => deleteFile(file.id)}
+                    onClick={() => delteSharedFile(file.id)}
                     className="filelist-delete-button"
                   >
                     Delete
