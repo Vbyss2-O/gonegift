@@ -1,0 +1,106 @@
+.problemform-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  padding: 40px 28px;
+  background: var(--bg-glass, rgba(255,255,255,0.85));
+  border-radius: var(--radius-xl, 1.5rem);
+  box-shadow: var(--shadow-rainbow, 0 5px 20px rgba(0,0,0,0.08));
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+}
+
+.problemform-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--primary, #a855f7), var(--secondary, #ec4899), var(--accent, #10b981));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.problemform-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.problemform-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.problemform-label {
+  font-weight: 600;
+  color: var(--primary, #a855f7);
+  font-size: 1.08rem;
+}
+
+.problemform-input,
+.problemform-textarea {
+  width: 100%;
+  padding: 0.9rem 1.1rem;
+  background: var(--bg-white, #fff);
+  border: 2px solid var(--border-light, #e5e7eb);
+  border-radius: var(--radius-lg, 1rem);
+  font-size: 1.08rem;
+  color: var(--text-primary, #222);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+  resize: none;
+}
+
+.problemform-input:focus,
+.problemform-textarea:focus {
+  border-color: var(--primary, #a855f7);
+  box-shadow: 0 0 0 2px #a855f733;
+}
+
+.problemform-submit-btn {
+  padding: 1rem 0;
+  background: linear-gradient(90deg, #a855f7 0%, #ec4899 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px rgba(168,85,247,0.08);
+}
+
+.problemform-submit-btn:hover {
+  background: linear-gradient(90deg, #c084fc 0%, #f472b6 100%);
+}
+
+.problemform-success {
+  color: #10b981;
+  margin-top: 1.3rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.problemform-error {
+  color: #ef4444;
+  margin-top: 1.3rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .problemform-container {
+    padding: 16px 4vw;
+  }
+  .problemform-title {
+    font-size: 1.3rem;
+  }
+  .problemform-input,
+  .problemform-textarea {
+    font-size: 0.97rem;
+    padding: 0.7rem 0.8rem;
+  }
+}

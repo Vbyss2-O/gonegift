@@ -23,6 +23,7 @@ import AboutGoneGift from "./Layout/About";
 import UpdateAndPlans from "./Layout/UpdatesAndPlans";
 import PrivacyPolicy from "./Layout/PrivacyPolicy";
 import UserGuides from "./Layout/HelpCenter";
+import HelpCenterForm from "./Layout/ProblemSubmit";
 
 
 function App() {
@@ -177,6 +178,12 @@ function App() {
         path="/userGuides"
         element={
           <UserGuides />
+        }
+      />
+      <Route
+        path="/help"
+        element={
+          <HelpCenterForm />
         }
       />
 

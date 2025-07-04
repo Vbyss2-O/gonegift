@@ -267,7 +267,7 @@ const GoogleLoginPage = () => {
                   <div className="alternative-login">
                     <p className="alternative-text">
                       Don't have a Google account?{" "}
-                      <a href="#contact">Contact Support</a>
+                      <a href="/help">Help Center</a>
                     </p>
                   </div>
                 </div>
