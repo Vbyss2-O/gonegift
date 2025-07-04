@@ -1,5 +1,8 @@
+import BackButton from "../components/BackButton"; // Import the BackButton component
 const LifeBuddyAbout = () => {
   return (
+    <>
+      <BackButton />
     <div className="p-6 max-w-2xl mx-auto bg-white shadow-lg rounded-xl">
       <h1 className="text-2xl font-bold mb-4 text-center">What is LifeBuddy?</h1>
       <p className="mb-4">
@@ -32,6 +35,7 @@ const LifeBuddyAbout = () => {
         You can always reset your state to CHILLING by interacting with LifeBuddy during any stage.
       </p>
     </div>
+  </>
   );
 };
 

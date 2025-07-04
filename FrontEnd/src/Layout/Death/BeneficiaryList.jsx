@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import BackButton from "../components/BackButton";
 
 const BeneficiaryList = () => {
   const navigate = useNavigate();
@@ -131,6 +132,8 @@ const BeneficiaryList = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
+    <>
+    <BackButton />
     <div className="beneficiary-list-container">
       <h2>
         Welcome, {userData?.firstName} {userData?.lastname}
@@ -241,6 +244,7 @@ const BeneficiaryList = () => {
         }
       `}</style>
     </div>
+    </>
   );
 };
 

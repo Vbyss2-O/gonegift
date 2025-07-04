@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient"; // Supabase client
 import axios from "axios"; // For making HTTP requests
 import "./BeneficiaryForm.css"; // Import your CSS styles
+import BackButton from "../components/BackButton"; // Import the BackButton component
 
 // Supabase configuration
 
@@ -72,6 +73,8 @@ const BeneficiaryForm = () => {
   };
 
   return (
+    <>
+    <BackButton />
     <div className="beneficiary-form-container">
       <h2 className="beneficiary-form-title">Add a Beneficiary</h2>
       <form onSubmit={handleSubmit}>
@@ -112,6 +115,7 @@ const BeneficiaryForm = () => {
         </p>
       )}
     </div>
+    </>
   );
 };
 

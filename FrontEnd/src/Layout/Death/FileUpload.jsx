@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { supabase } from './supabaseClient';
+import { supabase } from "./supabaseClient";
 import axios from "axios";
 import { enc, AES, PBKDF2 } from "crypto-js";
 import CryptoJS from "crypto-js";
 import "./FileUpload.css";
-
+import BackButton from "../components/BackButton";
 
 const FileUpload = () => {
   const [file, setFile] = useState(null);
@@ -48,7 +48,11 @@ const FileUpload = () => {
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/getKey/${currentUser.id}`
       );
-      if (response.data && typeof response.data === 'string' && response.data.length > 0) {
+      if (
+        response.data &&
+        typeof response.data === "string" &&
+        response.data.length > 0
+      ) {
         return response.data;
       } else {
         throw new Error("Invalid or empty encrypted key from server");
@@ -72,11 +76,15 @@ const FileUpload = () => {
       console.log("Derived Key:", derivedKey.toString());
       const iv = CryptoJS.enc.Base64.parse(ivBase64);
       console.log("IV:", iv);
-      const decrypted = CryptoJS.AES.decrypt({ ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) }, derivedKey, {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7,
-      });
+      const decrypted = CryptoJS.AES.decrypt(
+        { ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) },
+        derivedKey,
+        {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7,
+        }
+      );
       const decryptedKey = decrypted.toString(CryptoJS.enc.Utf8);
       if (!decryptedKey) {
         throw new Error("Decryption resulted in empty key");
@@ -110,8 +118,7 @@ const FileUpload = () => {
       const hashedToken = await hashWithSalt(input);
       console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`,
-
+        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
       );
       console.log("API Response:", response.data);
       if (response.status === 200) {
@@ -121,7 +128,11 @@ const FileUpload = () => {
           isSuccess: true,
         });
         const encryptedKey = await getEncryptedKey();
-        const derivedKey = await decryptKey(uuid.trim(), encryptedKey, password.trim());
+        const derivedKey = await decryptKey(
+          uuid.trim(),
+          encryptedKey,
+          password.trim()
+        );
         setDecryptedKey(derivedKey);
       } else {
         setIsUuidValid(false);
@@ -243,7 +254,6 @@ const FileUpload = () => {
         throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
 
-
       const fileMetadata = {
         idOfUser: currentUser.id,
         letterFileUrl: null,
@@ -292,6 +302,8 @@ const FileUpload = () => {
   }
 
   return (
+    <>
+    <BackButton />
     <div className="file-upload">
       <h2>Upload File</h2>
       <div className="uuid-section">
@@ -356,13 +368,15 @@ const FileUpload = () => {
       </div>
       {message.text && (
         <p
-          className={`status-message ${message.isSuccess ? "success" : "error"
-            }`}
+          className={`status-message ${
+            message.isSuccess ? "success" : "error"
+          }`}
         >
           {message.text}
         </p>
       )}
     </div>
+    </>
   );
 };
 

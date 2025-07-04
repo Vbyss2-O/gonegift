@@ -3,6 +3,7 @@ import { supabase } from "./supabaseClient";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import DragNdrop from "../components/DragNDrop";
+import BackButton from "../components/BackButton";
 
 const DeathReportForm = () => {
   const navigate = useNavigate();
@@ -145,6 +146,8 @@ const DeathReportForm = () => {
   if (!currentUser) return <div>Loading...</div>;
 
   return (
+    <>
+    <BackButton />
     <div style={styles.container}>
       <h2 style={styles.header}>Report a Death</h2>
       <form onSubmit={handleSubmit}>
@@ -232,6 +235,7 @@ const DeathReportForm = () => {
         </p>
       )}
     </div>
+    </>
   );
 };
 

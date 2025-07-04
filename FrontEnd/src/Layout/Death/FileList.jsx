@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./FileList.css"; // Import the CSS file
+import BackButton from "../components/BackButton"; // Import the BackButton component
 
 const FileList = () => {
   const navigate = useNavigate();
@@ -157,6 +158,7 @@ const FileList = () => {
   }
 
   return (
+    <>
     <div className="filelist-list-container">
       <h2 className="filelist-welcome-header">
         Welcome, {userData?.firstName} {userData?.lastname}
@@ -229,6 +231,7 @@ const FileList = () => {
         )
       }
     </div>
+    </>
   );
 };
 

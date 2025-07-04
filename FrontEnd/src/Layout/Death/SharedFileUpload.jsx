@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom"; // Corrected import f
 import DragNdrop from "../components/DragNDrop"; // Assuming this path is correct
 import { supabase } from "./supabaseClient"; // Assuming this path is correct
 import "./SharedFileUpload.css"; // Import the custom CSS file
+import BackButton from "../components/BackButton"; // Import the BackButton component
 
 const SharedFileUpload = () => {
     const [input, setInput] = useState("");
@@ -427,6 +428,8 @@ const SharedFileUpload = () => {
     };
 
     return (
+        <>
+        <BackButton />
         <div className="shared-file-upload-container">
             <h2 className="title">Shared File Space</h2>
 
@@ -527,6 +530,7 @@ const SharedFileUpload = () => {
                 </p>
             )}
         </div>
+        </>
     );
 };
 

@@ -4,6 +4,7 @@ import axios from "axios";
 import CryptoJS from "crypto-js";
 import { FiMic, FiSquare, FiX, FiPlay, FiPause, FiUpload } from "react-icons/fi";
 import "./AudioRecorder.css";
+import BackButton from "../components/BackButton"; // Import the BackButton component
 
 const UploadPage = () => {
   const [recording, setRecording] = useState(false);
@@ -399,6 +400,8 @@ const UploadPage = () => {
   }, [audioURL]);
 
   return (
+    <>
+    <BackButton />
     <div className="recorder-container">
       <div className="recorder-box">
         <div className="recorder-header">
@@ -561,6 +564,7 @@ const UploadPage = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

@@ -4,6 +4,7 @@ import CryptoJS from "crypto-js";
 import "./SharedSpace.css";
 import { supabase } from "./supabaseClient";
 import { useNavigate } from "react-router-dom";
+import BackButton from "../components/BackButton"; // Import the BackButton component
 
 const SharedSpace = () => {
   const [currentUser, setCurrentUser] = useState(null);
@@ -373,6 +374,8 @@ const SharedSpace = () => {
   };
 
   return (
+    <>
+    <BackButton />
     <div className="shared-container">
       <h2>Secure Shared Space</h2>
       <div className="total-space" style={{ color: "Black" }}>
@@ -444,6 +447,7 @@ const SharedSpace = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

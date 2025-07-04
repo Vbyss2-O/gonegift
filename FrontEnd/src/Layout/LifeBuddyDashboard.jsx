@@ -4,6 +4,7 @@ import { supabase } from "./Death/supabaseClient"; // Adjust path if needed
 import { v4 as uuidv4 } from "uuid";
 import { useNavigate } from "react-router-dom";
 import "./LifeBuddy.css"; // Import your CSS styles
+import BackButton from "./components/BackButton"; // Import the BackButton component
 
 const LifeBuddyDashboard = () => {
   const [userIdX, setUserIdX] = useState(null);
@@ -131,6 +132,8 @@ const LifeBuddyDashboard = () => {
   }, [replyStatus, userIdX]);
 
   return (
+    <>
+      <BackButton />
     <div className="lifebuddy-dashboard">
      
 
@@ -208,6 +211,7 @@ const LifeBuddyDashboard = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 

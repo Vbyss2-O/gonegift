@@ -4,6 +4,7 @@ import "react-quill/dist/quill.snow.css";
 import {supabase} from "./supabaseClient"; // Import your Supabase client
 import axios from "axios";
 import CryptoJS from "crypto-js";
+import BackButton from "../components/BackButton"; // Import the BackButton component
 
 const LetterEditor = () => {
   const [letterTitle, setLetterTitle] = useState("");
@@ -250,6 +251,8 @@ const LetterEditor = () => {
   }
 
   return (
+    <>
+    <BackButton />
     <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
       <div style={styles.uuidSection}>
         <div style={styles.uuidContainer}>
@@ -329,6 +332,7 @@ const LetterEditor = () => {
         )}
       </div>
     </div>
+    </>
   );
 };
 
