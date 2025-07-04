@@ -13,11 +13,17 @@ import BeneficiaryList from "./Layout/Death/BeneficiaryList";
 import FileList from "./Layout/Death/FileList";
 import LifeBuddyDashboard from "./Layout/LifeBuddyDashboard";
 import DecryptFile from "./Layout/Death/DecryptFile";
-import LifeBuddyAbout from "./Layout/Death/lifebuddyAbout";
 import ErrorPage from "./Layout/Death/ErrorPage";
 import UploadPage from "./Layout/Death/UploadPage";
 import SharedSpace from "./Layout/Death/SharedSpace";
 import SharedFileUpload from "./Layout/Death/SharedFileUpload";
+import LifeBuddyAbout from "./Layout/Death/LifebuddyAbout";
+import GoneGiftFeatures from "./Layout/feather";
+import AboutGoneGift from "./Layout/About";
+import UpdateAndPlans from "./Layout/UpdatesAndPlans";
+import PrivacyPolicy from "./Layout/PrivacyPolicy";
+import UserGuides from "./Layout/HelpCenter";
+
 
 function App() {
   return (
@@ -141,6 +147,36 @@ function App() {
           <ProtectedRoute redirectTo="/login">
           <SharedFileUpload />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/feathers"
+        element={
+          <GoneGiftFeatures />
+        }
+      />
+      <Route
+        path="/about"
+        element={
+          <AboutGoneGift />
+        }
+      />
+      <Route
+        path="/updateAndPlans"
+        element={
+          <UpdateAndPlans />
+        }
+      />
+      <Route
+        path="/privacy"
+        element={
+          <PrivacyPolicy />
+        }
+      />
+      <Route
+        path="/userGuides"
+        element={
+          <UserGuides />
         }
       />
 

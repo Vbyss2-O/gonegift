@@ -1,0 +1,62 @@
+.updatesplans-container {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 40px 28px;
+  background: var(--bg-glass, rgba(255,255,255,0.85));
+  border-radius: var(--radius-xl, 1.5rem);
+  box-shadow: var(--shadow-rainbow, 0 5px 20px rgba(0,0,0,0.08));
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+}
+
+.updatesplans-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, var(--primary, #a855f7), var(--secondary, #ec4899), var(--accent, #10b981));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.updatesplans-desc {
+  font-size: 1.13rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-primary, #333);
+  text-align: center;
+}
+
+.updatesplans-list {
+  list-style-type: disc;
+  padding-left: 1.5rem;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+.updatesplans-list li {
+  margin-bottom: 1.1rem;
+  background: rgba(168,85,247,0.04);
+  border-radius: 0.7rem;
+  padding: 0.7rem 1rem 0.7rem 0.7rem;
+  color: #444;
+}
+
+.updatesplans-list strong {
+  color: var(--primary, #a855f7);
+  font-weight: 700;
+}
+
+@media (max-width: 600px) {
+  .updatesplans-container {
+    padding: 16px 4vw;
+  }
+  .updatesplans-title {
+    font-size: 1.3rem;
+  }
+  .updatesplans-desc,
+  .updatesplans-list {
+    font-size: 0.97rem;
+  }
+}

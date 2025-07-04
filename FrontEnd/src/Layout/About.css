@@ -1,0 +1,60 @@
+.aboutgonegift-container {
+  max-width: 700px;
+  margin: 3rem auto;
+  padding: 40px 28px;
+  background: var(--bg-glass, rgba(255,255,255,0.8));
+  border-radius: var(--radius-xl, 1.5rem);
+  box-shadow: var(--shadow-rainbow, 0 5px 20px rgba(0,0,0,0.08));
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  border: 1px solid rgba(255,255,255,0.2);
+  position: relative;
+}
+
+.aboutgonegift-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  background: linear-gradient(135deg, var(--primary, #a855f7), var(--secondary, #ec4899), var(--accent, #10b981));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  text-align: center;
+}
+
+.aboutgonegift-content {
+  color: var(--text-primary, #333);
+  font-size: 1.13rem;
+  line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  gap: 1.3rem;
+}
+
+.aboutgonegift-content strong {
+  color: var(--primary, #a855f7);
+  font-weight: 700;
+}
+
+.aboutgonegift-signature {
+  text-align: right;
+  font-weight: 600;
+  margin-top: 2.5rem;
+  font-size: 1.08rem;
+  color: #6b21a8;
+}
+
+@media (max-width: 600px) {
+  .aboutgonegift-container {
+    padding: 16px 4vw;
+  }
+  .aboutgonegift-title {
+    font-size: 1.3rem;
+  }
+  .aboutgonegift-content {
+    font-size: 0.97rem;
+    gap: 1rem;
+  }
+  .aboutgonegift-signature {
+    font-size: 0.97rem;
+  }
+}
