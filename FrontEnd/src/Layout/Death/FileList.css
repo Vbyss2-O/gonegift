@@ -6,16 +6,16 @@
   min-height: 600px;
   margin: 3rem auto;
   padding: 40px;
-  background: var(--bg-glass, rgba(255,255,255,0.7));
+  background: var(--bg-glass, rgba(255, 255, 255, 0.7));
   border-radius: var(--radius-xl, 1.5rem);
-  box-shadow: var(--shadow-rainbow, 0 5px 20px rgba(0,0,0,0.08));
+  box-shadow: var(--shadow-rainbow, 0 5px 20px rgba(0, 0, 0, 0.08));
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
   backdrop-filter: var(--blur-light, blur(8px));
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
-  transition: var(--transition spring, box-shadow 0.3s cubic-bezier(.4,2,.6,1));
+  transition: var(--transition spring, box-shadow 0.3s cubic-bezier(.4, 2, .6, 1));
 }
 
 .filelist-list-container::before {
@@ -40,7 +40,7 @@
   font-size: 2.25rem;
   font-weight: 700;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .filelist-files-header {
@@ -97,11 +97,16 @@
   flex: 1;
   color: var(--text-primary, #2c3e50);
   text-align: left;
+  /* Added to prevent long file names from pushing the button out */
+  min-width: 0; 
+  word-break: break-word;
 }
 
 .filelist-file-name {
   font-size: 1.05rem;
   margin-bottom: 0.25rem;
+  /* Added to ensure file name wraps */
+  word-break: break-word; 
 }
 
 .filelist-file-type-display {
@@ -119,13 +124,15 @@
   font-weight: 600;
   font-size: 1rem;
   transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: var(--shadow-md, 0 2px 8px rgba(0,0,0,0.08));
+  box-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 0.08));
   margin-left: 1rem;
+  /* Ensure button doesn't shrink and push content */
+  flex-shrink: 0; 
 }
 
 .filelist-delete-button:hover {
   background: linear-gradient(135deg, #c0392b, #e74c3c);
-  box-shadow: var(--shadow-lg, 0 6px 12px rgba(239,68,68,0.12));
+  box-shadow: var(--shadow-lg, 0 6px 12px rgba(239, 68, 68, 0.12));
 }
 
 /* Separator */
@@ -207,6 +214,10 @@
 
 /* Animations */
 @keyframes gradientMove {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
 }

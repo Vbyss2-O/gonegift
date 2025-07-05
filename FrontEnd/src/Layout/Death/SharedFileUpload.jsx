@@ -372,6 +372,7 @@ const SharedFileUpload = () => {
             const originalExtension = extensionMatch ? extensionMatch[0] : "";
 
             const uniqueFileName = `${safeName}_${Date.now()}${originalExtension}.enc`;
+            const fileNameX =`${safeName}_${Date.now()}${originalExtension}`; // Use the original file name with timestamp for uniqueness
             const filePath = `${currentAuthorId}/${uniqueFileName}`; // Use unique file name for storage
 
             const { data, error } = await supabase.storage
@@ -393,7 +394,7 @@ const SharedFileUpload = () => {
                 token: token,
                 spaceHashPass: hashReadableKey(input.trim()),
                 uploadFileUrl: filePath,
-                fileName: uniqueFileName, // Use the unique file name
+                fileName: fileNameX, // Use the unique file name
                 userz: {
                     userIdX: currentAuthorId, // Redundant but kept for existing backend structure
                 },
