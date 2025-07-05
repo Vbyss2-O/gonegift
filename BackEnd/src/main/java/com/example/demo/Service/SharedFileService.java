@@ -63,4 +63,16 @@ public class SharedFileService {
         }
 
     }
+    public String giveShapredFileHashPassword(String token){
+       Optional<SharedToken> temp = sharedTokenRepository.findByToken(token);
+        if(temp.isPresent()){
+            SharedToken sharedToken = temp.get();
+            return sharedToken.getSpaceHashPass();
+        }else{
+            throw new EntityNotFoundException("Shared token not found with token: " + token);
+        }
+
+        
+
+    }
 }

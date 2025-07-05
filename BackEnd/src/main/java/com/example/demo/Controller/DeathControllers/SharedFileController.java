@@ -4,7 +4,6 @@ import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,11 +70,8 @@ public class SharedFileController {
 
     @GetMapping("/password/verify")
     public ResponseEntity<String> checkPasswordMatch(@RequestParam String token) {
-       Optional<String>  spaceHashPassList = sharedFileRepository.findSpaceHashPassByToken(token);
-       String spaceHashPass = spaceHashPassList.orElse(null);
-        if (spaceHashPass == null) {
-            return ResponseEntity.notFound().build();
-        }
+       String spaceHashPass = sharedFileService.giveShapredFileHashPassword(token);
+       
         return ResponseEntity.ok(spaceHashPass);
     }
 

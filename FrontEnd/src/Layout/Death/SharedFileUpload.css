@@ -19,17 +19,8 @@
     transition: var(--transition spring, box-shadow 0.3s cubic-bezier(.4,2,.6,1));
 }
 
-.shared-file-upload-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 6px;
-    background: var(--border-gradient, linear-gradient(90deg, #a855f7, #ec4899, #10b981));
-    background-size: 200% 200%;
-    animation: gradientMove 3s linear infinite;
-}
+/* Removed the top gradient line */
+/* .shared-file-upload-container::before { ... } */
 
 /* Titles and Headers */
 .title {
@@ -132,7 +123,7 @@
     cursor: not-allowed;
 }
 
-/* Buttons */
+/* Buttons - All Green */
 .action-button,
 .primary-button,
 .upload-button,
@@ -148,7 +139,7 @@
     transition: var(--transition spring, background 0.3s, box-shadow 0.3s);
     box-shadow: var(--shadow-md, 0 2px 8px rgba(0,0,0,0.08));
     color: var(--text-light, #fff);
-    background: linear-gradient(135deg, var(--primary, #007bff), var(--secondary, #ec4899));
+    background: linear-gradient(135deg, #10b981, #22d3ee);
     position: relative;
     overflow: hidden;
 }
@@ -171,9 +162,9 @@
 .primary-button:hover:not(:disabled),
 .upload-button:hover:not(:disabled),
 .secondary-button:hover:not(:disabled) {
-    background: linear-gradient(135deg, var(--primary-light, #c084fc), var(--secondary-light, #f472b6));
+    background: linear-gradient(135deg, #34d399, #06b6d4);
     transform: translateY(-3px);
-    box-shadow: var(--shadow-xl, 0 4px 16px rgba(168,85,247,0.15));
+    box-shadow: var(--shadow-xl, 0 4px 16px rgba(16,185,129,0.15));
 }
 
 .action-button:hover:not(:disabled)::before,

@@ -24,7 +24,7 @@ const SharedSpace = () => {
   const navigate = useNavigate();
 
   // Cooldown duration in milliseconds (60 seconds)
-  const COOLDOWN_DURATION = 60 * 1000*60*24;
+  const COOLDOWN_DURATION = 30 * 1000; // 0.5 min
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -265,46 +265,12 @@ const SharedSpace = () => {
       setCopiedToken(false); // Reset copied flag when new token is generated
       setCopiedPassword(false); // Reset copied password flag as well
 
-      // Now, proceed with saving the metadata
-      const metaData = {
-        authorId: currentUser.id,
-        uploadId: null, // Will be set on actual file upload
-        token: generatedToken, // Use the newly generated token
-        spaceHashPass: hashReadableKey(readableKey), // Use the newly generated readableKey
-        uploadFileUrl: null, // Will be set on actual file upload
-        fileName : null, 
-        userz: {
-          userIdX: currentUser.id,
-        },
-      };
-
-      try {
-        await axios.post(
-          "http://localhost:8080/shared-file/add-file",
-          metaData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-      } catch (error) {
-        console.error(
-          "Error uploading metadata:",
-          error.response?.data || error.message
-        );
-        setMessage(
-          (prev) => prev +
-          `\nFailed to add shared space metadata: ${
-            error.response?.data?.message || error.message
-          }`
-        );
-        return;
-      }
+      
 
       const tokenMetadata = {
         token: generatedToken, // Use the newly generated token
         userIDX: currentUser.id,
+        spaceHashPass: hashReadableKey(readableKey), // Use the newly generated readableKey
         expirydate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
       };
 

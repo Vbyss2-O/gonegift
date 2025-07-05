@@ -5,7 +5,6 @@ import { useNavigate, useParams } from "react-router-dom"; // Corrected import f
 import DragNdrop from "../components/DragNDrop"; // Assuming this path is correct
 import { supabase } from "./supabaseClient"; // Assuming this path is correct
 import "./SharedFileUpload.css"; // Import the custom CSS file
-import BackButton from "../components/BackButton"; // Import the BackButton component
 
 const SharedFileUpload = () => {
     const [input, setInput] = useState("");
@@ -228,10 +227,9 @@ const SharedFileUpload = () => {
             const decryptedFiles = await Promise.all(
                 response.data.map(async (fileMetadata) => {
                     try {
-                        const fullUrl = fileMetadata.uploadFileUrl;
-                       
-                        let filePath =  fullUrl;
+                        let filePath = fileMetadata.uploadFileUrl;
 
+                        // Ensure filePath is just the path within the bucket, without leading '/'
                         if (filePath.startsWith('/')) {
                             filePath = filePath.substring(1);
                         }
@@ -240,27 +238,30 @@ const SharedFileUpload = () => {
                         const originalFileName = fileNameWithEnc.replace(/\.enc$/, '');
                         const fileType = getFileTypeFromExtension(originalFileName);
 
-                        const { data, error } = await supabase.storage
-                            .from("sharedfile")
-                            .download(filePath);
+                        
 
-                        if (error) {
-                            console.error(`Failed to download file ${filePath}:`, error);
-                            throw new Error(`Failed to download file ${originalFileName}: ${error.message}`);
+                       
+                        const { data: fileBlob, error: downloadError } = await supabase.storage
+                            .from("sharedfile")
+                            .download(filePath); // Use the original filePath here
+
+                        if (downloadError) {
+                            console.error(`Failed to download file ${filePath}:`, downloadError);
+                            throw new Error(`Failed to download file ${originalFileName}: ${downloadError.message}`);
                         }
 
-                        const arrayBuffer = await data.arrayBuffer();
+                        const arrayBuffer = await fileBlob.arrayBuffer();
                         const fileData = new Uint8Array(arrayBuffer);
 
                         const decryptedData = await decryptFile(fileData, fileType, aesKey);
 
                         const blob = new Blob([decryptedData], { type: fileType });
-                        const url = URL.createObjectURL(blob);
+                        const url = URL.createObjectURL(blob); // This URL will be for the decrypted blob
 
                         return {
                             fileName: originalFileName,
                             fileType,
-                            downloadUrl: url,
+                            downloadUrl: url, // This is the URL to the decrypted file blob
                             metadata: fileMetadata,
                         };
                     } catch (fileError) {
@@ -358,7 +359,6 @@ const SharedFileUpload = () => {
             }
 
             const encryptedFileBlob = await encryptFile(file.type, fileContentForEncryption);
-            const fileName = `${currentUser.id}_${Date.now()}_${file.name}.enc`; // Append .enc to indicate encrypted
 
             // Ensure authorId is obtained from the token payload as it's the owner of the space
             const decodedToken = decodeURIComponent(token);
@@ -366,9 +366,17 @@ const SharedFileUpload = () => {
             const currentAuthorId = decryptedPayload.userId;
 
 
+            const originalName = file.name.replace(/\.[^/.]+$/, ""); // Remove original extension
+            const safeName = originalName.replace(/[^\w\-]+/g, "_");
+            const extensionMatch = file.name.match(/\.[^/.]+$/);
+            const originalExtension = extensionMatch ? extensionMatch[0] : "";
+
+            const uniqueFileName = `${safeName}_${Date.now()}${originalExtension}.enc`;
+            const filePath = `${currentAuthorId}/${uniqueFileName}`; // Use unique file name for storage
+
             const { data, error } = await supabase.storage
                 .from("sharedfile")
-                .upload(`${currentAuthorId}/${fileName}`, encryptedFileBlob, {
+                .upload(filePath, encryptedFileBlob, {
                     cacheControl: 3600,
                     upsert: false,
                     contentType: 'application/octet-stream', // Store as generic binary for encrypted files
@@ -378,29 +386,21 @@ const SharedFileUpload = () => {
                 throw new Error("File upload failed to Supabase: " + error.message);
             }
 
-            // Get public URL
-            const { data: publicUrlData } = supabase.storage
-                .from("sharedfile")
-                .getPublicUrl(`${currentAuthorId}/${fileName}`);
-
-            if (!publicUrlData || !publicUrlData.publicUrl) {
-                throw new Error("Failed to get public URL for the uploaded file.");
-            }
 
             const fileMetadata = {
                 authorId: currentAuthorId, // The actual owner of the shared space
                 uploaderId: currentUser.id, // The user performing the upload
                 token: token,
                 spaceHashPass: hashReadableKey(input.trim()),
-                uploadFileUrl: publicUrlData.publicUrl,
-                fileName : file.name, // Original file name
+                uploadFileUrl: filePath,
+                fileName: uniqueFileName, // Use the unique file name
                 userz: {
                     userIdX: currentAuthorId, // Redundant but kept for existing backend structure
                 },
             };
 
             await axios.post(
-                "http://localhost:8080/shared-file/addFile",
+                "http://localhost:8080/shared-file/add-file",
                 fileMetadata,
                 {
                     headers: {
@@ -428,8 +428,6 @@ const SharedFileUpload = () => {
     };
 
     return (
-        <>
-        <BackButton />
         <div className="shared-file-upload-container">
             <h2 className="title">Shared File Space</h2>
 
@@ -477,6 +475,7 @@ const SharedFileUpload = () => {
                             onClick={encryptFileController}
                             disabled={!file || loading}
                             className="action-button upload-button"
+                            style ={{ color: "White" }} 
                         >
                             {loading ? "Uploading..." : "Upload & Encrypt File"}
                         </button>
@@ -488,8 +487,10 @@ const SharedFileUpload = () => {
                             onClick={showAllFileStoredOfSharedSpace}
                             disabled={loading} // Only disable if loading for files
                             className="action-button secondary-button"
+                            style ={{ color: "White" }} 
+
                         >
-                            {loading ? "Loading Files..." : "Show All Files"}
+                            {loading ? "Loading Files..." : "Refresh File List"}
                         </button>
 
                         {fileList.length > 0 && (
@@ -530,7 +531,6 @@ const SharedFileUpload = () => {
                 </p>
             )}
         </div>
-        </>
     );
 };
 

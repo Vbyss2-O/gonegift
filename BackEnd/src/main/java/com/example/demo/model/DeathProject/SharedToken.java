@@ -29,6 +29,7 @@ public class SharedToken {
      private Long id;
      private String token;
      private UUID userIDX;
+     private String spaceHashPass;
      private LocalDate expirydate;
 
 }
