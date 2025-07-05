@@ -138,97 +138,90 @@ const DecryptFile = () => {
     }
   };
 
-  const decryptFile = async (ciphertext, aesKey, fileType) => {
-    if (!aesKey) {
-      throw new Error("AES key not available");
+ const decryptFile = async (ciphertext, aesKey, fileType) => {
+  if (!aesKey) throw new Error("AES key not available");
+  if (!ciphertext) throw new Error("Ciphertext not provided");
+
+  try {
+    if (fileType === "letter") {
+      const cleanedCiphertext = ciphertext.trim();
+      const decryptedData = CryptoJS.AES.decrypt(cleanedCiphertext, aesKey);
+      if (!decryptedData || decryptedData.sigBytes <= 0) throw new Error("Decryption produced invalid data");
+      const decryptedText = decryptedData.toString(CryptoJS.enc.Utf8);
+      if (!decryptedText) throw new Error("Decryption failed: Invalid key or data for LetterFile");
+      return decryptedText;
     }
-    if (!ciphertext) {
-      throw new Error("Ciphertext not provided");
-    }
-    try {
-      if (fileType === "letter") {
-        // For LetterFile, decode as UTF-8 to get HTML string
-        const cleanedCiphertext = ciphertext.trim();
-        const decryptedData = CryptoJS.AES.decrypt(cleanedCiphertext, aesKey);
-        if (!decryptedData || decryptedData.sigBytes <= 0) {
-          throw new Error("Decryption produced invalid data");
-        }
-        const decryptedText = decryptedData.toString(CryptoJS.enc.Utf8);
-        if (!decryptedText) {
-          throw new Error("Decryption failed: Invalid key or data for LetterFile");
-        }
-        return decryptedText;
-      } else if (fileType === "media") {
-        // For MediaFile, decode as UTF-8 to get hex string
-        const cleanedCiphertext = ciphertext.trim();
-        const decryptedData = CryptoJS.AES.decrypt(cleanedCiphertext, aesKey);
-        if (!decryptedData || decryptedData.sigBytes <= 0) {
-          throw new Error("Decryption produced invalid data");
-        }
-        const hexString = decryptedData.toString(CryptoJS.enc.Utf8);
-        if (!hexString) {
-          throw new Error("Decryption failed: Invalid key or data for MediaFile");
-        }
-        // Parse hex string to WordArray
-        const wordArray = CryptoJS.enc.Hex.parse(hexString);
-        // Convert WordArray to Base64
-        const base64 = wordArray.toString(CryptoJS.enc.Base64);
-        // Decode Base64 to binary
-        const binaryString = atob(base64);
-        const byteArray = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          byteArray[i] = binaryString.charCodeAt(i);
-        }
-        return byteArray.buffer; // Return ArrayBuffer
-      } else if (fileType === "voice") {
-        const encryptedArray = new Uint8Array(ciphertext);
 
-        // Convert bytes back to WordArray
-        const wordArray = CryptoJS.lib.WordArray.create();
-        for (let i = 0; i < encryptedArray.length; i += 4) {
-          const word =
-            ((encryptedArray[i] << 24) |
-              (encryptedArray[i + 1] << 16) |
-              (encryptedArray[i + 2] << 8) |
-              encryptedArray[i + 3]) >>> 0;
-          wordArray.words.push(word);
-        }
-        wordArray.sigBytes = encryptedArray.length;
-
-        const ivWords = CryptoJS.lib.WordArray.create(wordArray.words.slice(0, 4));
-        ivWords.sigBytes = 16;
-
-        const ciphertextWords = CryptoJS.lib.WordArray.create(
-          wordArray.words.slice(4),
-          wordArray.sigBytes - 16
-        );
-
-        const decryptedData = CryptoJS.AES.decrypt(
-          { ciphertext: ciphertextWords },
-          aesKey,
-          {
-            iv: ivWords,
-            mode: CryptoJS.mode.CBC,
-            padding: CryptoJS.pad.Pkcs7,
-          }
-        );
-
-        // Convert decrypted WordArray to ArrayBuffer
-        const decryptedArray = new Uint8Array(decryptedData.sigBytes);
-        for (let i = 0; i < decryptedData.sigBytes; i++) {
-          decryptedArray[i] =
-            (decryptedData.words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
-        }
-
-        return decryptedArray.buffer;
-      } else {
-        throw new Error("Invalid file type specified");
+    if (fileType === "media") {
+      const cleanedCiphertext = ciphertext.trim();
+      const decryptedData = CryptoJS.AES.decrypt(cleanedCiphertext, aesKey);
+      if (!decryptedData || decryptedData.sigBytes <= 0) throw new Error("Decryption produced invalid data");
+      const hexString = decryptedData.toString(CryptoJS.enc.Utf8);
+      if (!hexString) throw new Error("Decryption failed: Invalid key or data for MediaFile");
+      const wordArray = CryptoJS.enc.Hex.parse(hexString);
+      const base64 = wordArray.toString(CryptoJS.enc.Base64);
+      const binaryString = atob(base64);
+      const byteArray = new Uint8Array(binaryString.length);
+      for (let i = 0; i < binaryString.length; i++) {
+        byteArray[i] = binaryString.charCodeAt(i);
       }
-    } catch (error) {
-      console.error(`Decryption failed for ${fileType}:`, error);
-      throw new Error(`Failed to decrypt ${fileType} file: ${error.message}`);
+      return byteArray.buffer;
     }
-  };
+
+    if (fileType === "voice") {
+      // Fetch the ciphertext as an ArrayBuffer
+      const arrayBuffer = await ciphertext.arrayBuffer();
+      const encryptedArray = new Uint8Array(arrayBuffer);
+
+      // Ensure the data is long enough to contain IV (16 bytes)
+      if (encryptedArray.length < 16) {
+        throw new Error("Ciphertext is too short to contain an IV");
+      }
+
+      // Extract IV (first 16 bytes)
+      const iv = CryptoJS.lib.WordArray.create(encryptedArray.slice(0, 16));
+
+      // Extract ciphertext (remaining bytes)
+      const ciphertextWords = CryptoJS.lib.WordArray.create(encryptedArray.slice(16));
+
+      // Parse AES key as UTF-8 (consistent with encryption)
+      const key = CryptoJS.enc.Utf8.parse(aesKey);
+
+      // Decrypt using AES-CBC with PKCS7 padding
+      const decryptedData = CryptoJS.AES.decrypt(
+        { ciphertext: ciphertextWords },
+        key,
+        {
+          iv: iv,
+          mode: CryptoJS.mode.CBC,
+          padding: CryptoJS.pad.Pkcs7,
+        }
+      );
+
+      if (!decryptedData || decryptedData.sigBytes <= 0) {
+        throw new Error("Decryption produced invalid data for VoiceFile");
+      }
+
+      // Convert decrypted WordArray to Uint8Array
+      const decryptedArray = new Uint8Array(decryptedData.sigBytes);
+      for (let i = 0; i < decryptedData.sigBytes; i++) {
+        decryptedArray[i] = (decryptedData.words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
+      }
+
+      // Verify WebM header (optional, for debugging)
+      if (decryptedArray.length >= 4 && decryptedArray[0] !== 0x1A || decryptedArray[1] !== 0x45 || decryptedArray[2] !== 0xDF || decryptedArray[3] !== 0xA3) {
+        console.warn("Decrypted data may not be a valid WebM file");
+      }
+
+      return decryptedArray.buffer;
+    }
+
+    throw new Error("Invalid file type specified");
+  } catch (error) {
+    console.error(`Decryption failed for ${fileType}:`, error);
+    throw new Error(`Failed to decrypt ${fileType} file: ${error.message}`);
+  }
+};
 
   const decryptFiles = async () => {
     setLoading(true);
@@ -237,17 +230,18 @@ const DecryptFile = () => {
 
     try {
       if (encryptedFileUrls.length === 0) {
-        setMessage({ text: "No encrypted files available to decrypt.", isSuccess: false });
+        setMessage({ text: "No encrypted files to decrypt.", isSuccess: false });
+        setLoading(false);
         return;
       }
       if (!encryptedAesKey || !password) {
         throw new Error("AES key or password is missing.");
       }
-      const decryptedKey = await decryptKey(uuid.trim(), encryptedAesKey, password);
+      const decryptedKey = await decryptKey(uuid.trim(), encryptedAesKey, password.trim());
+
       if (!decryptedKey) {
         throw new Error("Invalid UUID or password. Cannot decrypt files.");
       }
-      console.log("Decrypted AES key:", decryptedKey); // Debug key
 
       const decryptedFileList = await Promise.all(
         encryptedFileUrls.map(async (fileUrl, index) => {
@@ -269,100 +263,71 @@ const DecryptFile = () => {
               bucketName = "voice";
               fileName = fileUrl.fileName;
             } else {
-              throw new Error("No valid file URL provided.");
+              // Skip if no valid URL is present
+              return null;
             }
-            const { data: signedUrlData, error: signedUrlError } = await supabase
-              .storage
-              .from(bucketName)
-              .createSignedUrl(url, 60);
-            console.log(`Signed URL `, signedUrlData);
-
-            if (signedUrlError) {
-              console.error("Error generating signed URL:", signedUrlError);
-              throw signedUrlError;
-            }
+            
+            const { data: signedUrlData, error: signedUrlError } = await supabase.storage.from(bucketName).createSignedUrl(url, 60);
+            if (signedUrlError) throw signedUrlError;
 
             const signedUrl = signedUrlData.signedUrl;
-            const fileResponse = await axios.get(signedUrl, { responseType: fileType === "voice" ? "arraybuffer" : "blob" });
-            const encryptedData = fileType === "voice" ? fileResponse.data : fileResponse.data;
-            const reader = new FileReader();
+            
+            // Fetch voice files as a 'blob', others as 'text'
+            const responseType = fileType === "voice" ? "blob" : "text";
+            const fileResponse = await axios.get(signedUrl, { responseType });
+            
+            const encryptedData = fileResponse.data; // Use .data for both blob and text
 
-            return new Promise(async (resolve, reject) => {
-              if (fileType === "voice") {
-                // Handle voice file directly as ArrayBuffer
-                try {
-                  const decryptedContent = await decryptFile(encryptedData, decryptedKey, fileType);
-                  const decryptedBlob = new Blob([decryptedContent], { type: "audio/webm" });
-                  resolve({
-                    type: "voice",
-                    url: URL.createObjectURL(decryptedBlob),
-                    fileName: fileName?.endsWith(".webm.enc")
-                      ? fileName.replace(".webm.enc", ".webm")
-                      : `decrypted_audio_${index + 1}.webm`,
-                  });
-                } catch (error) {
-                  reject(`Failed to decrypt voice file ${index + 1}: ${error.message}`);
-                }
-              } else {
-                reader.onload = async () => {
-                  try {
-                    const ciphertext = reader.result;
-                    console.log(`Ciphertext for file ${index + 1}:`, ciphertext.substring(0, 100)); // Debug ciphertext
-                    if (!ciphertext) {
-                      throw new Error("Invalid ciphertext received.");
-                    }
-                    const decryptedContent = await decryptFile(
-                      ciphertext,
-                      decryptedKey,
-                      fileType
-                    );
+            if (!encryptedData) {
+              throw new Error("Downloaded file data is empty.");
+            }
 
-                    if (fileType === "letter") {
-                      resolve({
-                        type: "letter",
-                        content: decryptedContent,
-                        fileName: fileName?.endsWith(".enc")
-                          ? fileName.replace(".enc", "")
-                          : `decrypted_letter_${index + 1}.html`,
-                      });
-                    } else if (fileType === "media") {
-                      const mimeType = fileName?.endsWith(".mp4.enc")
-                        ? "video/mp4"
-                        : fileName?.endsWith(".png.enc")
-                          ? "image/png"
-                          : "image/jpeg";
-                      const decryptedBlob = new Blob([decryptedContent], { type: mimeType });
-                      resolve({
-                        type: "media",
-                        url: URL.createObjectURL(decryptedBlob),
-                        fileName: fileName?.endsWith(".enc")
-                          ? fileName.replace(".enc", "")
-                          : `decrypted_media_${index + 1}.${mimeType.split("/")[1]}`,
-                      });
-                    }
-                  } catch (error) {
-                    console.error(`Error decrypting file ${index + 1}:`, error);
-                    reject(`Failed to decrypt file ${index + 1}: ${error.message}`);
-                  }
-                };
-                reader.onerror = () => reject(`Failed to read file ${index + 1}.`);
-                reader.readAsText(encryptedData); // Read as text for letter and media
-              }
-            });
+            // Decrypt the file content
+            const decryptedContent = await decryptFile(encryptedData, decryptedKey, fileType);
+            
+            // Process based on file type
+            if (fileType === "voice") {
+              const decryptedBlob = new Blob([decryptedContent], { type: "audio/webm" });
+              return {
+                type: "voice",
+                url: URL.createObjectURL(decryptedBlob),
+                fileName: fileName?.endsWith(".enc") ? fileName.replace(".enc", "") : `decrypted_audio_${index + 1}.webm`,
+              };
+            } else if (fileType === "letter") {
+              return {
+                type: "letter",
+                content: decryptedContent,
+                fileName: fileName?.endsWith(".enc") ? fileName.replace(".enc", "") : `decrypted_letter_${index + 1}.html`,
+              };
+            } else if (fileType === "media") {
+              const mimeType = fileName?.endsWith(".mp4.enc") ? "video/mp4" : (fileName?.endsWith(".png.enc") ? "image/png" : "image/jpeg");
+              const decryptedBlob = new Blob([decryptedContent], { type: mimeType });
+              return {
+                type: "media",
+                url: URL.createObjectURL(decryptedBlob),
+                fileName: fileName?.endsWith(".enc") ? fileName.replace(".enc", "") : `decrypted_media_${index + 1}.${mimeType.split("/")[1]}`,
+              };
+            }
           } catch (error) {
             console.error(`Error processing file ${index + 1}:`, error);
-            return `Error decrypting file ${index + 1}: ${error.message}`;
+            return { error: `Error decrypting file ${index + 1}: ${error.message}` };
           }
         })
       );
+      
+      const validFiles = decryptedFileList.filter(file => file && !file.error);
+      const errors = decryptedFileList.filter(file => file && file.error);
+      
+      if (errors.length > 0) {
+        setError(errors.map(e => e.error).join('; '));
+      }
 
-      const validFiles = decryptedFileList.filter(
-        (file) => typeof file === "object" && (file.type === "letter" || file.type === "media" || file.type === "voice")
-      );
       if (validFiles.length === 0 && decryptedFileList.length > 0) {
         throw new Error("No files could be decrypted successfully.");
       }
+      
       setDecryptedFiles(validFiles);
+
     } catch (error) {
       setError(`Error decrypting files: ${error.message || "An unexpected error occurred."}`);
     } finally {
@@ -371,129 +336,113 @@ const DecryptFile = () => {
   };
 
   return (
-    <div className="decrypt-file" style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <h2>Decrypt Files</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+   <div className="decryptfile-container">
+      <h2 className="decryptfile-title">Decrypt Files</h2>
+      {error && <p className="decryptfile-error">{error}</p>}
       {message.text && (
-        <p style={{ color: message.isSuccess ? "green" : "red" }}>{message.text}</p>
+        <p className={message.isSuccess ? "decryptfile-success" : "decryptfile-error"}>
+          {message.text}
+        </p>
       )}
-      <h3>Note: Please Enter the secrets of the person whose Assets you are going to Claim!</h3>
-      <label>Enter UUID:</label>
-      <input
-        type="text"
-        value={uuid}
-        onChange={(e) => setUuid(e.target.value)}
-        placeholder="Enter UUID"
-        style={{ margin: "10px 0", padding: "5px", width: "100%" }}
-      />
-      <label>Enter Password:</label>
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Enter Password"
-        style={{ margin: "10px 0", padding: "5px", width: "100%" }}
-      />
-      <button
-        onClick={validateUuid}
-        disabled={loading || !uuid || !password}
-        style={{
-          marginTop: "10px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor: loading ? "#6c757d" : "#28a745",
-          color: "#fff",
-          border: "none",
-          borderRadius: "4px",
-          cursor: loading || !uuid || !password ? "not-allowed" : "pointer",
-        }}
-      >
-        Validate Secrets
-      </button>
-      <button
-        onClick={decryptFiles}
-        disabled={loading || !uuid || !isUuidValid || encryptedFileUrls.length === 0}
-        style={{
-          marginTop: "10px",
-          marginLeft: "10px",
-          padding: "10px 20px",
-          fontSize: "16px",
-          backgroundColor:
-            loading || !uuid || !isUuidValid || encryptedFileUrls.length === 0
-              ? "#6c757d"
-              : "#007bff",
-          color: "#fff",
-          border: "none",
-          borderRadius: "4px",
-          cursor:
-            loading || !uuid || !isUuidValid || encryptedFileUrls.length === 0
-              ? "not-allowed"
-              : "pointer",
-        }}
-      >
-        {loading ? "Decrypting..." : "Decrypt Files"}
-      </button>
+      <div className="decryptfile-form">
+        <h3 className="decryptfile-note">
+          Please enter the secrets of the person whose assets you are going to claim!
+        </h3>
+        <div className="decryptfile-inputgroup">
+          <label htmlFor="uuid" className="decryptfile-label">Enter UUID:</label>
+          <input
+            id="uuid"
+            type="text"
+            value={uuid}
+            onChange={(e) => setUuid(e.target.value)}
+            placeholder="Enter UUID"
+            className="decryptfile-input"
+            autoComplete="off"
+          />
+        </div>
+        <div className="decryptfile-inputgroup">
+          <label htmlFor="password" className="decryptfile-label">Enter Password:</label>
+          <input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter Password"
+            className="decryptfile-input"
+            autoComplete="off"
+          />
+        </div>
+        <div className="decryptfile-btn-row">
+          <button
+            onClick={validateUuid}
+            disabled={loading || !uuid || !password}
+            className="decryptfile-btn decryptfile-btn-validate"
+          >
+            Validate Secrets
+          </button>
+          <button
+            onClick={decryptFiles}
+            disabled={loading || !uuid || !isUuidValid || encryptedFileUrls.length === 0}
+            className="decryptfile-btn decryptfile-btn-decrypt"
+          >
+            {loading ? "Decrypting..." : "Decrypt Files"}
+          </button>
+        </div>
+      </div>
       {decryptedFiles.length > 0 && (
-        <div style={{ marginTop: "20px" }}>
-          <h3>Decrypted Files:</h3>
+        <div className="decryptfile-files">
+          <h3 className="decryptfile-section-title">Decrypted Files</h3>
           {decryptedFiles.map((file, index) => (
-            <div key={index} style={{ marginBottom: "20px" }}>
+            <div key={index} className="decryptfile-filecard">
+              <h4 className="decryptfile-filename">{file.fileName}</h4>
               {file.type === "letter" ? (
                 <div>
-                  <h4>{file.fileName}</h4>
                   <div
-                    style={{
-                      border: "1px solid #ddd",
-                      padding: "10px",
-                      borderRadius: "4px",
-                      background: "#f9f9f9",
-                    }}
+                    className="decryptfile-letter"
                     dangerouslySetInnerHTML={{ __html: file.content }}
                   />
                   <a
                     href={URL.createObjectURL(new Blob([file.content], { type: "text/html" }))}
                     download={file.fileName}
-                    style={{ marginTop: "10px", display: "inline-block" }}
+                    className="decryptfile-download"
                   >
                     Download Letter
                   </a>
                 </div>
               ) : file.type === "media" ? (
                 <div>
-                  <h4>{file.fileName}</h4>
                   {file.fileName?.endsWith(".mp4") ? (
                     <video
                       controls
                       src={file.url}
-                      style={{ maxWidth: "100%", height: "auto" }}
+                      className="decryptfile-media"
                     />
                   ) : (
                     <img
                       src={file.url}
                       alt={file.fileName}
-                      style={{ maxWidth: "100%", height: "auto" }}
+                      className="decryptfile-media"
                     />
                   )}
                   <a
                     href={file.url}
                     download={file.fileName}
-                    style={{ marginTop: "10px", display: "inline-block" }}
+                    className="decryptfile-download"
                   >
                     Download Media
                   </a>
                 </div>
               ) : file.type === "voice" ? (
                 <div>
-                  <h4>{file.fileName}</h4>
                   <audio
                     controls
                     src={file.url}
-                    style={{ maxWidth: "100%" }}
+                    className="decryptfile-voice"
                   />
                   <a
                     href={file.url}
                     download={file.fileName}
-                    style={{ marginTop: "10px", display: "inline-block" }}
+                    className="decryptfile-download"
                   >
                     Download Audio
                   </a>

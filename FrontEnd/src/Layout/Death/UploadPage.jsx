@@ -270,36 +270,44 @@ const UploadPage = () => {
 
   // Encrypt audio blob
   const encryptAudio = async (blob) => {
-    const decryptedKey = decryptKey(uuid.trim(), encryptedAesKey, password.trim());
-    if (!decryptedKey) {
-      throw new Error("Decrypted key is missing.");
+  try {
+    // Decrypt the AES key
+    
+    const decryptedKeyx = await decryptKey(uuid.trim(), encryptedAesKey, password.trim()); // Adjusted to use ciphertext and iv
+    const decryptedKey = CryptoJS.enc.Utf8.parse(decryptedKeyx);
+    if (!decryptedKey || decryptedKey.sigBytes === 0) {
+      throw new Error("Decrypted key is missing or invalid.");
     }
-    try {
-      const arrayBuffer = await blob.arrayBuffer();
-      const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
-      const iv = CryptoJS.lib.WordArray.random(16); // Generate random IV
-      const encrypted = CryptoJS.AES.encrypt(wordArray,  CryptoJS.enc.Utf8.parse(decryptedKey), {
-        iv: iv,
-        mode: CryptoJS.mode.CBC,
-        padding: CryptoJS.pad.Pkcs7,
-      });
-    const encryptedData = iv.concat(encrypted.ciphertext);
-    const encryptedArray = encryptedData.words;
 
-    // Convert 32-bit words to bytes
-    const encryptedArray8Bit = new Uint8Array(encryptedArray.length * 4);
-    for (let i = 0; i < encryptedArray.length; i++) {
-      encryptedArray8Bit[i * 4] = (encryptedArray[i] >> 24) & 0xff;
-      encryptedArray8Bit[i * 4 + 1] = (encryptedArray[i] >> 16) & 0xff;
-      encryptedArray8Bit[i * 4 + 2] = (encryptedArray[i] >> 8) & 0xff;
-      encryptedArray8Bit[i * 4 + 3] = encryptedArray[i] & 0xff;
+    // Convert blob to WordArray
+    const arrayBuffer = await blob.arrayBuffer();
+    const wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(arrayBuffer));
+
+    // Generate random IV
+    const iv = CryptoJS.lib.WordArray.random(16);
+
+    // Encrypt using AES-CBC with PKCS7 padding
+    const encrypted = CryptoJS.AES.encrypt(wordArray, decryptedKey, {
+      iv: iv,
+      mode: CryptoJS.mode.CBC,
+      padding: CryptoJS.pad.Pkcs7,
+    });
+
+    // Concatenate IV and ciphertext
+    const encryptedData = iv.concat(encrypted.ciphertext);
+
+    // Convert to Uint8Array for Blob
+    const byteArray = new Uint8Array(encryptedData.sigBytes);
+    for (let i = 0; i < encryptedData.sigBytes; i++) {
+      byteArray[i] = (encryptedData.words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
     }
-    return new Blob([encryptedArray8Bit], { type: "audio/webm" });
-    } catch (error) {
-      console.error("Encryption failed:", error);
-      throw new Error("Failed to encrypt audio.");
-    }
-  };
+
+    return new Blob([byteArray], { type: "application/octet-stream" }); // Use generic type to avoid WebM-specific issues
+  } catch (error) {
+    console.error("Encryption failed:", error);
+    throw new Error(`Failed to encrypt audio: ${error.message}`);
+  }
+};
 
   // Upload encrypted audio
   const uploadAudio = async () => {
