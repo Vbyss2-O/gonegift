@@ -241,7 +241,14 @@ const FileUpload = () => {
         type: file.type,
       });
 
-      const uniqueFileName = `${currentUser.id}_${Date.now()}_${file.name}.enc`;
+      const originalName = file.name.replace(/\.[^/.]+$/, ""); // Remove original extension
+      const safeName = originalName.replace(/[^\w\-]+/g, "_");
+
+      // Get original extension  if you want to keep it as part of the encrypted name
+      // For example, ".webm"
+      const extensionMatch = file.name.match(/\.[^/.]+$/);
+      const originalExtension = extensionMatch ? extensionMatch[0] : "";
+      const uniqueFileName = `${Date.now()}_${safeName}${originalExtension}.enc`;
       const filePath = `${currentUser.id}/${uniqueFileName}`;
       const { error: uploadError } = await supabase.storage
         .from("media")
@@ -303,79 +310,78 @@ const FileUpload = () => {
 
   return (
     <>
-    <BackButton />
-    <div className="file-upload">
-      <h2>Upload File</h2>
-      <div className="uuid-section">
-        <div className="uuid-container">
-          <label className="uuid-label">UUID</label>
-          <input
-            type="text"
-            placeholder="Enter UUID"
-            value={uuid}
-            onChange={(e) => setUuid(e.target.value)}
-            className="uuid-input"
-            disabled={loading}
-          />
-          <label className="password-label">PASSWORD</label>
-          <input
-            type="text"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="password-input"
-            disabled={loading}
-          />
-        </div>
-        <button
-          onClick={validateUuid}
-          disabled={!uuid || !currentUser || loading}
-          className={`validate-button ${loading ? "loading" : ""}`}
-        >
-          Validate Secrects
-        </button>
-      </div>
-      <div className="upload-section">
-        <div className="upload-zone">
-          <span className="upload-zone-icon">
-            <img
-              src="/logo.png"
-              alt="Upload Icon"
-              style={{ width: "40px", height: "40px" }}
+      <BackButton />
+      <div className="file-upload">
+        <h2>Upload File</h2>
+        <div className="uuid-section">
+          <div className="uuid-container">
+            <label className="uuid-label">UUID</label>
+            <input
+              type="text"
+              placeholder="Enter UUID"
+              value={uuid}
+              onChange={(e) => setUuid(e.target.value)}
+              className="uuid-input"
+              disabled={loading}
             />
-          </span>
-          <p className="upload-zone-text">
-            {file
-              ? `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`
-              : "Drag & drop or click to upload an image, video, or PDF"}
-          </p>
-          <input
-            type="file"
-            onChange={handleFileChange}
-            accept="image/*,video/*,application/pdf"
-            disabled={loading || !isUuidValid}
-          />
-        </div>
-        <div className="button-container">
+            <label className="password-label">PASSWORD</label>
+            <input
+              type="text"
+              placeholder="Enter Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="password-input"
+              disabled={loading}
+            />
+          </div>
           <button
-            onClick={handleSubmit}
-            disabled={loading || !file || !isUuidValid || !decryptedKey}
-            className={`upload-button ${loading ? "loading" : ""}`}
+            onClick={validateUuid}
+            disabled={!uuid || !currentUser || loading}
+            className={`validate-button ${loading ? "loading" : ""}`}
           >
-            {loading ? "Encrypting & Uploading..." : "Upload Encrypted File"}
+            Validate Secrects
           </button>
         </div>
+        <div className="upload-section">
+          <div className="upload-zone">
+            <span className="upload-zone-icon">
+              <img
+                src="/logo.png"
+                alt="Upload Icon"
+                style={{ width: "40px", height: "40px" }}
+              />
+            </span>
+            <p className="upload-zone-text">
+              {file
+                ? `Selected: ${file.name} (${(file.size / 1024).toFixed(2)} KB)`
+                : "Drag & drop or click to upload an image, video, or PDF"}
+            </p>
+            <input
+              type="file"
+              onChange={handleFileChange}
+              accept="image/*,video/*,application/pdf"
+              disabled={loading || !isUuidValid}
+            />
+          </div>
+          <div className="button-container">
+            <button
+              onClick={handleSubmit}
+              disabled={loading || !file || !isUuidValid || !decryptedKey}
+              className={`upload-button ${loading ? "loading" : ""}`}
+            >
+              {loading ? "Encrypting & Uploading..." : "Upload Encrypted File"}
+            </button>
+          </div>
+        </div>
+        {message.text && (
+          <p
+            className={`status-message ${message.isSuccess ? "success" : "error"
+              }`}
+          >
+            {message.text}
+          </p>
+        )}
       </div>
-      {message.text && (
-        <p
-          className={`status-message ${
-            message.isSuccess ? "success" : "error"
-          }`}
-        >
-          {message.text}
-        </p>
-      )}
-    </div>
     </>
   );
 };

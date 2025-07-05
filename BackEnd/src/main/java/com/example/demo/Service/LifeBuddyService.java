@@ -75,6 +75,8 @@ public class LifeBuddyService {
             logActivity(user.getUserIdX(), "Buddy Status Changed:)" , BuddyStatus);
     }
 
+    
+    @Transactional
     public void sendGoodbyeNotification(DeathUser user) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();

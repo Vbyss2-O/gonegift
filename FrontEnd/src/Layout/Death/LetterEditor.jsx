@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import {supabase} from "./supabaseClient"; // Import your Supabase client
+import { supabase } from "./supabaseClient"; // Import your Supabase client
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import BackButton from "../components/BackButton"; // Import the BackButton component
@@ -170,7 +170,9 @@ const LetterEditor = () => {
       const encryptedContent = await encryptLetter(letterContent);
 
       // Convert encrypted content to a Blob
-      const fileName = `${letterTitle.replace(/\s+/g, "_")}_${Date.now()}.html.enc`;
+      const cleanTitle = letterTitle.replace(/[\/\\]/g, "_").replace(/\s+/g, "_");
+      const fileName = `${cleanTitle}_${Date.now()}.html.enc`;
+
       const file = new Blob([encryptedContent], { type: "text/plain" });
       const bucket = "letters";
       const filePath = `${currentUser.id}/${fileName}`;
@@ -252,86 +254,86 @@ const LetterEditor = () => {
 
   return (
     <>
-    <BackButton />
-    <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
-      <div style={styles.uuidSection}>
-        <div style={styles.uuidContainer}>
-          <label style={styles.label}>UUID</label>
-          <input
-            type="text"
-            placeholder="Enter UUID"
-            value={uuid}
-            onChange={(e) => setUuid(e.target.value)}
-            style={styles.input}
-            disabled={loading}
-          />
-          <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            placeholder="Enter Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
-            disabled={loading}
-          />
-        </div>
-        <button
-          onClick={validateUuid}
-          disabled={!uuid || !password || loading}
-          style={{
-            ...styles.validateButton,
-            ...(loading ? styles.validateButtonDisabled : {}),
-          }}
-        >
-          {loading ? "Validating..." : "Validate Secrets"}
-        </button>
-      </div>
-      <div style={styles.container}>
-        <div style={styles.editorContainer}>
-          <div style={styles.inputGroup}>
+      <BackButton />
+      <div style={{ maxWidth: "800px", margin: "2rem auto" }}>
+        <div style={styles.uuidSection}>
+          <div style={styles.uuidContainer}>
+            <label style={styles.label}>UUID</label>
             <input
               type="text"
-              value={letterTitle}
-              onChange={(e) => setLetterTitle(e.target.value)}
-              placeholder="Enter letter title"
+              placeholder="Enter UUID"
+              value={uuid}
+              onChange={(e) => setUuid(e.target.value)}
               style={styles.input}
-              disabled={!isUuidValid}
+              disabled={loading}
+            />
+            <label style={styles.label}>Password</label>
+            <input
+              type="password"
+              placeholder="Enter Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={styles.input}
+              disabled={loading}
             />
           </div>
-
-          <ReactQuill
-            value={letterContent}
-            onChange={setLetterContent}
-            style={styles.quill}
-            theme="snow"
-            readOnly={!isUuidValid}
-          />
-
-          <div style={styles.buttonContainer}>
-            <button
-              onClick={handleSave}
-              disabled={loading || !isUuidValid || !decryptedKey}
-              style={{
-                ...styles.saveButton,
-                ...(loading || !isUuidValid || !decryptedKey ? styles.saveButtonDisabled : {}),
-              }}
-            >
-              {loading ? "Saving..." : "Save Letter"}
-            </button>
-          </div>
-        </div>
-
-        {message && (
-          <p
-            style={
-              message.includes("success") ? styles.successMessage : styles.errorMessage
-            }
+          <button
+            onClick={validateUuid}
+            disabled={!uuid || !password || loading}
+            style={{
+              ...styles.validateButton,
+              ...(loading ? styles.validateButtonDisabled : {}),
+            }}
           >
-            {message}
-          </p>
-        )}
+            {loading ? "Validating..." : "Validate Secrets"}
+          </button>
+        </div>
+        <div style={styles.container}>
+          <div style={styles.editorContainer}>
+            <div style={styles.inputGroup}>
+              <input
+                type="text"
+                value={letterTitle}
+                onChange={(e) => setLetterTitle(e.target.value)}
+                placeholder="Enter letter title"
+                style={styles.input}
+                disabled={!isUuidValid}
+              />
+            </div>
+
+            <ReactQuill
+              value={letterContent}
+              onChange={setLetterContent}
+              style={styles.quill}
+              theme="snow"
+              readOnly={!isUuidValid}
+            />
+
+            <div style={styles.buttonContainer}>
+              <button
+                onClick={handleSave}
+                disabled={loading || !isUuidValid || !decryptedKey}
+                style={{
+                  ...styles.saveButton,
+                  ...(loading || !isUuidValid || !decryptedKey ? styles.saveButtonDisabled : {}),
+                }}
+              >
+                {loading ? "Saving..." : "Save Letter"}
+              </button>
+            </div>
+          </div>
+
+          {message && (
+            <p
+              style={
+                message.includes("success") ? styles.successMessage : styles.errorMessage
+              }
+            >
+              {message}
+            </p>
+          )}
+        </div>
       </div>
-    </div>
     </>
   );
 };

@@ -66,17 +66,21 @@ public class DeathReportService {
         sendMagicLinks(user);
     }
 
+    @Transactional
     public void triggerUser(DeathUser user) {
         if (user == null) {
             throw new RuntimeException("Null user found");
         }
+        System.out.println("done1----------------------------------------------------------------");
         user.setIsdeceased(true);
+        System.out.println("done2----------------------------------------------------------------");
         deathUserRepository.save(user);
+        System.out.println("done3----------------------------------------------------------------");
 
         sendMagicLinks(user);
     }
 
-    
+    @Transactional
     private void sendMagicLinks(DeathUser user) {
         List<Beneficiary> beneficiaries = user.getBeneficiaries();
         if (beneficiaries == null || beneficiaries.isEmpty()) {

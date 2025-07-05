@@ -133,7 +133,7 @@ const UploadPage = () => {
       if (response.status === 200) {
         const encryptedKeyData = await getEncryptedKey(currentUser.id);
         setEncryptedAesKey(encryptedKeyData);
-        
+
         setIsUuidValid(true);
         setMessage("UUID validated successfully. You can now record audio.");
       } else {
@@ -270,7 +270,7 @@ const UploadPage = () => {
 
   // Encrypt audio blob
   const encryptAudio = async (blob) => {
-    const decryptedKey = decryptKey(uuid.trim() ,encryptedAesKey , password.trim());
+    const decryptedKey = decryptKey(uuid.trim(), encryptedAesKey, password.trim());
     if (!decryptedKey) {
       throw new Error("Decrypted key is missing.");
     }
@@ -278,22 +278,23 @@ const UploadPage = () => {
       const arrayBuffer = await blob.arrayBuffer();
       const wordArray = CryptoJS.lib.WordArray.create(arrayBuffer);
       const iv = CryptoJS.lib.WordArray.random(16); // Generate random IV
-      const encrypted = CryptoJS.AES.encrypt(wordArray, decryptedKey, {
+      const encrypted = CryptoJS.AES.encrypt(wordArray,  CryptoJS.enc.Utf8.parse(decryptedKey), {
         iv: iv,
         mode: CryptoJS.mode.CBC,
         padding: CryptoJS.pad.Pkcs7,
       });
-      const encryptedData = iv.concat(encrypted.ciphertext); // Prepend IV to ciphertext
-      const encryptedArray = encryptedData.words;
-      //this is for convert each 32-bit word into 4 bytes, to create a standard binary format.
-      const encryptedArray8Bit = new Uint8Array(encryptedArray.length * 4);
-      for (let i = 0; i < encryptedArray.length; i++) {
-        encryptedArray8Bit[i * 4] = (encryptedArray[i] >> 24) & 0xff;
-        encryptedArray8Bit[i * 4 + 1] = (encryptedArray[i] >> 16) & 0xff;
-        encryptedArray8Bit[i * 4 + 2] = (encryptedArray[i] >> 8) & 0xff;
-        encryptedArray8Bit[i * 4 + 3] = encryptedArray[i] & 0xff;
-      }
-      return new Blob([encryptedArray8Bit], { type: "audio/webm" });
+    const encryptedData = iv.concat(encrypted.ciphertext);
+    const encryptedArray = encryptedData.words;
+
+    // Convert 32-bit words to bytes
+    const encryptedArray8Bit = new Uint8Array(encryptedArray.length * 4);
+    for (let i = 0; i < encryptedArray.length; i++) {
+      encryptedArray8Bit[i * 4] = (encryptedArray[i] >> 24) & 0xff;
+      encryptedArray8Bit[i * 4 + 1] = (encryptedArray[i] >> 16) & 0xff;
+      encryptedArray8Bit[i * 4 + 2] = (encryptedArray[i] >> 8) & 0xff;
+      encryptedArray8Bit[i * 4 + 3] = encryptedArray[i] & 0xff;
+    }
+    return new Blob([encryptedArray8Bit], { type: "audio/webm" });
     } catch (error) {
       console.error("Encryption failed:", error);
       throw new Error("Failed to encrypt audio.");
@@ -302,15 +303,22 @@ const UploadPage = () => {
 
   // Upload encrypted audio
   const uploadAudio = async () => {
-    if (!audioBlob ) {
+    if (!audioBlob) {
       setMessage("No audio to upload or missing encryption key.");
       return;
     }
     setIsUploading(true);
     try {
       const encryptedBlob = await encryptAudio(audioBlob);
-      const fileName = `encrypted-audio-${Date.now()}.webm.enc`;
-      const file = new File([encryptedBlob], fileName, {
+      // Remove extension
+      const safeBaseName = "audio_recording";
+
+      // You can set an extension to indicate original format
+      const originalExtension = ".webm";
+
+      const uniqueFileName = `${Date.now()}_${currentUser.id}_${safeBaseName}${originalExtension}.enc`;
+      const filePath = `${currentUser.id}/${uniqueFileName}`;
+      const file = new File([encryptedBlob], uniqueFileName, {
         type: "audio/webm",
       });
 
@@ -318,7 +326,7 @@ const UploadPage = () => {
 
       const { data, error } = await supabase.storage
         .from("voice")
-        .upload(`${currentUser.id}/${fileName}`, file, {
+        .upload(filePath, file, {
           cacheControl: "3600",
           upsert: false,
         });
@@ -332,14 +340,13 @@ const UploadPage = () => {
 
       setMessage(" Upload successful!");
 
-     const filePath = `${currentUser.id}/${fileName}`;
 
-        const fileMetadata = {
+      const fileMetadata = {
         idOfUser: currentUser.id,
         letterFileUrl: null,
         mediaFileUrl: null,
         voiceFileUrl: filePath,
-        fileName: fileName,
+        fileName: "Audio Recording",
         usery: {
           userIdX: currentUser.id,
         },
@@ -354,7 +361,7 @@ const UploadPage = () => {
           },
         }
       );
-      if(response.status === 200 || response.status === 201) {
+      if (response.status === 200 || response.status === 201) {
         setMessage("Letter saved successfully!");
         setUuid("");
         setPassword("");
@@ -399,169 +406,169 @@ const UploadPage = () => {
 
   return (
     <>
-    <BackButton />
-    <div className="recorder-container">
-      <div className="recorder-box">
-        <div className="recorder-header">
-          <div className="icon-circle">
-            <FiMic size={24} />
-          </div>
-          <h2>Audio Recorder</h2>
-          <p>Record high-quality audio messages</p>
-        </div>
-        <div>
-          <input
-            type="text"
-            value={uuid}
-            onChange={(e) => setUuid(e.target.value)}
-            placeholder="User ID"
-            className="input-userid"
-            required
-            style={{
-              marginBottom: "10px",
-              padding: "0.8rem",
-              borderRadius: "0.5rem",
-              border: "1px solid #ddd",
-              width: "100%",
-            }}
-            disabled={isUuidValid || loading}
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
-            className="input-userid"
-            required
-            style={{
-              marginBottom: "10px",
-              padding: "0.8rem",
-              borderRadius: "0.5rem",
-              border: "1px solid #ddd",
-              width: "100%",
-            }}
-            disabled={isUuidValid || loading}
-          />
-        </div>
-        <div>
-          <button
-            className="btn"
-            onClick={validateUuid}
-            disabled={loading || isUuidValid}
-            style={{
-              background: isUuidValid ? "green" : "green",
-              color: "white",
-              padding: "0.8rem 1rem",
-              borderRadius: "1rem",
-              border: "none",
-              cursor: loading || isUuidValid ? "not-allowed" : "pointer",
-            }}
-          >
-            {loading ? "Validating..." : "Validate Secrets"}
-          </button>
-        </div>
-        {message && (
-          <div
-            style={{
-              margin: "1rem 0",
-              color: isUuidValid ? "#059669" : "#dc2626",
-              fontSize: "0.9rem",
-            }}
-          >
-            {message}
-          </div>
-        )}
-
-        {recording && (
-          <div className="recording-indicator">
-            <div className="audio-bars">
-              {[...Array(5)].map((_, i) => (
-                <div
-                  key={i}
-                  className="audio-bar"
-                  style={{
-                    height: `${Math.max(
-                      8,
-                      audioLevel * 40 + Math.random() * 10
-                    )}px`,
-                    opacity: audioLevel > 0.1 ? 1 : 0.3,
-                  }}
-                />
-              ))}
+      <BackButton />
+      <div className="recorder-container">
+        <div className="recorder-box">
+          <div className="recorder-header">
+            <div className="icon-circle">
+              <FiMic size={24} />
             </div>
-            <span className="recording-text">Recording...</span>
-            <div className="recording-time">{formatTime(recordingTime)}</div>
+            <h2>Audio Recorder</h2>
+            <p>Record high-quality audio messages</p>
           </div>
-        )}
-
-        <div className="controls">
-          {!recording && !audioBlob && (
+          <div>
+            <input
+              type="text"
+              value={uuid}
+              onChange={(e) => setUuid(e.target.value)}
+              placeholder="User ID"
+              className="input-userid"
+              required
+              style={{
+                marginBottom: "10px",
+                padding: "0.8rem",
+                borderRadius: "0.5rem",
+                border: "1px solid #ddd",
+                width: "100%",
+              }}
+              disabled={isUuidValid || loading}
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="input-userid"
+              required
+              style={{
+                marginBottom: "10px",
+                padding: "0.8rem",
+                borderRadius: "0.5rem",
+                border: "1px solid #ddd",
+                width: "100%",
+              }}
+              disabled={isUuidValid || loading}
+            />
+          </div>
+          <div>
             <button
-              className="btn start"
-              onClick={startRecording}
-              disabled={!isUuidValid}
+              className="btn"
+              onClick={validateUuid}
+              disabled={loading || isUuidValid}
+              style={{
+                background: isUuidValid ? "green" : "green",
+                color: "white",
+                padding: "0.8rem 1rem",
+                borderRadius: "1rem",
+                border: "none",
+                cursor: loading || isUuidValid ? "not-allowed" : "pointer",
+              }}
             >
-              <FiMic size={16} /> Start Recording
+              {loading ? "Validating..." : "Validate Secrets"}
             </button>
+          </div>
+          {message && (
+            <div
+              style={{
+                margin: "1rem 0",
+                color: isUuidValid ? "#059669" : "#dc2626",
+                fontSize: "0.9rem",
+              }}
+            >
+              {message}
+            </div>
           )}
 
           {recording && (
-            <>
-              <button className="btn stop" onClick={stopRecording}>
-                <FiSquare size={16} /> Stop
-              </button>
-              <button className="btn cancel" onClick={cancelRecording}>
-                <FiX size={16} /> Cancel
-              </button>
-            </>
+            <div className="recording-indicator">
+              <div className="audio-bars">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="audio-bar"
+                    style={{
+                      height: `${Math.max(
+                        8,
+                        audioLevel * 40 + Math.random() * 10
+                      )}px`,
+                      opacity: audioLevel > 0.1 ? 1 : 0.3,
+                    }}
+                  />
+                ))}
+              </div>
+              <span className="recording-text">Recording...</span>
+              <div className="recording-time">{formatTime(recordingTime)}</div>
+            </div>
           )}
 
-          {audioURL && (
-            <div className="preview-box">
-              <audio
-                ref={audioRef}
-                src={audioURL}
-                onEnded={() => setIsPlaying(false)}
-                hidden
-              />
-              <div className="preview-controls">
-                <span>Your Recording</span>
-                <button onClick={togglePlayback}>
-                  {isPlaying ? <FiPause size={16} /> : <FiPlay size={16} />}
-                </button>
-              </div>
-              <div
-                className="progress-bar"
-                style={{ width: `${progress}%` }}
-              ></div>
+          <div className="controls">
+            {!recording && !audioBlob && (
+              <button
+                className="btn start"
+                onClick={startRecording}
+                disabled={!isUuidValid}
+              >
+                <FiMic size={16} /> Start Recording
+              </button>
+            )}
 
-              <div className="actions">
-                <button
-                  className="btn upload"
-                  onClick={uploadAudio}
-                  disabled={isUploading}
-                >
-                  <FiUpload size={16} />{" "}
-                  {isUploading ? "Uploading..." : "Upload"}
+            {recording && (
+              <>
+                <button className="btn stop" onClick={stopRecording}>
+                  <FiSquare size={16} /> Stop
                 </button>
                 <button className="btn cancel" onClick={cancelRecording}>
                   <FiX size={16} /> Cancel
                 </button>
+              </>
+            )}
+
+            {audioURL && (
+              <div className="preview-box">
+                <audio
+                  ref={audioRef}
+                  src={audioURL}
+                  onEnded={() => setIsPlaying(false)}
+                  hidden
+                />
+                <div className="preview-controls">
+                  <span>Your Recording</span>
+                  <button onClick={togglePlayback}>
+                    {isPlaying ? <FiPause size={16} /> : <FiPlay size={16} />}
+                  </button>
+                </div>
+                <div
+                  className="progress-bar"
+                  style={{ width: `${progress}%` }}
+                ></div>
+
+                <div className="actions">
+                  <button
+                    className="btn upload"
+                    onClick={uploadAudio}
+                    disabled={isUploading}
+                  >
+                    <FiUpload size={16} />{" "}
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </button>
+                  <button className="btn cancel" onClick={cancelRecording}>
+                    <FiX size={16} /> Cancel
+                  </button>
+                </div>
               </div>
+            )}
+          </div>
+
+          {isUploading && (
+            <div className="uploading-message">
+              <div className="spinner" />
+              <span>Uploading your recording...</span>
             </div>
           )}
         </div>
-
-        {isUploading && (
-          <div className="uploading-message">
-            <div className="spinner" />
-            <span>Uploading your recording...</span>
-          </div>
-        )}
       </div>
-    </div>
     </>
   );
 };

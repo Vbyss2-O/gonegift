@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CryptoJS from "crypto-js";
 import "./DecryptFile.css"; // Assuming you have a CSS file for styles
+import { supabase } from "./supabaseClient"; // Adjust the import path as necessary
 
 const DecryptFile = () => {
   const [encryptedFileUrls, setEncryptedFileUrls] = useState([]);
@@ -180,29 +181,28 @@ const DecryptFile = () => {
         }
         return byteArray.buffer; // Return ArrayBuffer
       } else if (fileType === "voice") {
-        // For VoiceFile (audio/webm), extract IV and ciphertext
         const encryptedArray = new Uint8Array(ciphertext);
+
+        // Convert bytes back to WordArray
         const wordArray = CryptoJS.lib.WordArray.create();
         for (let i = 0; i < encryptedArray.length; i += 4) {
           const word =
             ((encryptedArray[i] << 24) |
               (encryptedArray[i + 1] << 16) |
               (encryptedArray[i + 2] << 8) |
-              encryptedArray[i + 3]) >>>
-            0;
+              encryptedArray[i + 3]) >>> 0;
           wordArray.words.push(word);
         }
         wordArray.sigBytes = encryptedArray.length;
 
-        // Extract IV (first 16 bytes) and ciphertext
         const ivWords = CryptoJS.lib.WordArray.create(wordArray.words.slice(0, 4));
         ivWords.sigBytes = 16;
+
         const ciphertextWords = CryptoJS.lib.WordArray.create(
           wordArray.words.slice(4),
           wordArray.sigBytes - 16
         );
 
-        // Decrypt the audio data
         const decryptedData = CryptoJS.AES.decrypt(
           { ciphertext: ciphertextWords },
           aesKey,
@@ -216,9 +216,11 @@ const DecryptFile = () => {
         // Convert decrypted WordArray to ArrayBuffer
         const decryptedArray = new Uint8Array(decryptedData.sigBytes);
         for (let i = 0; i < decryptedData.sigBytes; i++) {
-          decryptedArray[i] = (decryptedData.words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
+          decryptedArray[i] =
+            (decryptedData.words[i >> 2] >> (24 - (i % 4) * 8)) & 0xff;
         }
-        return decryptedArray.buffer; // Return ArrayBuffer for audio/webm
+
+        return decryptedArray.buffer;
       } else {
         throw new Error("Invalid file type specified");
       }
@@ -272,7 +274,8 @@ const DecryptFile = () => {
             const { data: signedUrlData, error: signedUrlError } = await supabase
               .storage
               .from(bucketName)
-              .createSignedUrl(filePath, 60);
+              .createSignedUrl(url, 60);
+            console.log(`Signed URL `, signedUrlData);
 
             if (signedUrlError) {
               console.error("Error generating signed URL:", signedUrlError);
@@ -284,11 +287,11 @@ const DecryptFile = () => {
             const encryptedData = fileType === "voice" ? fileResponse.data : fileResponse.data;
             const reader = new FileReader();
 
-            return new Promise((resolve, reject) => { 
+            return new Promise(async (resolve, reject) => {
               if (fileType === "voice") {
                 // Handle voice file directly as ArrayBuffer
                 try {
-                  const decryptedContent = decryptFile(encryptedData, decryptedKey, fileType);
+                  const decryptedContent = await decryptFile(encryptedData, decryptedKey, fileType);
                   const decryptedBlob = new Blob([decryptedContent], { type: "audio/webm" });
                   resolve({
                     type: "voice",
