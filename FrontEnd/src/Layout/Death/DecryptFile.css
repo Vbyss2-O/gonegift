@@ -2,11 +2,11 @@
   max-width: 800px;
   margin: 3rem auto;
   padding: 40px 28px;
-  background: var(--bg-glass, rgba(255,255,255,0.92));
+  background: var(--bg-glass, rgba(255, 255, 255, 0.92));
   border-radius: var(--radius-xl, 1.5rem);
-  box-shadow: var(--shadow-rainbow, 0 5px 24px rgba(168,85,247,0.10));
+  box-shadow: var(--shadow-rainbow, 0 5px 24px rgba(168, 85, 247, 0.10));
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  border: 1px solid rgba(255,255,255,0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
 }
 
@@ -18,7 +18,7 @@
   background: linear-gradient(135deg, var(--primary, #a855f7), var(--secondary, #ec4899), var(--accent, #10b981));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
 }
 
 .decryptfile-note {
@@ -75,7 +75,8 @@
   flex-wrap: wrap;
 }
 
-.decryptfile-btn {
+.decryptfile-btn,
+.action-button { /* Apply styles to the new button as well */
   padding: 1rem 2.2rem;
   font-size: 1.08rem;
   font-weight: 600;
@@ -83,29 +84,32 @@
   border-radius: 1rem;
   cursor: pointer;
   transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(168,85,247,0.08);
-}
-
-.decryptfile-btn-validate {
-  background: linear-gradient(90deg, #a855f7 0%, #ec4899 100%);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15); /* Soft green shadow */
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%); /* Green gradient */
   color: #fff;
 }
 
-.decryptfile-btn-validate:disabled {
+.decryptfile-btn:hover,
+.action-button:hover {
+  background: linear-gradient(90deg, #059669 0%, #047857 100%); /* Darker green on hover */
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+}
+
+.decryptfile-btn:disabled,
+.action-button:disabled {
   background: #ddd;
   color: #aaa;
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Specific button styles (if you still want them to look slightly different but remain green) */
+.decryptfile-btn-validate {
+  /* Keep the general .decryptfile-btn styles, or override if needed */
 }
 
 .decryptfile-btn-decrypt {
-  background: linear-gradient(90deg, #10b981 0%, #a855f7 100%);
-  color: #fff;
-}
-
-.decryptfile-btn-decrypt:disabled {
-  background: #ddd;
-  color: #aaa;
-  cursor: not-allowed;
+  /* Keep the general .decryptfile-btn styles, or override if needed */
 }
 
 .decryptfile-error {
@@ -122,7 +126,8 @@
   font-weight: 600;
 }
 
-.decryptfile-section-title {
+.decryptfile-section-title,
+.section-title { /* Apply styles to the new section title */
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--primary, #a855f7);
@@ -136,14 +141,15 @@
 }
 
 .decryptfile-filecard {
-  background: rgba(168,85,247,0.04);
+  background: rgba(168, 85, 247, 0.04);
   border-radius: 1rem;
   padding: 1.2rem 1.5rem;
   margin-bottom: 2rem;
-  box-shadow: 0 1px 4px rgba(168,85,247,0.04);
+  box-shadow: 0 1px 4px rgba(168, 85, 247, 0.04);
 }
 
-.decryptfile-filename {
+.decryptfile-filename,
+.list-title { /* Apply styles to the new list title */
   font-size: 1.13rem;
   font-weight: 700;
   color: var(--primary, #a855f7);
@@ -168,10 +174,11 @@
   border-radius: 0.7rem;
   margin-bottom: 0.7rem;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(168,85,247,0.04);
+  box-shadow: 0 1px 4px rgba(168, 85, 247, 0.04);
 }
 
-.decryptfile-download {
+.decryptfile-download,
+.file-download-link { /* Apply styles to the new download links */
   display: inline-block;
   margin-top: 0.5rem;
   color: var(--primary, #a855f7);
@@ -181,9 +188,80 @@
   transition: color 0.2s;
 }
 
-.decryptfile-download:hover {
+.decryptfile-download:hover,
+.file-download-link:hover {
   color: var(--secondary, #ec4899);
 }
+
+/* New Styles for Shared Files Section */
+.decryptfile-separator {
+  border: none;
+  border-top: 1px dashed #ccc;
+  margin: 3rem 0;
+}
+
+.view-files-section {
+  margin-top: 2.5rem;
+  text-align: center; /* Center the button and message */
+}
+
+.file-list-container {
+  margin-top: 1.5rem;
+  text-align: left; /* Align list items to the left */
+  background: rgba(16, 185, 129, 0.05); /* Light green background */
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);
+}
+
+.file-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-list-item {
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.file-list-item:last-child {
+  border-bottom: none;
+}
+
+.file-type-tag {
+  background: #e0f2f7; /* Light blue for tags */
+  color: #0d7b9e;
+  padding: 0.3em 0.6em;
+  border-radius: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.message-box {
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.7rem;
+  margin-top: 1.5rem;
+  font-weight: 600;
+  text-align: center;
+  border: 1px solid;
+}
+
+.message-success {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #c3e6cb;
+}
+
+.message-error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border-color: #f5c6cb;
+}
+
 
 @media (max-width: 900px) {
   .decryptfile-container {
@@ -201,14 +279,21 @@
   .decryptfile-title {
     font-size: 1.3rem;
   }
-  .decryptfile-section-title {
+  .decryptfile-section-title,
+  .section-title {
     font-size: 1.05rem;
   }
-  .decryptfile-filename {
+  .decryptfile-filename,
+  .list-title {
     font-size: 1rem;
   }
-  .decryptfile-btn {
+  .decryptfile-btn,
+  .action-button {
     padding: 0.7rem 1.1rem;
     font-size: 0.97rem;
+  }
+  .decryptfile-btn-row {
+    flex-direction: column; /* Stack buttons vertically on small screens */
+    align-items: stretch; /* Make them full width */
   }
 }

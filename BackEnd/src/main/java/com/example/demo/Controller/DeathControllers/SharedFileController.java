@@ -75,9 +75,9 @@ public class SharedFileController {
         return ResponseEntity.ok(spaceHashPass);
     }
 
-    @GetMapping("/getAllFiles")
-    public List<SharedFile> getAllFiles() {
-        return sharedFileRepository.findAll();
+    @GetMapping("/getAllFiles/{userId}")
+    public List<SharedFile> getAllFiles(@PathVariable UUID userId) {
+        return sharedFileRepository.findByAuthorId(userId);
     }
 
     @GetMapping("/getList")
