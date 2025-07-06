@@ -24,6 +24,8 @@ import UpdateAndPlans from "./Layout/UpdatesAndPlans";
 import PrivacyPolicy from "./Layout/PrivacyPolicy";
 import UserGuides from "./Layout/HelpCenter";
 import HelpCenterForm from "./Layout/ProblemSubmit";
+import CreateDelivery from "./Layout/Death/CreateDelivery";
+import PendingDelivery from "./Layout/Death/PendingDelivery";
 
 
 function App() {
@@ -184,6 +186,22 @@ function App() {
         path="/help"
         element={
           <HelpCenterForm />
+        }
+      />
+      <Route
+        path="/delivery"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <CreateDelivery />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/pendingDelivery"
+        element={
+          <ProtectedRoute redirectTo="/login">
+            <PendingDelivery />
+          </ProtectedRoute>
         }
       />
 

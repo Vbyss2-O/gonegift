@@ -117,7 +117,7 @@ const Dashboard = () => {
 
   const generalMenuItems = [
     { icon: <FiUpload size={24} />, text: "Upload File", path: "/upload-file" },
-    { icon: <FiMail size={24} />, text: "Create Delivery", path: "/create-delivery" },
+    { icon: <FiMail size={24} />, text: "Create Delivery", path: "/delivery" },
     { icon: <FiUsers size={24} />, text: "Beneficiary", path: "/beneficiaries" },
     { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
     { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
@@ -206,7 +206,7 @@ const Dashboard = () => {
           </div>
           <div 
             className="stat-card clickable"
-            onClick={() => navigate("/pending-deliveries")}
+            onClick={() => navigate("/pendingDelivery")}
             role="button"
             tabIndex={0}
           >
