@@ -1,15 +1,11 @@
 package com.example.demo.Service;
 
-
-
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-
 import com.example.demo.Repo.DeathUserRepository;
 import com.example.demo.model.DeathProject.BuddyStatus;
 import com.example.demo.model.DeathProject.DeathUser;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -18,93 +14,109 @@ import java.util.List;
 @Service
 public class BuddyScheduler {
 
-  
-    
-        @Autowired
-        private DeathUserRepository userRepository;
-    
-        @Autowired
-        private LifeBuddyService buddyService;
+    @Autowired
+    private DeathUserRepository userRepository;
 
-        @Autowired
-        private DeathReportService deathReportService;
+    @Autowired
+    private LifeBuddyService buddyService;
 
-       
-        
-        @Scheduled(fixedRate = 60*1000) //24 hours
-        public void checkUsers() {
-            LocalDateTime now = LocalDateTime.now();
-            List<DeathUser> users = userRepository.findAll();
-    
-            for (DeathUser user : users) {
-                long daysSinceLastActivity = user.getLastActivityDate() != null
+    @Autowired
+    private DeathReportService deathReportService;
+
+    /**
+     * this scheduled task runs every day at 2 AM.
+     */
+    @Scheduled(cron = "0 0 2 * * *")
+    public void checkUsers() {
+        LocalDateTime now = LocalDateTime.now();
+        List<DeathUser> users = userRepository.findAll();
+
+        for (DeathUser user : users) {
+            boolean stateChanged = false;
+
+            long daysSinceLastActivity = user.getLastActivityDate() != null
                     ? ChronoUnit.DAYS.between(user.getLastActivityDate(), now)
                     : 0;
-    
-                // Check lastInteraction first (for all states except CHILLING)
-                if (user.getBuddyStatus() != BuddyStatus.CHILLING && 
-                user.getLastInteraction() != null && 
-                user.getLastInteraction().isAfter(user.getLastActivityDate())) {
-                // User responded, reset to CHILLING
-                
+
+            if (
+                user.getBuddyStatus() != BuddyStatus.CHILLING &&
+                user.getLastInteraction() != null &&
+                user.getLastActivityDate() != null &&
+                user.getLastInteraction().isAfter(user.getLastActivityDate())
+            ) {
                 user.setLastActivityDate(user.getLastInteraction());
-                user.setInactivityThresholdDays(0); // inactivity counter
                 user.setLastInteraction(null);
-                user.setBuddyStatus(BuddyStatus.CHILLING);
+                user.setInactivityThresholdDays(0);
                 user.setAttemptCount(0);
-                
+                user.setBuddyStatus(BuddyStatus.CHILLING);
+                stateChanged = true;
+
             } else {
-                // No response, proceed with state transitions
                 switch (user.getBuddyStatus()) {
                     case CHILLING:
-                        if (daysSinceLastActivity >= 20) {
+                        if (daysSinceLastActivity >= 90 && user.getAttemptCount() == 0) {
                             user.setBuddyStatus(BuddyStatus.CHILLING1);
                             user.setAttemptCount(1);
-                            user.setInactivityThresholdDays((int)daysSinceLastActivity);
+                            user.setInactivityThresholdDays((int) daysSinceLastActivity);
                             user.setLastInteraction(now);
-                                
+                            stateChanged = true;
                         }
                         break;
+
                     case CHILLING1:
-                        if (daysSinceLastActivity >= 21 && user.getAttemptCount() == 1 && user.getInactivityThresholdDays() >=21) { // 20 + 1 day
+                        if (daysSinceLastActivity >= 95 && user.getAttemptCount() == 1) {
                             user.setBuddyStatus(BuddyStatus.CURIOUS);
                             user.setAttemptCount(2);
-                            user.setInactivityThresholdDays((int)daysSinceLastActivity);
+                            buddyService.sendBuddyMessage(user, "CHILLING1");
+                            user.setInactivityThresholdDays((int) daysSinceLastActivity);
                             user.setLastInteraction(now);
-                            buddyService.logActivity(user.getUserIdX(), "Buddy Status Changed:)" , "CHILLING1");
+                            stateChanged = true;
                         }
                         break;
+
                     case CURIOUS:
-                        if (daysSinceLastActivity >= 22 && user.getAttemptCount() == 2 && user.getInactivityThresholdDays() >=22) { // 20 + 1 + 1 day
+                        if (daysSinceLastActivity >= 110 && user.getAttemptCount() == 2) {
                             user.setBuddyStatus(BuddyStatus.WORRIED);
                             user.setAttemptCount(3);
-                            buddyService.sendBuddyMessage(user , "CURIOUS");
-                            user.setInactivityThresholdDays((int)daysSinceLastActivity);
+                            buddyService.sendBuddyMessage(user, "CURIOUS");
+                            user.setInactivityThresholdDays((int) daysSinceLastActivity);
                             user.setLastInteraction(now);
+                            stateChanged = true;
                         }
                         break;
-                    case WORRIED:
-                        if (daysSinceLastActivity >= 23 && user.getAttemptCount() == 3 && user.getInactivityThresholdDays() >=23) { // 20 + 1 + 1 + 1 day
-                            user.setBuddyStatus(BuddyStatus.GOODBYE);
-                            buddyService.lastCall(user , "WORRIED");
-                            user.setInactivityThresholdDays((int)daysSinceLastActivity);
-                            user.setLastInteraction(now);
-                            
-                        }
-                        break;
-                    case GOODBYE:
-                       if(!user.isIsdeceased()){    
-                        buddyService.sendGoodbyeNotification(user);
-                        deathReportService.triggerUser(user);
 
-                       }
-                       break;
+                    case WORRIED:
+                        if (daysSinceLastActivity >= 120 && user.getAttemptCount() == 3) {
+                            user.setBuddyStatus(BuddyStatus.GOODBYE);
+                            buddyService.lastCall(user, "WORRIED");
+                            user.setAttemptCount(4);
+                            user.setInactivityThresholdDays((int) daysSinceLastActivity);
+                            user.setLastInteraction(now);
+                            stateChanged = true;
+                        }
+                        break;
+
+                    case GOODBYE:
+                        if (
+                            daysSinceLastActivity >= 140 &&
+                            !user.isIsdeceased() &&
+                            user.getAttemptCount() == 4 &&
+                            user.getInactivityThresholdDays() >= 120
+                        ) {
+                            buddyService.sendGoodbyeNotification(user);
+                            deathReportService.triggerUser(user);
+                            user.setAttemptCount(5); 
+                        }
+                        break;
+
                     default:
-                        
                         break;
                 }
             }
-            userRepository.save(user);
+
+            if (stateChanged) {
+                userRepository.save(user);
+            }
         }
     }
 }

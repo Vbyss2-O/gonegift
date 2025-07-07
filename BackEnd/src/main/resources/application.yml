@@ -25,10 +25,10 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        cache:
-          use_second_level_cache: true
-          use_query_cache: true
-          region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        # cache:
+        #   use_second_level_cache: true
+        #   use_query_cache: true
+        #   region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
 
         jdbc:
           use_legacy_prepared_statement_naming: true  # Keep this to avoid naming conflicts

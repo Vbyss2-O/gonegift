@@ -125,5 +125,26 @@ public class DeathUserController {
             return ResponseEntity.notFound().build();
         }
     }
+    @GetMapping("findHashTokenByUUID/{userId}")
+    public ResponseEntity<String> findHashTokenByUUID(@PathVariable UUID userId) {
+        String hashToken = deathUserService.findHashTokenByUUID(userId);
+        if (hashToken != null) {
+            return ResponseEntity.ok(hashToken);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+        @GetMapping("/findUserByHashKey")
+        public ResponseEntity<DeathUser> findUserByHashKey(@RequestParam String secrectKey){
+            DeathUser wanted = deathUserService.findUserByHash(secrectKey);
+            if(wanted != null){
+                return ResponseEntity.ok(wanted);
+            }
+            else{
+                return ResponseEntity.notFound().build();
+
+            }
+
+        }
    
 }

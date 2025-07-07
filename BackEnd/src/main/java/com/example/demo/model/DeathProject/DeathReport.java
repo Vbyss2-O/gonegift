@@ -1,5 +1,7 @@
 package com.example.demo.model.DeathProject;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -13,11 +15,7 @@ public class DeathReport {
     @Column(nullable = false)
     private Long id;
     
-    @Column(nullable = false)
-    private String secretId;
-
-    @Column(nullable = false)
-    private String password;
+   
 
     @Column(nullable = false)
     private String bucketUrl;
@@ -26,10 +24,24 @@ public class DeathReport {
     private String name;
 
     @Column(nullable = false)
+    private String middleName;
+
+    @Column(nullable = false)
     private String surname;
 
     @Column(nullable = false)
     private String reportDetails;
+
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String secretKey;
+
+    @Column(nullable = false)
+    private LocalDate dateOfBirth;
+
+    
     
     @Column(nullable = false)
     private String status = "pending";

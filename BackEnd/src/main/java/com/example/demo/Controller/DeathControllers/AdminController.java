@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 // import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin")
@@ -48,10 +49,10 @@ public class AdminController {
     // }
 
     // Review and trigger a death report
-    @PostMapping("/death-reports/trigger/{reportId}")
-    public ResponseEntity<String> triggerReport(@PathVariable Long reportId) {
+    @PostMapping("/death-reports/trigger")
+    public ResponseEntity<String> triggerReport(@RequestParam Long reportId , @RequestParam String hash) {
         try {
-            deathReportService.triggerReport(reportId);
+            deathReportService.triggerReport(reportId , hash);
             return ResponseEntity.ok("Report triggered successfully, user marked as deceased");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

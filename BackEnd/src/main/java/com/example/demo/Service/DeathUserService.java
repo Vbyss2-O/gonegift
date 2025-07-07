@@ -145,6 +145,17 @@ public class DeathUserService {
         }
         return count;
     }
+    public String findHashTokenByUUID(UUID userId) {
+        DeathUser user = deathUserRepository.findById(userId).orElse(null);
+        if (user != null) {
+            return user.getHashuuid();
+        } else {
+            throw new RuntimeException("User not found with ID: " + userId);
+        }
+    }
+    public DeathUser findUserByHash(String hashId){
+        return deathUserRepository.findByHashuuid(hashId);
+    }
     
     
 }

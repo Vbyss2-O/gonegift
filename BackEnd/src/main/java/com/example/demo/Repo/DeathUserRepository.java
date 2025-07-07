@@ -21,5 +21,6 @@ public interface DeathUserRepository extends JpaRepository<DeathUser, UUID> {
     @Query("SELECT d.userIdX FROM DeathUser d WHERE d.hashuuid = :hashuuid")
     UUID findUserIdXByHashuuid(@Param("hashuuid") String hashuuid);
 
-    // List<DeathUser> findByNextBuddyDateBefore(LocalDateTime now);
+    DeathUser findByHashuuid(String hashuuid);
+
 }

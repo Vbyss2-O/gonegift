@@ -1,5 +1,6 @@
 package com.example.demo.model.DeathProject;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +38,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @Entity
 // @Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+// @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DeathUser {
 
     @Id
@@ -50,8 +51,13 @@ public class DeathUser {
     @Column(nullable = false)
     private String firstName;
 
+    // @Column(nullable = false)
+    private String middleName;
+
     @Column(nullable = false)
     private String lastname ;
+
+    private LocalDate dateOfBirth;
     
     @Column(nullable = false)
     private LocalDateTime lastActivityDate;
@@ -73,13 +79,12 @@ public class DeathUser {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
     private BuddyStatus buddyStatus = BuddyStatus.CHILLING; 
 
     @Column(nullable = false)
-    private Integer attemptCount;
+    private Integer attemptCount;   
 
-
+//this is intraction of buddy with the user
     private LocalDateTime lastInteraction;
     
 

@@ -14,6 +14,8 @@ const UserDetailsForm = () => {
   const [loading, setLoading] = useState(false);
   const [loadingScreen, setLoadingScreen] = useState(true);  // Added for initial loading state
   const [user, setUser] = useState(null);
+  const [middleName , setMiddleName] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
 
 
   // Check if user is logged in, if not redirect to login
@@ -109,7 +111,9 @@ const UserDetailsForm = () => {
         userIdX: user.id,
         email: email,
         firstName: firstName,
+        middleName : middleName,
         lastname: lastname,
+        dateOfBirth: dateOfBirth,
         lastActivityDate: new Date().toISOString(),
         inactivityThresholdDays: 0,
         userRole: "general",
@@ -214,7 +218,17 @@ const UserDetailsForm = () => {
               <input
                 type="text"
                 value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
+                onChange={(e) => setFirstName(e.target.value.toLowerCase().replace(/[^a-z]/g, ""))}
+                required
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label>Middle Name:</label>
+              <input
+                type="text"
+                value={middleName}
+                onChange={(e) => setMiddleName(e.target.value.toLowerCase().replace(/[^a-z]/g, ""))}
                 required
                 style={styles.input}
               />
@@ -224,7 +238,17 @@ const UserDetailsForm = () => {
               <input
                 type="text"
                 value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
+                onChange={(e) => setLastname(e.target.value.toLowerCase().replace(/[^a-z]/g, ""))}
+                required
+                style={styles.input}
+              />
+            </div>
+            <div style={styles.inputGroup}>
+              <label>Date of Birth:</label>
+              <input
+                type="date"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
                 required
                 style={styles.input}
               />

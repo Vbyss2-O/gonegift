@@ -49,20 +49,22 @@ public class DeathReportService {
     }
 
     @Transactional
-    public void triggerReport(Long reportId) {
+    public void triggerReport(Long reportId , String hash) {
         DeathReport report = deathReportRepository.findById(reportId)
             .orElseThrow(() -> new RuntimeException("Report not found with ID: " + reportId));
 
-        report.setStatus("approved");
+        report.setStatus("approved");     
         deathReportRepository.save(report);
 
-        DeathUser user = deathUserRepository.findBySecretKey(report.getSecretId());
+        // DeathUser user = deathUserRepository.findById(userId)
+        //     .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        DeathUser user = deathUserRepository.findByHashuuid(hash);
         if (user == null) {
-            throw new RuntimeException("User not found with secret ID: " + report.getSecretId());
+            throw new RuntimeException("User not found with secret ID: " + report.getSecretKey());
         }
         user.setIsdeceased(true);
-        deathUserRepository.save(user);
 
+        sendMailToSpecificUserEmailId(user.getEmail(), user.getUserIdX());
         sendMagicLinks(user);
     }
 
@@ -71,13 +73,12 @@ public class DeathReportService {
         if (user == null) {
             throw new RuntimeException("Null user found");
         }
-        System.out.println("done1----------------------------------------------------------------");
+        //transactional annotaion auto commits the changes
         user.setIsdeceased(true);
-        System.out.println("done2----------------------------------------------------------------");
-        deathUserRepository.save(user);
-        System.out.println("done3----------------------------------------------------------------");
+        // deathUserRepository.save(user);
 
         sendMagicLinks(user);
+        
     }
 
     @Transactional
@@ -119,6 +120,40 @@ public class DeathReportService {
                 System.err.println("Failed to send email to " + beneficiary.getEmail() + ": " + e.getMessage());
             }
         }
+    }
+    @Transactional
+    public void sendMailToSpecificUserEmailId(String email , UUID userId){
+         try {
+                String token = generateMagicToken(userId);
+                //at time of production change this properly 
+                //check the response of api
+                String magicLink = "http://localhost:8080/api/magic-link/retrieve?token=" + token;
+
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setFrom("devlomentpurpose@gmail.com"); 
+                message.setTo(email);
+                message.setSubject("Access to Deceased User Data - Magic Link");
+                message.setText(
+                    "Dear Beneficiary,\n\n" +
+                    "The user with ID " + userId + " has been confirmed deceased.\n" +
+                    "To access their data, please click the link below and enter your decryption key:\n\n" +
+                    magicLink + "\n\n" +
+                    "Regards,\nGoneGift Team"
+                );
+                // mailSender.send(message);
+            try {
+                mailSender.send(message);
+            } catch (MailAuthenticationException e) {
+                System.err.println("Authentication failed: " + e.getMessage());
+                throw new RuntimeException("Email authentication failed. Please check SMTP credentials.", e);
+            } catch (MailSendException e) {
+                System.err.println("Failed to send email: " + e.getMessage());
+                throw new RuntimeException("Email sending failed. Please check SMTP configuration.", e);
+            }
+            } catch (Exception e) {
+                System.err.println("Failed to send email" );
+            }
+
     }
 
    public String generateMagicToken(UUID userId) {
