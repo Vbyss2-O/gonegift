@@ -33,6 +33,11 @@ public class BuddyScheduler {
 
         for (DeathUser user : users) {
             boolean stateChanged = false;
+            if(!user.getFlag()){
+                // Skip users who are not flagged for buddy status updates
+                //this is states that dead man toggle switch is off
+                continue;   
+            }
 
             long daysSinceLastActivity = user.getLastActivityDate() != null
                     ? ChronoUnit.DAYS.between(user.getLastActivityDate(), now)

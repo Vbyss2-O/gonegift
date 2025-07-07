@@ -2,35 +2,42 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./DeathDashboard.css";
-import { 
-  FiUpload, 
-  FiMail, 
-  FiUsers, 
-  FiFileText, 
-  FiGift, 
-  FiSettings, 
-  FiLogOut, 
-  FiGrid, 
-  FiBox, 
+import {
+  FiUpload,
+  FiMail,
+  FiUsers,
+  FiFileText,
+  FiGift,
+  FiSettings,
+  FiLogOut,
+  FiGrid,
+  FiBox,
   FiTrendingUp,
   FiUploadCloud,
-} from 'react-icons/fi';
+} from "react-icons/fi";
 import { FaRobot, FaVoicemail } from "react-icons/fa";
+import MonitoringToggle from "../components/ToggleSwitch";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [countFile, setCountFile] = useState(null); 
+  const [countFile, setCountFile] = useState(null);
   const [countBenificiary, setCountBenificiary] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const { data: { user }, error } = await supabase.auth.getUser();
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser();
         if (error || !user) {
-          console.error("Error fetching user:", error?.message || "No user found");
+          console.error(
+            "Error fetching user:",
+            error?.message || "No user found"
+          );
           navigate("/login");
           return;
         }
@@ -43,7 +50,10 @@ const Dashboard = () => {
           .maybeSingle();
 
         if (fetchError || !existingUser) {
-          console.error("Error fetching user data:", fetchError || "User not found in death_user table");
+          console.error(
+            "Error fetching user data:",
+            fetchError || "User not found in death_user table"
+          );
           navigate("/login");
           return;
         }
@@ -66,30 +76,37 @@ const Dashboard = () => {
   }, [navigate]);
 
   useEffect(() => {
-  if (userData) {
-    Promise.all([
-      fetch(`http://localhost:8080/api/deathusers/filesize/${userData.userIdX}`).then(res => res.text()),
-      fetch(`http://localhost:8080/api/deathusers/sharedfilesize/${userData.userIdX}`).then(res => res.text()),
-    ])
-    .then(([fileSizeText, sharedSizeText]) => {
-      const fileSize = parseInt(fileSizeText, 10) || 0;
-      const sharedSize = parseInt(sharedSizeText, 10) || 0;
+    if (userData) {
+      Promise.all([
+        fetch(
+          `http://localhost:8080/api/deathusers/filesize/${userData.userIdX}`
+        ).then((res) => res.text()),
+        fetch(
+          `http://localhost:8080/api/deathusers/sharedfilesize/${userData.userIdX}`
+        ).then((res) => res.text()),
+      ])
+        .then(([fileSizeText, sharedSizeText]) => {
+          const fileSize = parseInt(fileSizeText, 10) || 0;
+          const sharedSize = parseInt(sharedSizeText, 10) || 0;
 
-      setCountFile(fileSize+ sharedSize);
-    })
-    .catch(error => console.error("Error fetching file counts:", error));
-  }
-}, [userData]);
-
-  
-  useEffect(() => {
-    if (userData) { 
-      fetch(`http://localhost:8080/api/deathusers/beneficiarysize/${userData.userIdX}`) 
-        .then((response) => response.text()) 
-        .then((datax) => {
-          setCountBenificiary(parseInt(datax, 10)); 
+          setCountFile(fileSize + sharedSize);
         })
-        .catch((error) => console.error("Error fetching beneficiary count:", error));
+        .catch((error) => console.error("Error fetching file counts:", error));
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (userData) {
+      fetch(
+        `http://localhost:8080/api/deathusers/beneficiarysize/${userData.userIdX}`
+      )
+        .then((response) => response.text())
+        .then((datax) => {
+          setCountBenificiary(parseInt(datax, 10));
+        })
+        .catch((error) =>
+          console.error("Error fetching beneficiary count:", error)
+        );
     }
   }, [userData]);
 
@@ -106,7 +123,7 @@ const Dashboard = () => {
   //naviage to voice route
   const handleVoice = () => {
     navigate("/voice");
-  }
+  };
 
   // if (loading) return (
   //   <div className="loading-screen">
@@ -118,12 +135,24 @@ const Dashboard = () => {
   const generalMenuItems = [
     { icon: <FiUpload size={24} />, text: "Upload File", path: "/upload-file" },
     { icon: <FiMail size={24} />, text: "Create Delivery", path: "/delivery" },
-    { icon: <FiUsers size={24} />, text: "Beneficiary", path: "/beneficiaries" },
+    {
+      icon: <FiUsers size={24} />,
+      text: "Beneficiary",
+      path: "/beneficiaries",
+    },
     { icon: <FiFileText size={24} />, text: "Letter", path: "/letter" },
-    { icon: <FiGift size={24} />, text: "Claim as Beneficiary", path: "/beneficiary-claim" },
+    {
+      icon: <FiGift size={24} />,
+      text: "Claim as Beneficiary",
+      path: "/beneficiary-claim",
+    },
     { icon: <FaRobot size={24} />, text: "Visite Budddy", path: "/lifebuddy" },
     { icon: <FaVoicemail size={24} />, text: "Voice", path: "/voice" },
-    { icon: <FiUploadCloud size={24} />, text: "Shared Space", path: "/sharedSpace"}
+    {
+      icon: <FiUploadCloud size={24} />,
+      text: "Shared Space",
+      path: "/sharedSpace",
+    },
   ];
 
   const adminMenuItems = [
@@ -140,7 +169,7 @@ const Dashboard = () => {
           <FiGrid size={24} />
           <h2>GoneGift</h2>
         </div>
-        
+
         <nav className="sidebar-menu">
           {menuItems.map((item, index) => (
             <button
@@ -162,22 +191,44 @@ const Dashboard = () => {
 
       <main className="main-content">
         <header className="main-header">
-          <div className="user-welcome">
+          <div className="user-welcome"
+            style={{
+              position: "relative",
+              padding: "20px",
+              border: "1px solid #ccc",
+              borderRadius: "8px",
+              overflow: "hidden" // this keeps children inside
+            }}>
             <h1>Welcome back, {userData?.firstName}!</h1>
-            <p>{new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}</p>
+            <p>
+              {new Date().toLocaleDateString("en-US", {
+                weekday: "long",
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}
+            </p>
+            <div
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                maxWidth: "100%",
+                boxSizing: "border-box",
+              }}
+            >
+              <MonitoringToggle
+                userId={userData?.userIdX}
+                initialEnabled={true}
+              />
+            </div>
           </div>
-          <div className="user-profile">
-          </div>
+          <div className="user-profile"></div>
         </header>
 
         <div className="stats-grid">
-          <div 
-            className="stat-card clickable" 
+          <div
+            className="stat-card clickable"
             onClick={() => navigate("/allFiles")}
             role="button"
             tabIndex={0}
@@ -190,8 +241,8 @@ const Dashboard = () => {
               <p>{countFile}</p>
             </div>
           </div>
-          <div 
-            className="stat-card clickable" 
+          <div
+            className="stat-card clickable"
             onClick={() => navigate("/allBenificiarys")}
             role="button"
             tabIndex={0}
@@ -204,7 +255,7 @@ const Dashboard = () => {
               <p>{countBenificiary}</p>
             </div>
           </div>
-          <div 
+          <div
             className="stat-card clickable"
             onClick={() => navigate("/pendingDelivery")}
             role="button"
@@ -218,14 +269,13 @@ const Dashboard = () => {
               <p>0</p>
             </div>
           </div>
-         
         </div>
 
         <div className="dashboard-grid">
           {menuItems.map((item, index) => (
-            <div 
-              key={index} 
-              className="dashboard-card" 
+            <div
+              key={index}
+              className="dashboard-card"
               onClick={() => navigate(item.path)}
             >
               <div className="card-icon">{item.icon}</div>

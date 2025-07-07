@@ -124,6 +124,7 @@ const UserDetailsForm = () => {
         buddyStatus: "CHILLING",
         hashuuid: hashedUuid,
         secretKey: encryptedKey, // Use the returned value directly
+        flag : true, 
 
       };
 

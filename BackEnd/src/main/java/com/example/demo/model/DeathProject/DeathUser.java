@@ -86,6 +86,9 @@ public class DeathUser {
 
 //this is intraction of buddy with the user
     private LocalDateTime lastInteraction;
+
+    @Column(nullable = false)
+    private Boolean flag;
     
 
     // corrected the mapping for beneficiaries
