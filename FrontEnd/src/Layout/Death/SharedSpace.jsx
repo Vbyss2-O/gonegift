@@ -24,7 +24,7 @@ const SharedSpace = () => {
   const navigate = useNavigate();
 
   // Cooldown duration in milliseconds (60 seconds)
-  const COOLDOWN_DURATION = 30 * 1000; // 0.5 min
+  const COOLDOWN_DURATION = 60*1000*60*24; // 0.5 min
 
   useEffect(() => {
     const fetchUser = async () => {
