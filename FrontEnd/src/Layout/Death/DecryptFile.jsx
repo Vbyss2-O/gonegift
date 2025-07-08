@@ -426,7 +426,6 @@ const DecryptFile = () => {
       }
 
       const response = await axios.get(`http://localhost:8080/shared-file/getAllFiles/${userID}`);
-      console.log("Response from backend:", response.data);
 
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error("Invalid response format from backend.");

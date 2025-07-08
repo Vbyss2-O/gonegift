@@ -73,9 +73,7 @@ const FileUpload = () => {
         keySize: 256 / 32,
         iterations: 10000,
       });
-      console.log("Derived Key:", derivedKey.toString());
       const iv = CryptoJS.enc.Base64.parse(ivBase64);
-      console.log("IV:", iv);
       const decrypted = CryptoJS.AES.decrypt(
         { ciphertext: CryptoJS.enc.Base64.parse(encryptedKey) },
         derivedKey,
@@ -114,13 +112,10 @@ const FileUpload = () => {
     setLoading(true);
     try {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
-      console.log("Input to hashWithSalt:", input);
       const hashedToken = await hashWithSalt(input);
-      console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
       );
-      console.log("API Response:", response.data);
       if (response.status === 200) {
         setIsUuidValid(true);
         setMessage({

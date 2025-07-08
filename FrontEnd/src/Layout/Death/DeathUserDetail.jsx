@@ -128,13 +128,11 @@ const UserDetailsForm = () => {
 
       };
 
-      console.log("Submitting user details:", userDetails);
 
       const response = await axios.post("http://localhost:8080/api/deathusers", userDetails, {
         headers: { "Content-Type": "application/json" },
       });
 
-      console.log("User created successfully:", response.data);
       // alert(`This is your most important key. Do not share it with anyone other than your beneficiary: Your Id: ${generatedUuid} Your Password: ${iv} `);
       showCredentialsBox(generatedUuid, iv);
       navigate("/death-dashboard");

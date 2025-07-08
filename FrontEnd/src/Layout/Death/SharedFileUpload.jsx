@@ -52,9 +52,6 @@ const SharedFileUpload = () => {
             const response = await axios.get(`http://localhost:8080/shared-file/password/verify?token=${encodeURIComponent(token)}`);
 
             const hashedInput = hashReadableKey(input.trim());
-            console.log("Hashed Input:", hashedInput);
-            console.log("User Input (trimmed):", input.trim());
-            console.log("Backend Response Data:", response.data);
 
             if (hashedInput === response.data) {
                 setValidated(true);
@@ -423,7 +420,6 @@ const SharedFileUpload = () => {
     };
 
     const handleFileSelection = (selectedFile) => {
-        console.log("File selected:", selectedFile);
         setFile(selectedFile);
         setMessage(""); // Clear any previous messages when a new file is selected
     };

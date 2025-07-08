@@ -107,7 +107,6 @@ const AdminDashboard = () => {
 
   const findUserAndValidate = async (report) => {
     const secrectKey = report.secretKey;
-    console.log("Secret Key for validation:", secrectKey); // Log the secret key for debugging
     try {
       const deadUserResponse = await axios.get(
         `http://localhost:8080/api/deathusers/findUserByHashKey`,
@@ -117,10 +116,8 @@ const AdminDashboard = () => {
           }
         }
       );
-      console.log("Dead User Response:", deadUserResponse); // Log the response for debugging
 
       const deadUser = deadUserResponse.data;
-      console.log("Dead User:", deadUser);
 
       if (deadUser) {
         // Check if all name, surname, and middleName are matching
@@ -152,7 +149,6 @@ const AdminDashboard = () => {
   const handleTrigger = async (reportIdX, report) => {
     setMessage(""); // Clear previous messages
     // Improved console log to clearly show the value of reportIdX
-    console.log(`reportIdX in handleTrigger: ${reportIdX}`);
 
     const validationResult = await findUserAndValidate(report); // Await the validation result
     const { isValidated, userId: validatedUserId } = validationResult; // Destructure the result
@@ -207,7 +203,6 @@ const AdminDashboard = () => {
       ) : (
         reports.map((report) => {
           // Log report.id here to check its value before rendering the button
-          console.log(`Rendering report card for ID: ${report.id}`);
           return (
             <div key={report.id} style={styles.reportCard}>
               <p><strong>Report ID:</strong> {report.id}</p>

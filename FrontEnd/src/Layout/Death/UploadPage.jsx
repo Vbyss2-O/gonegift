@@ -52,7 +52,6 @@ const UploadPage = () => {
         throw new Error(error.message);
       }
       if (user) {
-        console.log("Fetched current user:", user);
         setCurrentUser(user);
       } else {
         setMessage("No authenticated user found.");
@@ -126,7 +125,6 @@ const UploadPage = () => {
     try {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
-      console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
       );
@@ -330,7 +328,6 @@ const UploadPage = () => {
         type: "audio/webm",
       });
 
-      console.log("🎙 Uploading encrypted file to Supabase:", file);
 
       const { data, error } = await supabase.storage
         .from("voice")
@@ -339,7 +336,6 @@ const UploadPage = () => {
           upsert: false,
         });
 
-      console.log("📡 Supabase response:", { data, error });
 
       if (error) {
         setMessage(" Upload failed: " + error.message);

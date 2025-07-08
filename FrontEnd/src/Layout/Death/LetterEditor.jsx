@@ -35,10 +35,8 @@ const LetterEditor = () => {
       return;
     }
     if (user) {
-      console.log("Fetched current user:", user);
       setCurrentUser(user);
     } else {
-      console.log("No authenticated user found.");
     }
   };
 
@@ -102,7 +100,6 @@ const LetterEditor = () => {
     try {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
-      console.log("Hashed Token:", hashedToken);
       const response = await axios.get(
         `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
       );
@@ -183,7 +180,6 @@ const LetterEditor = () => {
         throw new Error("Unable to get user session: " + (sessionError?.message || "No session"));
       }
 
-      console.log("Saving encrypted letter as user:", currentUser.id, "to bucket:", bucket);
 
       // Upload the encrypted letter to Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
@@ -199,7 +195,6 @@ const LetterEditor = () => {
         throw new Error(`Failed to upload to Supabase: ${uploadError.message}`);
       }
 
-      console.log("Encrypted letter uploaded successfully:", uploadData);
 
       // Get public URL for the uploaded file
 
@@ -216,7 +211,6 @@ const LetterEditor = () => {
         },
       };
 
-      console.log("Sending metadata to backend:", fileMetadata);
 
       // Send metadata to backend
       const response = await axios.post(

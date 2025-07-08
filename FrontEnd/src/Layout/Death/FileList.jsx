@@ -111,7 +111,6 @@ const FileList = () => {
           method: "DELETE",
         }
       );
-      console.log("Delete response:", response);
 
       if (response.ok) {
         // Filter out the deleted file from both lists
@@ -132,7 +131,6 @@ const FileList = () => {
           method: "DELETE",
         }
       );
-      console.log("Delete response:", response);
       if (response.ok) {
         // Filter out the deleted file from both lists
         setSharedFiles((prevSharedFiles) => prevSharedFiles.filter((file) => file.id!== fileId));
