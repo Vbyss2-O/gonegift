@@ -102,7 +102,7 @@ const Dashboard = () => {
       )
         .then((response) => response.text())
         .then((datax) => {
-          setCountBenificiary(parseInt(datax, 10));
+          setCountBenificiary(parseInt(datax, 10) || 0);
         })
         .catch((error) =>
           console.error("Error fetching beneficiary count:", error)
