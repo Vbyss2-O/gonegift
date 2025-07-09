@@ -143,29 +143,29 @@ const UserDetailsForm = () => {
       setLoading(false);
     }
   };
-  function showCredentialsBox(uuid, password) {
-    // Create overlay
-    const overlay = document.createElement("div");
-    overlay.style.position = "fixed";
-    overlay.style.top = 0;
-    overlay.style.left = 0;
-    overlay.style.right = 0;
-    overlay.style.bottom = 0;
-    overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
-    overlay.style.display = "flex";
-    overlay.style.alignItems = "center";
-    overlay.style.justifyContent = "center";
-    overlay.style.zIndex = "9999";
+ function showCredentialsBox(uuid, password) {
+  // Create overlay
+  const overlay = document.createElement("div");
+  overlay.style.position = "fixed";
+  overlay.style.top = 0;
+  overlay.style.left = 0;
+  overlay.style.right = 0;
+  overlay.style.bottom = 0;
+  overlay.style.backgroundColor = "rgba(0,0,0,0.5)";
+  overlay.style.display = "flex";
+  overlay.style.alignItems = "center";
+  overlay.style.justifyContent = "center";
+  overlay.style.zIndex = "9999";
 
-    // Create box
-    const box = document.createElement("div");
-    box.style.background = "#fff";
-    box.style.borderRadius = "8px";
-    box.style.padding = "32px";
-    box.style.maxWidth = "600px";
-    box.style.width = "98%";
-    box.style.boxShadow = "0 2px 16px rgba(0,0,0,0.25)";
-    box.innerHTML = `
+  // Create box
+  const box = document.createElement("div");
+  box.style.background = "#fff";
+  box.style.borderRadius = "8px";
+  box.style.padding = "32px";
+  box.style.maxWidth = "600px";
+  box.style.width = "98%";
+  box.style.boxShadow = "0 2px 16px rgba(0,0,0,0.25)";
+  box.innerHTML = `
     <h3 style="font-size:1.5em;">Your Important Credentials</h3>
     <p><strong>Your ID:</strong></p>
     <div style="display:flex; margin-bottom:16px;">
@@ -181,23 +181,65 @@ const UserDetailsForm = () => {
     <button id="closeBox" style="margin-top:16px;padding:12px 24px;background:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:1em;">Close</button>
   `;
 
-    overlay.appendChild(box);
-    document.body.appendChild(overlay);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
 
-    // Copy handlers
-    box.querySelector("#copyUuid").onclick = () => {
-      navigator.clipboard.writeText(uuid);
-    };
-    box.querySelector("#copyPassword").onclick = () => {
-      navigator.clipboard.writeText(password);
+  // Copy handlers
+  box.querySelector("#copyUuid").onclick = () => {
+    navigator.clipboard.writeText(uuid);
+  };
+  box.querySelector("#copyPassword").onclick = () => {
+    navigator.clipboard.writeText(password);
+  };
+
+  // Close handler
+  box.querySelector("#closeBox").onclick = () => {
+    // Create confirmation overlay
+    const confirmOverlay = document.createElement("div");
+    confirmOverlay.style.position = "fixed";
+    confirmOverlay.style.top = 0;
+    confirmOverlay.style.left = 0;
+    confirmOverlay.style.right = 0;
+    confirmOverlay.style.bottom = 0;
+    confirmOverlay.style.backgroundColor = "rgba(0,0,0,0.6)";
+    confirmOverlay.style.display = "flex";
+    confirmOverlay.style.alignItems = "center";
+    confirmOverlay.style.justifyContent = "center";
+    confirmOverlay.style.zIndex = "10000";
+
+    // Create confirmation box
+    const confirmBox = document.createElement("div");
+    confirmBox.style.background = "#fff";
+    confirmBox.style.borderRadius = "8px";
+    confirmBox.style.padding = "24px";
+    confirmBox.style.maxWidth = "400px";
+    confirmBox.style.width = "90%";
+    confirmBox.style.boxShadow = "0 2px 12px rgba(0,0,0,0.25)";
+    confirmBox.innerHTML = `
+      <h4 style="margin-top:0;">Warning</h4>
+      <p style="margin:16px 0;">This credential will not be visible again. One-time copy only. Make sure you have saved it before proceeding.</p>
+      <div style="display:flex;justify-content:flex-end;gap:8px;">
+        <button id="cancelConfirm" style="padding:8px 16px;background:#6c757d;color:#fff;border:none;border-radius:4px;cursor:pointer;">Close</button>
+        <button id="continueConfirm" style="padding:8px 16px;background:#dc3545;color:#fff;border:none;border-radius:4px;cursor:pointer;">Continue</button>
+      </div>
+    `;
+
+    confirmOverlay.appendChild(confirmBox);
+    document.body.appendChild(confirmOverlay);
+
+    // Handle Close (just hide confirmation)
+    confirmBox.querySelector("#cancelConfirm").onclick = () => {
+      document.body.removeChild(confirmOverlay);
     };
 
-    // Close handler
-    box.querySelector("#closeBox").onclick = () => {
-      alert("This credential will not be visible again. One-time copy only, so please make sure to copy the credentials.");
+    // Handle Continue (remove everything)
+    confirmBox.querySelector("#continueConfirm").onclick = () => {
+      document.body.removeChild(confirmOverlay);
       document.body.removeChild(overlay);
     };
-  }
+  };
+}
+
 
 
 
