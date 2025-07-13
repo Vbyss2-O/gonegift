@@ -18,13 +18,20 @@ public class MailConfig {
     @Value("${spring.mail.password}")
     private String developmentPassword;
 
+    @Value("$(lifebuddy.mail.username)")
+    private String lifebuddyUsername;
+
+    @Value("$(lifebuddy.mail.password)")
+    private String lifebuddyPassword;
+
+
     @Bean(name = "lifeBuddyMailSender")
     public JavaMailSender lifeBuddyMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost("smtp.gmail.com");
         mailSender.setPort(587);
-        mailSender.setUsername(developmentEmail);
-        mailSender.setPassword(developmentPassword);
+        mailSender.setUsername(lifebuddyUsername);
+        mailSender.setPassword(lifebuddyPassword);
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.smtp.auth", "true");

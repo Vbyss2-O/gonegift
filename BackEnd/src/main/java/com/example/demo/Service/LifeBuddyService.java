@@ -28,9 +28,11 @@ public class LifeBuddyService {
     private BuddyActivityRepository activityRepository;
 
     private static final String[] MESSAGES = {
-        "Hey %s! Did you wrestle a bear today? Tell me your wildest moment!",
+        "Hello %s! Did you have chai or filter coffee today? Share your funniest moment from this week!"
+,
         "Yo %s, still alive? What’s the silliest thing you’ve seen this week?",
-        "Uh-oh %s, did the zombies get you? Reply or I’ll send my cartoon minions!"
+        "Hi %s! What’s the most *jugaadu* thing you did this week? Spill the beans!"
+
     };
 
     public void sendBuddyMessage(DeathUser user , String BuddyStatus) {
@@ -47,7 +49,7 @@ public class LifeBuddyService {
             messageText += "\nClick here to chat back: " + replyLink;
 
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("devlomentpurpose@gmail.com");
+            message.setFrom("lifebuddy.gonegift@gmail.com");
             message.setTo(user.getEmail());
             message.setSubject("Buddy's Checking In!");
             message.setText(messageText);
@@ -66,7 +68,7 @@ public class LifeBuddyService {
            String messageText = "This is my final effort to reach you dear......." +"\nClick here to chat back: " + replyLink;
 
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("devlomentpurpose@gmail.com");
+            message.setFrom("lifebuddy.gonegift@gmail.com");
             message.setTo(user.getEmail());
             message.setSubject("Buddy's Checking In!");
             message.setText(messageText);
@@ -80,9 +82,9 @@ public class LifeBuddyService {
     public void sendGoodbyeNotification(DeathUser user) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
-            message.setFrom("devlomentpurpose@gmail.com");
+            message.setFrom("lifebuddy.gonegift@gmail.com");
             message.setTo(user.getEmail());
-            message.setSubject("LifeBuddy’s Final Call");
+            message.setSubject("LifeBuddy’s Final Call Failed");
             message.setText("LifeBuddy thinks " + user.getUserIdX() + " might be gone. No response after all attempts.");
             lifeBuddyMailSender.send(message);
 

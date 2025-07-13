@@ -96,7 +96,7 @@ public class DeathReportService {
                 String magicLink = "http://localhost:8080/api/magic-link/retrieve?token=" + token;
 
                 SimpleMailMessage message = new SimpleMailMessage();
-                message.setFrom("devlomentpurpose@gmail.com"); 
+                message.setFrom("gonegift.team@gmail.com"); 
                 message.setTo(beneficiary.getEmail());
                 message.setSubject("Access to Deceased User Data - Magic Link");
                 message.setText(
@@ -130,7 +130,7 @@ public class DeathReportService {
                 String magicLink = "http://localhost:8080/api/magic-link/retrieve?token=" + token;
 
                 SimpleMailMessage message = new SimpleMailMessage();
-                message.setFrom("devlomentpurpose@gmail.com"); 
+                message.setFrom("gonegift.team@gmail.com"); 
                 message.setTo(email);
                 message.setSubject("Access to Deceased User Data - Magic Link");
                 message.setText(

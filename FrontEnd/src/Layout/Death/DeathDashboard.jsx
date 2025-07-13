@@ -191,6 +191,7 @@ const Dashboard = () => {
 
       <main className="main-content">
         <header className="main-header">
+          
           <div className="user-welcome"
             style={{
               position: "relative",
@@ -199,6 +200,7 @@ const Dashboard = () => {
               borderRadius: "8px",
               overflow: "hidden" // this keeps children inside
             }}>
+              
             <h1>Welcome back, {userData?.firstName}!</h1>
             <p>
               {new Date().toLocaleDateString("en-US", {
