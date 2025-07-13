@@ -64,7 +64,7 @@ public class LifeBuddyService {
     }
    
     public void lastCall(DeathUser user , String BuddyStatus) {
-           String replyLink = "http://localhost:8080/lifebuddy?userId=" + user.getUserIdX();
+           String replyLink = "http://localhost:5173/lifebuddy";
            String messageText = "This is my final effort to reach you dear......." +"\nClick here to chat back: " + replyLink;
 
             SimpleMailMessage message = new SimpleMailMessage();
@@ -85,7 +85,7 @@ public class LifeBuddyService {
             message.setFrom("lifebuddy.gonegift@gmail.com");
             message.setTo(user.getEmail());
             message.setSubject("LifeBuddy’s Final Call Failed");
-            message.setText("LifeBuddy thinks " + user.getUserIdX() + " might be gone. No response after all attempts.");
+            message.setText("LifeBuddy thinks " + user.getFirstName() +" "+user.getMiddleName()+" "+user.getLastname()+ " might be gone. No response after all attempts.");
             lifeBuddyMailSender.send(message);
 
             logActivity(user.getUserIdX(), "Marked as deceased" , BuddyStatus.GOODBYE.toString());
