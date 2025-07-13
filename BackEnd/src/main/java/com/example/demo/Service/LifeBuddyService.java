@@ -45,7 +45,7 @@ public class LifeBuddyService {
             int messageIndex = random.nextInt(MESSAGES.length);
             if (messageIndex < 0) messageIndex = 0; // Handle attemptCount = 0 edge case
             String messageText = String.format(MESSAGES[messageIndex], name);
-            String replyLink = "http://localhost:8080/lifebuddy?userId=" + user.getUserIdX();
+            String replyLink = "http://localhost:5173/lifebuddy";
             messageText += "\nClick here to chat back: " + replyLink;
 
             SimpleMailMessage message = new SimpleMailMessage();
