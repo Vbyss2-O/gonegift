@@ -66,12 +66,12 @@ const DeathReportForm = () => {
       const input = secretId.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`,
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`,
 
       );
       //finded hashtoken of current user (this is because user cant able to fool me with entering his own credentials)
       const check = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashTokenByUUID/${currentUser.id}`);
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashTokenByUUID/${currentUser.id}`);
 
 
 
@@ -147,7 +147,7 @@ const DeathReportForm = () => {
         status: "pending",
       };
 
-      await axios.post("http://localhost:8080/api/death-reports", reportData, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/death-reports`, reportData, {
         headers: { "Content-Type": "application/json" },
       });
 

@@ -129,7 +129,7 @@ const UserDetailsForm = () => {
       };
 
 
-      const response = await axios.post("http://localhost:8080/api/deathusers", userDetails, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/deathusers`, userDetails, {
         headers: { "Content-Type": "application/json" },
       });
 

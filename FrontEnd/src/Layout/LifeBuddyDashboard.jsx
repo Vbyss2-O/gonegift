@@ -32,7 +32,7 @@ const LifeBuddyDashboard = () => {
 
         // Fetch DeathUser data
         const userResponse = await axios.get(
-          `http://localhost:8080/api/deathusers/${user.id}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/${user.id}`
         );
         setUserX(userResponse.data);
 
@@ -52,7 +52,7 @@ const LifeBuddyDashboard = () => {
     setError(null);
     try {
       const response = await axios.get(
-        `http://localhost:8080/lifebuddy/activities/${userId}`
+        `${import.meta.env.VITE_API_URL}/lifebuddy/activities/${userId}`
       );
       setActivities(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
@@ -75,7 +75,7 @@ const LifeBuddyDashboard = () => {
     }
     setReplyStatus(null);
     try {
-      await axios.delete(`http://localhost:8080/buddy/delete/${userIdX}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/buddy/delete/${userIdX}`);
 
       console.log("Previous logs deleted successfully Thank You!");
     } catch (err) {
@@ -84,7 +84,7 @@ const LifeBuddyDashboard = () => {
     try {
       const token = uuidv4();
       const response = await axios.get(
-        `http://localhost:8080/buddy?userId=${userIdX}&token=${token}`
+        `${import.meta.env.VITE_API_URL}/buddy?userId=${userIdX}&token=${token}`
       );
       setReplyStatus(response.data);
       setReplyMessage("");
@@ -108,7 +108,7 @@ const LifeBuddyDashboard = () => {
 
       try {
         const userResponse = await axios.get(
-          `http://localhost:8080/api/deathusers/${userIdX}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/${userIdX}`
         );
         const currentUser = userResponse.data;
         const updatedUser = {
@@ -117,7 +117,7 @@ const LifeBuddyDashboard = () => {
           attemptCount: 0, // Added as per requirement
         };
 
-        await axios.post("http://localhost:8080/api/deathusers", updatedUser, {
+        await axios.post(`${import.meta.env.VITE_API_URL}/api/deathusers`, updatedUser, {
           headers: { "Content-Type": "application/json" },
         });
         setUserX(updatedUser); // Update userx after successful POST

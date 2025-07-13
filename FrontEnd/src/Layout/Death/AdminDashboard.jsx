@@ -60,7 +60,7 @@ const AdminDashboard = () => {
 
     try {
       const response = await axios.get(
-        "http://localhost:8080/api/admin/death-reports"
+        `${import.meta.env.VITE_API_URL}/api/admin/death-reports`
       );
 
       if (response.data && Array.isArray(response.data)) {
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
     const secrectKey = report.secretKey;
     try {
       const deadUserResponse = await axios.get(
-        `http://localhost:8080/api/deathusers/findUserByHashKey`,
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findUserByHashKey`,
         {
           params: {
             secrectKey: secrectKey
@@ -156,7 +156,7 @@ const AdminDashboard = () => {
     if (isValidated) {
       try {
         await axios.post(
-          `http://localhost:8080/api/admin/death-reports/trigger`,
+          `${import.meta.env.VITE_API_URL}/api/admin/death-reports/trigger`,
           null, // no request body
           {
             params: {

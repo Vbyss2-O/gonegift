@@ -69,7 +69,7 @@ const FileList = () => {
   const fetchFiles = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/deathusers/listOfFiles/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfFiles/${userId}`
       );
       const data = await response.json();
 
@@ -88,7 +88,7 @@ const FileList = () => {
   const fetchSharedFiles = async (userId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/deathusers/listOfSharedFile/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfSharedFile/${userId}`
       );
       const data = await response.json();
       if (Array.isArray(data)) {
@@ -106,7 +106,7 @@ const FileList = () => {
   const deleteFile = async (fileId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/filemetadata/${fileId}`,
+        `${import.meta.env.VITE_API_URL}/api/filemetadata/${fileId}`,
         {
           method: "DELETE",
         }
@@ -126,7 +126,7 @@ const FileList = () => {
   const delteSharedFile = async (fileId) => {
     try {
       const response = await fetch(
-        `http://localhost:8080/shared-file/delete/${fileId}`,
+        `${import.meta.env.VITE_API_URL}/shared-file/delete/${fileId}`,
         {
           method: "DELETE",
         }

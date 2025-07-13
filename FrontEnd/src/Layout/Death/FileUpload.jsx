@@ -46,7 +46,7 @@ const FileUpload = () => {
   const getEncryptedKey = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/getKey/${currentUser.id}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${currentUser.id}`
       );
       if (
         response.data &&
@@ -114,7 +114,7 @@ const FileUpload = () => {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
       );
       if (response.status === 200) {
         setIsUuidValid(true);
@@ -267,7 +267,7 @@ const FileUpload = () => {
         },
       };
       const response = await axios.post(
-        "http://localhost:8080/api/filemetadata",
+        `${import.meta.env.VITE_API_URL}/api/filemetadata`,
         fileMetadata,
         {
           headers: {

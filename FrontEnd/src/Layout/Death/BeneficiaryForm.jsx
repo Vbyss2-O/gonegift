@@ -49,7 +49,7 @@ const BeneficiaryForm = () => {
     setMessage(null); // Clear previous messages
 
     try {
-      const response = await axios.post("http://localhost:8080/api/beneficiaries", {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/beneficiaries`, {
         name,
         email,
         idOfUser: currentUser.uid,

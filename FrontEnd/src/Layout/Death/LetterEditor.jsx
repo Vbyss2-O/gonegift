@@ -43,7 +43,7 @@ const LetterEditor = () => {
   const getEncryptedKey = async (userId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/getKey/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userId}`
       );
       if (response.status === 200) {
         return response.data; // Assume { ciphertext: "...", iv: "..." }
@@ -101,15 +101,17 @@ const LetterEditor = () => {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
       );
       if (response.status === 200) {
+        console.log("Ok");
         setIsUuidValid(true);
         const encryptedKeyData = await getEncryptedKey(currentUser.id);
+        console.log("ok1")
         const derivedKey = await decryptKey(
           uuid.trim(),
           encryptedKeyData,
-          password
+          password.trim()
         );
         setDecryptedKey(derivedKey);
         setMessage("UUID validated successfully. You can now save the letter.");
@@ -214,7 +216,7 @@ const LetterEditor = () => {
 
       // Send metadata to backend
       const response = await axios.post(
-        "http://localhost:8080/api/filemetadata",
+        `${import.meta.env.VITE_API_URL}/api/filemetadata`,
         fileMetadata,
         {
           headers: {

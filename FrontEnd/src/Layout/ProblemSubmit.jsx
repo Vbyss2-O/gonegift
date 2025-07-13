@@ -18,7 +18,7 @@ const HelpCenterForm = () => {
     };
 
     try {
-      const response = await fetch("http://localhost:8080/problem/add", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/problem/add`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -49,7 +49,7 @@ const SharedFileUpload = () => {
         setLoading(true);
         setMessage("Validating password...");
         try {
-            const response = await axios.get(`http://localhost:8080/shared-file/password/verify?token=${encodeURIComponent(token)}`);
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/shared-file/password/verify?token=${encodeURIComponent(token)}`);
 
             const hashedInput = hashReadableKey(input.trim());
 
@@ -177,7 +177,7 @@ const SharedFileUpload = () => {
             const userId = decryptedPayload.userId;
             setAuthorId(userId);
 
-            const response = await axios.get(`http://localhost:8080/shared-file/getList`, {
+            const response = await axios.get(`${import.meta.env.VITE_API_URL}/shared-file/getList`, {
                 params: {
                     authorId: userId,
                     hash: hashReadableKey(input.trim()),
@@ -398,7 +398,7 @@ const SharedFileUpload = () => {
             };
 
             await axios.post(
-                "http://localhost:8080/shared-file/add-file",
+                `${import.meta.env.VITE_API_URL}/shared-file/add-file`,
                 fileMetadata,
                 {
                     headers: {

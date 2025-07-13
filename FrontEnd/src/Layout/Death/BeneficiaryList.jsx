@@ -68,7 +68,7 @@ const BeneficiaryList = () => {
     try {
       setError(null);
       const response = await fetch(
-        `http://localhost:8080/api/deathusers/listOfBeneficiary/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfBeneficiary/${userId}`
       );
 
       if (!response.ok) {
@@ -105,7 +105,7 @@ const BeneficiaryList = () => {
 
     try {
       const response = await fetch(
-        `http://localhost:8080/api/beneficiaries/${beneficiaryId}`,
+        `${import.meta.env.VITE_API_URL}/api/beneficiaries/${beneficiaryId}`,
         {
           method: "DELETE",
         }

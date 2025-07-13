@@ -79,10 +79,10 @@ const Dashboard = () => {
     if (userData) {
       Promise.all([
         fetch(
-          `http://localhost:8080/api/deathusers/filesize/${userData.userIdX}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/filesize/${userData.userIdX}`
         ).then((res) => res.text()),
         fetch(
-          `http://localhost:8080/api/deathusers/sharedfilesize/${userData.userIdX}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/sharedfilesize/${userData.userIdX}`
         ).then((res) => res.text()),
       ])
         .then(([fileSizeText, sharedSizeText]) => {
@@ -98,7 +98,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (userData) {
       fetch(
-        `http://localhost:8080/api/deathusers/beneficiarysize/${userData.userIdX}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/beneficiarysize/${userData.userIdX}`
       )
         .then((response) => response.text())
         .then((datax) => {

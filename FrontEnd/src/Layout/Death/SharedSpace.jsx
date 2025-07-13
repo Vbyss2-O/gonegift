@@ -48,7 +48,7 @@ const SharedSpace = () => {
         // Ensure currentUser.id is available before making the request
         if (currentUser && currentUser.id) {
           const response = await axios.get(
-            `http://localhost:8080/shared-file/totalSpaces/${currentUser.id}`
+            `${import.meta.env.VITE_API_URL}/shared-file/totalSpaces/${currentUser.id}`
           );
           setTotalSharedSpace(response.data);
         }
@@ -93,7 +93,7 @@ const SharedSpace = () => {
   const getEncryptedKey = async (userId) => {
     try {
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/getKey/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userId}`
       );
       if (response.status === 200 && response.data) {
         // Assuming response.data directly contains the encrypted key string
@@ -164,7 +164,7 @@ const SharedSpace = () => {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
       );
       if (response.status === 200) {
         setIsValidated(true);
@@ -276,7 +276,7 @@ const SharedSpace = () => {
 
       try {
         await axios.post(
-          "http://localhost:8080/shared-file/addToken",
+          `${import.meta.env.VITE_API_URL}/shared-file/addToken`,
           tokenMetadata,
           {
             headers: {
@@ -314,7 +314,7 @@ const SharedSpace = () => {
       }
       const encodedToken = encodeURIComponent(token);
       await navigator.clipboard.writeText(
-        `http://localhost:8080/shared-file/verify?token=${encodedToken}`
+        `${import.meta.env.VITE_API_URL}/shared-file/verify?token=${encodedToken}`
       );
       setCopiedToken(true);
       setMessage("Token URL copied to clipboard!");

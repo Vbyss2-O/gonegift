@@ -39,14 +39,14 @@ const DecryptFile = () => {
         uuid.trim() + "Vedant_Kasar" + password.trim()
       );
       const response = await axios.get(
-        `http://localhost:8080/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
       );
       if (response.status === 200) {
         setIsUuidValid(true);
         setMessage({ text: "Validated successfully.", isSuccess: true });
         try {
           const userIdResponse = await axios.get(
-            `http://localhost:8080/api/deathusers/findUUIDByHashuuid/${hashedToken}`
+            `${import.meta.env.VITE_API_URL}/api/deathusers/findUUIDByHashuuid/${hashedToken}`
           );
           if (userIdResponse.status === 200) {
             setUserId(userIdResponse.data);
@@ -78,7 +78,7 @@ const DecryptFile = () => {
       try {
         if (!userID) return;
         const response = await axios.get(
-          `http://localhost:8080/api/deathusers/getKey/${userID}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userID}`
         );
         if (response.status === 200) {
           setEncryptedAesKey(response.data);
@@ -98,7 +98,7 @@ const DecryptFile = () => {
       try {
         if (!userID) return;
         const response = await axios.get(
-          `http://localhost:8080/api/deathusers/listOfFiles/${userID}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/listOfFiles/${userID}`
         );
         if (response.status === 200) {
           const files = response.data.map((fileObj) => ({
@@ -425,7 +425,7 @@ const DecryptFile = () => {
         throw new Error("Invalid UUID or password. Cannot decrypt shared files.");
       }
 
-      const response = await axios.get(`http://localhost:8080/shared-file/getAllFiles/${userID}`);
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/shared-file/getAllFiles/${userID}`);
 
       if (!response.data || !Array.isArray(response.data)) {
         throw new Error("Invalid response format from backend.");
