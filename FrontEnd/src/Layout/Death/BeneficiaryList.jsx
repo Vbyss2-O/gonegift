@@ -9,6 +9,27 @@ const BeneficiaryList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [beneficiaries, setBeneficiaries] = useState([]);
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+
+      const accessToken = data.session?.access_token;
+
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+
+    initAuth();
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -68,7 +89,14 @@ const BeneficiaryList = () => {
     try {
       setError(null);
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfBeneficiary/${userId}`
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/deathusers/listOfBeneficiary/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
       if (!response.ok) {
@@ -108,6 +136,9 @@ const BeneficiaryList = () => {
         `${import.meta.env.VITE_API_URL}/api/beneficiaries/${beneficiaryId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
 
@@ -132,117 +163,117 @@ const BeneficiaryList = () => {
 
   return (
     <>
-    <BackButton />
-    <div className="beneficiary-list-container">
-      <h2>
-        Welcome, {userData?.firstName} {userData?.lastname}
-      </h2>
-      <h3>Your Beneficiaries:</h3>
+      <BackButton />
+      <div className="beneficiary-list-container">
+        <h2>
+          Welcome, {userData?.firstName} {userData?.lastname}
+        </h2>
+        <h3>Your Beneficiaries:</h3>
 
-      {error && <div className="error-message">Error: {error}</div>}
+        {error && <div className="error-message">Error: {error}</div>}
 
-      {beneficiaries.length === 0 ? (
-        <p>No beneficiaries found.</p>
-      ) : (
-        <ul className="beneficiary-list">
-          {beneficiaries.map((ben) => (
-            <li key={ben.id} className="beneficiary-item">
-              <div className="beneficiary-info">
-                <strong>Name:</strong> {ben.name} <br />
-                <strong>Email:</strong> {ben.email}
-              </div>
-              <button
-                onClick={() => removeBeneficiary(ben.id)}
-                className="remove-button"
-              >
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+        {beneficiaries.length === 0 ? (
+          <p>No beneficiaries found.</p>
+        ) : (
+          <ul className="beneficiary-list">
+            {beneficiaries.map((ben) => (
+              <li key={ben.id} className="beneficiary-item">
+                <div className="beneficiary-info">
+                  <strong>Name:</strong> {ben.name} <br />
+                  <strong>Email:</strong> {ben.email}
+                </div>
+                <button
+                  onClick={() => removeBeneficiary(ben.id)}
+                  className="remove-button"
+                >
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <style jsx>{`
-        .beneficiary-list-container {
-          padding: 24px;
-          max-width: 800px;
-          margin: 40px auto 0 auto; /* Top margin added */
-          background: var(--bg-glass, rgba(255, 255, 255, 0.05));
-          border-radius: 16px;
-          box-shadow: var(--shadow-rainbow, 0 4px 30px rgba(0, 0, 0, 0.1));
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-        }
+        <style jsx>{`
+          .beneficiary-list-container {
+            padding: 24px;
+            max-width: 800px;
+            margin: 40px auto 0 auto; /* Top margin added */
+            background: var(--bg-glass, rgba(255, 255, 255, 0.05));
+            border-radius: 16px;
+            box-shadow: var(--shadow-rainbow, 0 4px 30px rgba(0, 0, 0, 0.1));
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+          }
 
-        .beneficiary-list {
-          list-style: none;
-          padding: 0;
-          margin: 0;
-        }
+          .beneficiary-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+          }
 
-        .beneficiary-item {
-          border: 1px solid rgba(255, 255, 255, 0.15);
-          margin: 12px 0;
-          padding: 16px;
-          border-radius: 12px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          background-color: var(--bg-glass, #f9f9f9);
-          box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.05));
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .beneficiary-item:hover {
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-lg, 0 6px 12px rgba(0, 0, 0, 0.12));
-        }
-
-        .beneficiary-info {
-          flex: 1;
-          color: var(--text-primary, #2c3e50);
-          font-size: 16px;
-        }
-
-        .remove-button {
-          background-color: var(--accent5, #e74c3c);
-          color: #fff;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 6px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: background-color 0.2s ease;
-          font-size: 14px;
-        }
-
-        .remove-button:hover {
-          background-color: #c0392b;
-        }
-
-        .error-message {
-          color: var(--accent3, #e74c3c);
-          padding: 12px;
-          margin: 16px 0;
-          border: 1px solid var(--accent3, #e74c3c);
-          border-radius: 8px;
-          background-color: rgba(231, 76, 60, 0.1);
-          font-weight: 500;
-        }
-
-        @media (max-width: 600px) {
           .beneficiary-item {
-            flex-direction: column;
-            align-items: flex-start;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            margin: 12px 0;
+            padding: 16px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-glass, #f9f9f9);
+            box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.05));
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+          }
+
+          .beneficiary-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg, 0 6px 12px rgba(0, 0, 0, 0.12));
+          }
+
+          .beneficiary-info {
+            flex: 1;
+            color: var(--text-primary, #2c3e50);
+            font-size: 16px;
           }
 
           .remove-button {
-            margin-top: 10px;
-            align-self: flex-end;
+            background-color: var(--accent5, #e74c3c);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 14px;
           }
-        }
-      `}</style>
-    </div>
+
+          .remove-button:hover {
+            background-color: #c0392b;
+          }
+
+          .error-message {
+            color: var(--accent3, #e74c3c);
+            padding: 12px;
+            margin: 16px 0;
+            border: 1px solid var(--accent3, #e74c3c);
+            border-radius: 8px;
+            background-color: rgba(231, 76, 60, 0.1);
+            font-weight: 500;
+          }
+
+          @media (max-width: 600px) {
+            .beneficiary-item {
+              flex-direction: column;
+              align-items: flex-start;
+            }
+
+            .remove-button {
+              margin-top: 10px;
+              align-self: flex-end;
+            }
+          }
+        `}</style>
+      </div>
     </>
   );
 };

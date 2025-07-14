@@ -18,6 +18,8 @@ const DecryptFile = () => {
   const [sharedFileList, setSharedFileList] = useState([]); // Renamed for clarity
   const [sharedFileMessage, setSharedFileMessage] = useState(""); // New state for shared file messages
   const [sharedFileLoading, setSharedFileLoading] = useState(false); // New state for shared file loading
+  const [accessToken , setAccessToken] = useState(null);
+  
 
   const hashWithSalt = async (x) => {
     const salt = x.substring(0, 16);
@@ -29,6 +31,25 @@ const DecryptFile = () => {
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   };
+   useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+  
+      const accessToken = data.session?.access_token;
+  
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+  
+    initAuth();
+  }, []);
 
   const validateUuid = async () => {
     setLoading(true);
@@ -39,14 +60,24 @@ const DecryptFile = () => {
         uuid.trim() + "Vedant_Kasar" + password.trim()
       );
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`,
+        {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
       );
       if (response.status === 200) {
         setIsUuidValid(true);
         setMessage({ text: "Validated successfully.", isSuccess: true });
         try {
           const userIdResponse = await axios.get(
-            `${import.meta.env.VITE_API_URL}/api/deathusers/findUUIDByHashuuid/${hashedToken}`
+            `${import.meta.env.VITE_API_URL}/api/deathusers/findUUIDByHashuuid/${hashedToken}`,
+            {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
           );
           if (userIdResponse.status === 200) {
             setUserId(userIdResponse.data);
@@ -78,7 +109,12 @@ const DecryptFile = () => {
       try {
         if (!userID) return;
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userID}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userID}`,
+          {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
         );
         if (response.status === 200) {
           setEncryptedAesKey(response.data);
@@ -98,7 +134,12 @@ const DecryptFile = () => {
       try {
         if (!userID) return;
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL}/api/deathusers/listOfFiles/${userID}`
+          `${import.meta.env.VITE_API_URL}/api/deathusers/listOfFiles/${userID}`,
+          {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
         );
         if (response.status === 200) {
           const files = response.data.map((fileObj) => ({

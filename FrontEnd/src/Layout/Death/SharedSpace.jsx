@@ -22,7 +22,27 @@ const SharedSpace = () => {
   const [isGenerateDisabled, setIsGenerateDisabled] = useState(false);
   const [cooldownTime, setCooldownTime] = useState(0);
   const navigate = useNavigate();
+  const [accessToken , setAccessToken] = useState(null);
+  
+useEffect(() => {
+  const initAuth = async () => {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) {
+      console.error("Error getting session:", error);
+      return;
+    }
 
+    const accessToken = data.session?.access_token;
+
+    if (accessToken) {
+      setAccessToken(accessToken);
+    } else {
+      console.warn("No access token found—user probably signed out.");
+    }
+  };
+
+  initAuth();
+}, []);
   // Cooldown duration in milliseconds (60 seconds)
   const COOLDOWN_DURATION = 60*1000*60*24; // 0.5 min
 
@@ -48,7 +68,12 @@ const SharedSpace = () => {
         // Ensure currentUser.id is available before making the request
         if (currentUser && currentUser.id) {
           const response = await axios.get(
-            `${import.meta.env.VITE_API_URL}/shared-file/totalSpaces/${currentUser.id}`
+            `${import.meta.env.VITE_API_URL}/shared-file/totalSpaces/${currentUser.id}`,
+            {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
           );
           setTotalSharedSpace(response.data);
         }
@@ -93,7 +118,12 @@ const SharedSpace = () => {
   const getEncryptedKey = async (userId) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userId}`,
+        {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
       );
       if (response.status === 200 && response.data) {
         // Assuming response.data directly contains the encrypted key string
@@ -164,7 +194,12 @@ const SharedSpace = () => {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`,
+        {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
       );
       if (response.status === 200) {
         setIsValidated(true);
@@ -281,6 +316,10 @@ const SharedSpace = () => {
           {
             headers: {
               "Content-Type": "application/json",
+              
+                
+                  Authorization: `Bearer ${accessToken}`
+                 
             },
           }
         );

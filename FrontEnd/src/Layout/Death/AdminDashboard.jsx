@@ -7,6 +7,27 @@ const AdminDashboard = () => {
   const [message, setMessage] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+
+      const accessToken = data.session?.access_token;
+
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+
+    initAuth();
+  }, []);
 
   useEffect(() => {
     const checkAdminRole = async () => {
@@ -31,7 +52,10 @@ const AdminDashboard = () => {
           .single();
 
         if (roleError || !data) {
-          console.error("Error fetching user role or user not found:", roleError);
+          console.error(
+            "Error fetching user role or user not found:",
+            roleError
+          );
           setMessage("Access denied: User role not found or not authorized.");
           setLoading(false);
           return;
@@ -60,7 +84,12 @@ const AdminDashboard = () => {
 
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/admin/death-reports`
+        `${import.meta.env.VITE_API_URL}/api/admin/death-reports`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
 
       if (response.data && Array.isArray(response.data)) {
@@ -95,11 +124,16 @@ const AdminDashboard = () => {
           setMessage("No reports available.");
         }
       } else {
-        setMessage("Failed to fetch reports: Invalid response format from server.");
+        setMessage(
+          "Failed to fetch reports: Invalid response format from server."
+        );
       }
     } catch (error) {
       console.error("Failed to fetch reports:", error);
-      setMessage("Failed to fetch reports: " + (error.response?.data?.message || error.message));
+      setMessage(
+        "Failed to fetch reports: " +
+          (error.response?.data?.message || error.message)
+      );
     } finally {
       setLoading(false); // Stop loading regardless of success or failure
     }
@@ -112,8 +146,12 @@ const AdminDashboard = () => {
         `${import.meta.env.VITE_API_URL}/api/deathusers/findUserByHashKey`,
         {
           params: {
-            secrectKey: secrectKey
-          }
+            secrectKey: secrectKey,
+          },
+
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
 
@@ -135,7 +173,11 @@ const AdminDashboard = () => {
       return { isValidated: false, userId: null }; // If deadUser is null (due to 404 or no data), return false
     } catch (error) {
       // Specifically handle 404 as "user not found" without throwing a hard error
-      if (axios.isAxiosError(error) && error.response && error.response.status === 404) {
+      if (
+        axios.isAxiosError(error) &&
+        error.response &&
+        error.response.status === 404
+      ) {
         console.warn("User not found for secret key:", secrectKey);
         return { isValidated: false, userId: null }; // User not found is a valid "failed validation"
       } else {
@@ -161,8 +203,12 @@ const AdminDashboard = () => {
           {
             params: {
               reportId: reportIdX,
-              hash: report.secretKey
-            }
+              hash: report.secretKey,
+            },
+
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           }
         );
 
@@ -171,15 +217,27 @@ const AdminDashboard = () => {
       } catch (error) {
         console.error("Failed to trigger report:", error);
         // Log the response data from the backend if available
-        if (axios.isAxiosError(error) && error.response && error.response.data) {
+        if (
+          axios.isAxiosError(error) &&
+          error.response &&
+          error.response.data
+        ) {
           console.error("Backend error response data:", error.response.data);
-          setMessage("Failed to trigger report: " + (error.response.data.message || JSON.stringify(error.response.data)));
+          setMessage(
+            "Failed to trigger report: " +
+              (error.response.data.message ||
+                JSON.stringify(error.response.data))
+          );
         } else {
-          setMessage("Failed to trigger report: " + (error.message || "Unknown error"));
+          setMessage(
+            "Failed to trigger report: " + (error.message || "Unknown error")
+          );
         }
       }
     } else {
-      setMessage("Cannot verify the report: metadata mismatched or user not found.");
+      setMessage(
+        "Cannot verify the report: metadata mismatched or user not found."
+      );
     }
   };
 
@@ -196,52 +254,70 @@ const AdminDashboard = () => {
   return (
     <div style={styles.container}>
       <h2>Admin Dashboard - Death Reports</h2>
-      {message && <p style={styles.message}>{message}</p>} {/* Display messages here */}
-
-      {reports.length === 0 ? (
-        !loading && <p>No reports to display.</p> // Only show if not loading and no reports
-      ) : (
-        reports.map((report) => {
-          // Log report.id here to check its value before rendering the button
-          return (
-            <div key={report.id} style={styles.reportCard}>
-              <p><strong>Report ID:</strong> {report.id}</p>
-              <p><strong>Name:</strong> {report.name}</p>
-              <p><strong>Middle Name:</strong> {report.middleName || "None"}</p>
-              <p><strong>Surname:</strong> {report.surname}</p>
-              <p><strong>Email:</strong> {report.email}</p>
-              <p><strong>Details:</strong> {report.reportDetails || "None"}</p>
-              {report.signedEvidenceUrl ? (
-                <a
-                  href={report.signedEvidenceUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={styles.downloadLink}
-                >
-                  View/Download Certificate
-                </a>
-              ) : (
-                <p style={styles.noCertificate}>No certificate available.</p>
-              )}
-              <p><strong>Status:</strong> {report.status}</p>
-              <div style={styles.buttonContainer}>
-                <button
-                  onClick={() => handleTrigger(report.id, report)} // Pass the full report object
-                  style={{
-                    ...styles.button,
-                    backgroundColor: report.status === "approved" ? "#6c757d" : "#28a745", // Gray if approved
-                    cursor: report.status === "approved" ? "not-allowed" : "pointer",
-                    opacity: report.status === "approved" ? 0.6 : 1,
-                  }}
-                  disabled={report.status === "approved"} // Disable if already approved
-                >
-                  {report.status === "approved" ? "Approved" : "Trigger Approval"}
-                </button>
+      {message && <p style={styles.message}>{message}</p>}{" "}
+      {/* Display messages here */}
+      {reports.length === 0
+        ? !loading && <p>No reports to display.</p> // Only show if not loading and no reports
+        : reports.map((report) => {
+            // Log report.id here to check its value before rendering the button
+            return (
+              <div key={report.id} style={styles.reportCard}>
+                <p>
+                  <strong>Report ID:</strong> {report.id}
+                </p>
+                <p>
+                  <strong>Name:</strong> {report.name}
+                </p>
+                <p>
+                  <strong>Middle Name:</strong> {report.middleName || "None"}
+                </p>
+                <p>
+                  <strong>Surname:</strong> {report.surname}
+                </p>
+                <p>
+                  <strong>Email:</strong> {report.email}
+                </p>
+                <p>
+                  <strong>Details:</strong> {report.reportDetails || "None"}
+                </p>
+                {report.signedEvidenceUrl ? (
+                  <a
+                    href={report.signedEvidenceUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={styles.downloadLink}
+                  >
+                    View/Download Certificate
+                  </a>
+                ) : (
+                  <p style={styles.noCertificate}>No certificate available.</p>
+                )}
+                <p>
+                  <strong>Status:</strong> {report.status}
+                </p>
+                <div style={styles.buttonContainer}>
+                  <button
+                    onClick={() => handleTrigger(report.id, report)} // Pass the full report object
+                    style={{
+                      ...styles.button,
+                      backgroundColor:
+                        report.status === "approved" ? "#6c757d" : "#28a745", // Gray if approved
+                      cursor:
+                        report.status === "approved"
+                          ? "not-allowed"
+                          : "pointer",
+                      opacity: report.status === "approved" ? 0.6 : 1,
+                    }}
+                    disabled={report.status === "approved"} // Disable if already approved
+                  >
+                    {report.status === "approved"
+                      ? "Approved"
+                      : "Trigger Approval"}
+                  </button>
+                </div>
               </div>
-            </div>
-          );
-        })
-      )}
+            );
+          })}
     </div>
   );
 };
@@ -310,7 +386,8 @@ const styles = {
     paddingBottom: "2px",
     transition: "color 0.2s ease, border-color 0.2s ease",
   },
-  "downloadLink:hover": { // Note: This pseudo-class won't work directly in inline styles. For hover, use a CSS stylesheet or a library like styled-components.
+  "downloadLink:hover": {
+    // Note: This pseudo-class won't work directly in inline styles. For hover, use a CSS stylesheet or a library like styled-components.
     color: "#0056b3",
     borderColor: "#0056b3",
   },
@@ -318,7 +395,7 @@ const styles = {
     fontStyle: "italic",
     color: "#777",
     marginTop: "10px",
-  }
+  },
 };
 
 export default AdminDashboard;

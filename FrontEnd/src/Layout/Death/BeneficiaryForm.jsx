@@ -6,13 +6,33 @@ import BackButton from "../components/BackButton"; // Import the BackButton comp
 
 // Supabase configuration
 
-
 const BeneficiaryForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+
+      const accessToken = data.session?.access_token;
+
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+
+    initAuth();
+  }, []);
 
   // Fetch current user data from Supabase
   useEffect(() => {
@@ -21,7 +41,7 @@ const BeneficiaryForm = () => {
       if (error || !user?.user) {
         console.error("Error fetching user:", error);
         // Optionally redirect to login if user is not found
-        // navigate("/login"); 
+        // navigate("/login");
         return;
       }
       setCurrentUser({
@@ -49,12 +69,20 @@ const BeneficiaryForm = () => {
     setMessage(null); // Clear previous messages
 
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/beneficiaries`, {
-        name,
-        email,
-        idOfUser: currentUser.uid,
-        userx: { userIdX: currentUser.uid }, // Ensure this matches your backend DTO/entity
-      });
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/beneficiaries`,
+        {
+          name,
+          email,
+          idOfUser: currentUser.uid,
+          userx: { userIdX: currentUser.uid }, // Ensure this matches your backend DTO/entity
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.status === 200) {
         setMessage("Beneficiary successfully added!");
@@ -65,7 +93,10 @@ const BeneficiaryForm = () => {
         throw new Error(`Failed to add beneficiary: Status ${response.status}`);
       }
     } catch (err) {
-      console.error("Error submitting form:", err.response?.data || err.message);
+      console.error(
+        "Error submitting form:",
+        err.response?.data || err.message
+      );
       setMessage("An error occurred. Please try again.");
     } finally {
       setLoading(false);
@@ -74,47 +105,61 @@ const BeneficiaryForm = () => {
 
   return (
     <>
-    <BackButton />
-    <div className="beneficiary-form-container">
-      <h2 className="beneficiary-form-title">Add a Beneficiary</h2>
-      <form onSubmit={handleSubmit}>
-        <div className="beneficiary-form-input-group">
-          <label htmlFor="name" className="beneficiary-form-label">Beneficiary Name</label>
-          <input
-            id="name"
-            type="text"
-            placeholder="Enter beneficiary name..."
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="beneficiary-form-input"
-            required // Added required attribute for basic validation
-          />
-        </div>
-        <div className="beneficiary-form-input-group">
-          <label htmlFor="email" className="beneficiary-form-label">Beneficiary Email</label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Enter beneficiary email..."
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="beneficiary-form-input"
-            required // Added required attribute
-          />
-        </div>
-        <br />
-        <div style={{ textAlign: "center" }}> {/* Keeping inline style for text-align for simple alignment */}
-          <button type="submit" disabled={loading} className="beneficiary-form-button">
-            {loading ? "Adding..." : "Add Beneficiary"}
-          </button>
-        </div>
-      </form>
-      {message && (
-        <p className={`beneficiary-form-message ${message.includes("successfully") ? "success" : "error"}`}>
-          {message}
-        </p>
-      )}
-    </div>
+      <BackButton />
+      <div className="beneficiary-form-container">
+        <h2 className="beneficiary-form-title">Add a Beneficiary</h2>
+        <form onSubmit={handleSubmit}>
+          <div className="beneficiary-form-input-group">
+            <label htmlFor="name" className="beneficiary-form-label">
+              Beneficiary Name
+            </label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Enter beneficiary name..."
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="beneficiary-form-input"
+              required // Added required attribute for basic validation
+            />
+          </div>
+          <div className="beneficiary-form-input-group">
+            <label htmlFor="email" className="beneficiary-form-label">
+              Beneficiary Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Enter beneficiary email..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="beneficiary-form-input"
+              required // Added required attribute
+            />
+          </div>
+          <br />
+          <div style={{ textAlign: "center" }}>
+            {" "}
+            {/* Keeping inline style for text-align for simple alignment */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="beneficiary-form-button"
+            >
+              {loading ? "Adding..." : "Add Beneficiary"}
+            </button>
+          </div>
+        </form>
+        {message && (
+          <p
+            className={`beneficiary-form-message ${
+              message.includes("successfully") ? "success" : "error"
+            }`}
+          >
+            {message}
+          </p>
+        )}
+      </div>
     </>
   );
 };

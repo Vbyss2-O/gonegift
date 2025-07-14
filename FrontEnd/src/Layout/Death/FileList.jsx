@@ -10,6 +10,27 @@ const FileList = () => {
   const [loading, setLoading] = useState(true);
   const [files, setFiles] = useState([]);
   const [sharedFiles, setSharedFiles] = useState([]);
+  const [accessToken, setAccessToken] = useState(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+
+      const accessToken = data.session?.access_token;
+
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+
+    initAuth();
+  }, []);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -50,8 +71,6 @@ const FileList = () => {
           lastname: existingUser.lastname,
         });
 
-
-
         // Fetch files using the user ID
         await fetchFiles(user.id);
         await fetchSharedFiles(user.id);
@@ -69,7 +88,12 @@ const FileList = () => {
   const fetchFiles = async (userId) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfFiles/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfFiles/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
       const data = await response.json();
 
@@ -88,7 +112,14 @@ const FileList = () => {
   const fetchSharedFiles = async (userId) => {
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/listOfSharedFile/${userId}`
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/deathusers/listOfSharedFile/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
       const data = await response.json();
       if (Array.isArray(data)) {
@@ -109,13 +140,18 @@ const FileList = () => {
         `${import.meta.env.VITE_API_URL}/api/filemetadata/${fileId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
 
       if (response.ok) {
         // Filter out the deleted file from both lists
         setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
-        setSharedFiles((prevSharedFiles) => prevSharedFiles.filter((file) => file.id !== fileId));
+        setSharedFiles((prevSharedFiles) =>
+          prevSharedFiles.filter((file) => file.id !== fileId)
+        );
       } else {
         console.error("Failed to delete file");
       }
@@ -129,32 +165,37 @@ const FileList = () => {
         `${import.meta.env.VITE_API_URL}/shared-file/delete/${fileId}`,
         {
           method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
         }
       );
       if (response.ok) {
         // Filter out the deleted file from both lists
-        setSharedFiles((prevSharedFiles) => prevSharedFiles.filter((file) => file.id!== fileId));
+        setSharedFiles((prevSharedFiles) =>
+          prevSharedFiles.filter((file) => file.id !== fileId)
+        );
       } else {
         console.error("Failed to delete shared file");
       }
     } catch (error) {
       console.error("Error deleting shared file:", error);
     }
-  }
+  };
 
   const getFileTypeFromUrl = (url) => {
     if (!url) return "unknown";
     try {
       const urlObj = new URL(url);
-      const pathSegments = urlObj.pathname.split('/');
-      const filenameWithEnc = pathSegments[pathSegments.length - 1]; 
+      const pathSegments = urlObj.pathname.split("/");
+      const filenameWithEnc = pathSegments[pathSegments.length - 1];
 
-      const parts = filenameWithEnc.split('.');
+      const parts = filenameWithEnc.split(".");
       if (parts.length < 2) {
         return "unknown";
       }
       // if the last part is "enc", then the actual extension is the second to last part
-      if (parts[parts.length - 1] === 'enc' && parts.length >= 2) {
+      if (parts[parts.length - 1] === "enc" && parts.length >= 2) {
         return parts[parts.length - 2];
       }
       // otherwise, return the last part as the extension
@@ -164,7 +205,6 @@ const FileList = () => {
       return "unknown";
     }
   };
-
 
   if (loading) {
     return (
@@ -176,57 +216,58 @@ const FileList = () => {
 
   return (
     <>
-    <div className="filelist-list-container">
-      <h2 className="filelist-welcome-header">
-        Welcome, {userData?.firstName} {userData?.lastname}
-      </h2>
+      <div className="filelist-list-container">
+        <h2 className="filelist-welcome-header">
+          Welcome, {userData?.firstName} {userData?.lastname}
+        </h2>
 
-      <h3 className="filelist-files-header">Your Uploaded Files:</h3>
-      <p className="filelist-note">
-        Note: Your all files are Encrypted and Stored securely so Delete files
-        from their names only.
-      </p>
+        <h3 className="filelist-files-header">Your Uploaded Files:</h3>
+        <p className="filelist-note">
+          Note: Your all files are Encrypted and Stored securely so Delete files
+          from their names only.
+        </p>
 
-      {!Array.isArray(files) || files.length === 0 ? (
-        <p className="filelist-no-files">No files uploaded by you yet.</p>
-      ) : (
-        <ul className="filelist-file-list">
-          {files.map((file) => (
-            <li key={file.id || Math.random()} className="filelist-file-item">
-              <div className="filelist-file-info">
-                <div className="filelist-file-name">
-                  <strong>File Name:</strong> {file.fileName}
+        {!Array.isArray(files) || files.length === 0 ? (
+          <p className="filelist-no-files">No files uploaded by you yet.</p>
+        ) : (
+          <ul className="filelist-file-list">
+            {files.map((file) => (
+              <li key={file.id || Math.random()} className="filelist-file-item">
+                <div className="filelist-file-info">
+                  <div className="filelist-file-name">
+                    <strong>File Name:</strong> {file.fileName}
+                  </div>
+                  <div className="filelist-file-type-display">
+                    <strong>File Type:</strong>{" "}
+                    {file.letterFileUrl != null ? "Letter File" : "Media File"}
+                  </div>
                 </div>
-                <div className="filelist-file-type-display">
-                  <strong>File Type:</strong>{" "}
-                  {file.letterFileUrl != null ? "Letter File" : "Media File"}
-                </div>
-              </div>
-              <button
-                onClick={() => deleteFile(file.id)}
-                className="filelist-delete-button"
-              >
-                Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                <button
+                  onClick={() => deleteFile(file.id)}
+                  className="filelist-delete-button"
+                >
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
 
-      <hr className="filelist-separator" /> 
+        <hr className="filelist-separator" />
 
-      <h3 className="filelist-files-header">Files from Shared Space:</h3>
-     
+        <h3 className="filelist-files-header">Files from Shared Space:</h3>
 
-      {
-        !Array.isArray(sharedFiles) || sharedFiles.length === 0 ? (
+        {!Array.isArray(sharedFiles) || sharedFiles.length === 0 ? (
           <p className="filelist-no-files">No files found in shared spaces.</p>
         ) : (
           <ul className="filelist-file-list">
             {sharedFiles
-              .filter(file => file.uploadFileUrl != null) // This is the crucial change
+              .filter((file) => file.uploadFileUrl != null) // This is the crucial change
               .map((file) => (
-                <li key={file.id || Math.random()} className="filelist-file-item">
+                <li
+                  key={file.id || Math.random()}
+                  className="filelist-file-item"
+                >
                   <div className="filelist-file-info">
                     <div className="filelist-file-name">
                       <strong>File Name:</strong> {file.fileName}
@@ -245,9 +286,8 @@ const FileList = () => {
                 </li>
               ))}
           </ul>
-        )
-      }
-    </div>
+        )}
+      </div>
     </>
   );
 };

@@ -22,7 +22,27 @@ const DeathReportForm = () => {
   const [isUuidValid, setIsUuidValid] = useState(false);
   const [key, setKey] = useState("");
   const [middleName, setMiddleName] = useState("");
+  const [accessToken, setAccessToken] = useState(null);
 
+  useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+
+      const accessToken = data.session?.access_token;
+
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+
+    initAuth();
+  }, []);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -66,20 +86,31 @@ const DeathReportForm = () => {
       const input = secretId.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`,
-
+        `${
+          import.meta.env.VITE_API_URL
+        }/api/deathusers/findHashToken/${hashedToken}`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
       );
       //finded hashtoken of current user (this is because user cant able to fool me with entering his own credentials)
       const check = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashTokenByUUID/${currentUser.id}`);
-
-
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashTokenByUUID/${
+          currentUser.id
+        }`,
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       if (response.status === 200 && check.data !== hashedToken) {
         setIsUuidValid(true);
         setMessage("UUID validated successfully. You can now upload a file.");
         setKey(hashedToken); // Store the hashed token for later use
-
       } else {
         setIsUuidValid(false);
         setMessage("Invalid UUID or password. Please check and try again.");
@@ -90,7 +121,9 @@ const DeathReportForm = () => {
       if (error.response && error.response.status === 404) {
         setMessage("Validation endpoint not found or invalid UUID/password.");
       } else {
-        setMessage(`Validation failed: ${error.message || "Please try again."}`);
+        setMessage(
+          `Validation failed: ${error.message || "Please try again."}`
+        );
       }
     } finally {
       setLoading(false);
@@ -105,7 +138,9 @@ const DeathReportForm = () => {
     }
     // Added dob and middleName to required fields check
     if (!name || !middleName || !surname || !file || !email || !dob) {
-      setMessage("Please fill in all required fields and upload a death certificate.");
+      setMessage(
+        "Please fill in all required fields and upload a death certificate."
+      );
       return;
     }
 
@@ -147,9 +182,16 @@ const DeathReportForm = () => {
         status: "pending",
       };
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/death-reports`, reportData, {
-        headers: { "Content-Type": "application/json" },
-      });
+      await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/death-reports`,
+        reportData,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
 
       setMessage("Death report submitted successfully!");
       setName("");
@@ -212,7 +254,12 @@ const DeathReportForm = () => {
               {loading ? "Validating..." : "Validate UUID"}
             </button>
           )}
-          <fieldset style={{ border: "none", padding: 0 }} disabled={!isUuidValid}> {/* Disable fields until UUID is valid */}
+          <fieldset
+            style={{ border: "none", padding: 0 }}
+            disabled={!isUuidValid}
+          >
+            {" "}
+            {/* Disable fields until UUID is valid */}
             <div style={styles.inputGroup}>
               <label style={styles.label}>Name</label>
               <input
@@ -232,7 +279,9 @@ const DeathReportForm = () => {
                 type="text"
                 value={middleName}
                 onChange={(e) =>
-                  setMiddleName(e.target.value.toLowerCase().replace(/[^a-z]/g, ""))
+                  setMiddleName(
+                    e.target.value.toLowerCase().replace(/[^a-z]/g, "")
+                  )
                 }
                 placeholder="Enter the user’s Middle Name"
                 style={styles.input}
@@ -245,15 +294,15 @@ const DeathReportForm = () => {
                 type="text"
                 value={surname}
                 onChange={(e) =>
-                  setSurname(e.target.value.toLowerCase().replace(/[^a-z]/g, ""))
+                  setSurname(
+                    e.target.value.toLowerCase().replace(/[^a-z]/g, "")
+                  )
                 }
                 placeholder="Enter the user’s surname"
                 style={styles.input}
                 required
               />
             </div>
-
-
             <div style={styles.inputGroup}>
               <label style={styles.label}>Date of Birth</label>
               <input
@@ -266,7 +315,8 @@ const DeathReportForm = () => {
               />
             </div>
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Email</label> {/* Changed label to "Email" */}
+              <label style={styles.label}>Email</label>{" "}
+              {/* Changed label to "Email" */}
               <input
                 type="email" // Changed type to "email" for better validation
                 value={email}
@@ -277,7 +327,8 @@ const DeathReportForm = () => {
               />
             </div>
             <div style={styles.inputGroup}>
-              <label style={styles.label}>Details (Optional)</label> {/* Added (Optional) */}
+              <label style={styles.label}>Details (Optional)</label>{" "}
+              {/* Added (Optional) */}
               <textarea
                 value={reportDetails}
                 onChange={(e) => setReportDetails(e.target.value)}
@@ -286,19 +337,29 @@ const DeathReportForm = () => {
               />
             </div>
             <div>
-              <label style={styles.label}>Upload Death Certificate (PDF only)</label> {/* Clarified file type */}
+              <label style={styles.label}>
+                Upload Death Certificate (PDF only)
+              </label>{" "}
+              {/* Clarified file type */}
               <div>
                 <DragNdrop onFilesSelected={setFile} />
               </div>
             </div>
-
-            <button type="submit" disabled={loading || !isUuidValid} style={styles.button}> {/* Disable submit if not validated */}
+            <button
+              type="submit"
+              disabled={loading || !isUuidValid}
+              style={styles.button}
+            >
+              {" "}
+              {/* Disable submit if not validated */}
               {loading ? "Submitting..." : "Submit Report"}
             </button>
           </fieldset>
         </form>
         {message && (
-          <p style={message.includes("success") ? styles.success : styles.error}>
+          <p
+            style={message.includes("success") ? styles.success : styles.error}
+          >
             {message}
           </p>
         )}

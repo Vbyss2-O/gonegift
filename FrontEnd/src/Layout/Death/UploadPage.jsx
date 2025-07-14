@@ -22,6 +22,8 @@ const UploadPage = () => {
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [encryptedAesKey, setEncryptedAesKey] = useState(null);
+  const [accessToken , setAccessToken] = useState(null);
+  
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
@@ -43,6 +45,26 @@ const UploadPage = () => {
       .map((b) => b.toString(16).padStart(2, "0"))
       .join("");
   };
+
+   useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+  
+      const accessToken = data.session?.access_token;
+  
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+  
+    initAuth();
+  }, []);
 
   // Fetch current user
   const fetchCurrentUser = async () => {
@@ -66,7 +88,12 @@ const UploadPage = () => {
   const getEncryptedKey = async (userId) => {
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userId}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/getKey/${userId}`,
+        {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
       );
       if (response.status === 200) {
         return response.data; // { ciphertext: "...", iv: "..." }
@@ -126,7 +153,12 @@ const UploadPage = () => {
       const input = uuid.trim() + "Vedant_Kasar" + password.trim();
       const hashedToken = await hashWithSalt(input);
       const response = await axios.get(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`
+        `${import.meta.env.VITE_API_URL}/api/deathusers/findHashToken/${hashedToken}`,
+        {
+                headers: {
+                  Authorization: `Bearer ${accessToken}`,
+                 },
+              }
       );
       if (response.status === 200) {
         const encryptedKeyData = await getEncryptedKey(currentUser.id);
@@ -362,6 +394,11 @@ const UploadPage = () => {
         {
           headers: {
             "Content-Type": "application/json",
+            
+                
+                  Authorization: `Bearer ${accessToken}`,
+                 
+              
           },
         }
       );
@@ -375,7 +412,7 @@ const UploadPage = () => {
 
       cancelRecording();
     } catch (err) {
-      console.error("❗ Unexpected Upload Error:", err);
+      console.error("Unexpected Upload Error:", err);
       setMessage("Something went wrong during upload.");
     } finally {
       setIsUploading(false);
