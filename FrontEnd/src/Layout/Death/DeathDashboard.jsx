@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import "./DeathDashboard.css";
+import GoneGiftLogo from "../components/GoneGiftLogo";
+
 import {
   FiUpload,
   FiMail,
@@ -25,8 +27,7 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [countFile, setCountFile] = useState(null);
   const [countBenificiary, setCountBenificiary] = useState(null);
-  const [accessToken , setAccessToken] = useState(null);
-  
+  const [accessToken, setAccessToken] = useState(null);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -84,16 +85,16 @@ const Dashboard = () => {
         console.error("Error getting session:", error);
         return;
       }
-  
+
       const accessToken = data.session?.access_token;
-  
+
       if (accessToken) {
         setAccessToken(accessToken);
       } else {
         console.warn("No access token found—user probably signed out.");
       }
     };
-  
+
     initAuth();
   }, []);
 
@@ -101,15 +102,17 @@ const Dashboard = () => {
     if (userData) {
       Promise.all([
         fetch(
-          `${import.meta.env.VITE_API_URL}/api/deathusers/filesize/${userData.userIdX}`,
+          `${import.meta.env.VITE_API_URL}/api/deathusers/filesize/${userData.userIdX
+          }`,
           {
-            headers:{Authorization: `Bearer ${accessToken}`},
+            headers: { Authorization: `Bearer ${accessToken}` },
           }
         ).then((res) => res.text()),
         fetch(
-          `${import.meta.env.VITE_API_URL}/api/deathusers/sharedfilesize/${userData.userIdX}`,
+          `${import.meta.env.VITE_API_URL}/api/deathusers/sharedfilesize/${userData.userIdX
+          }`,
           {
-            headers:{Authorization: `Bearer ${accessToken}`},
+            headers: { Authorization: `Bearer ${accessToken}` },
           }
         ).then((res) => res.text()),
       ])
@@ -126,10 +129,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (userData) {
       fetch(
-        `${import.meta.env.VITE_API_URL}/api/deathusers/beneficiarysize/${userData.userIdX}`,
+        `${import.meta.env.VITE_API_URL}/api/deathusers/beneficiarysize/${userData.userIdX
+        }`,
         {
-            headers:{Authorization: `Bearer ${accessToken}`},
-          }
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
       )
         .then((response) => response.text())
         .then((datax) => {
@@ -197,8 +201,10 @@ const Dashboard = () => {
     <div className="dashboard-container">
       <aside className="sidebar">
         <div className="sidebar-header">
-          <FiGrid size={24} />
-          <h2>GoneGift</h2>
+          <h2>
+            <GoneGiftLogo/>
+          </h2>
+
         </div>
 
         <nav className="sidebar-menu">
@@ -222,16 +228,16 @@ const Dashboard = () => {
 
       <main className="main-content">
         <header className="main-header">
-          
-          <div className="user-welcome"
+          <div
+            className="user-welcome"
             style={{
               position: "relative",
               padding: "20px",
               border: "1px solid #ccc",
               borderRadius: "8px",
-              overflow: "hidden" // this keeps children inside
-            }}>
-              
+              overflow: "hidden", // this keeps children inside
+            }}
+          >
             <h1>Welcome back, {userData?.firstName}!</h1>
             <p>
               {new Date().toLocaleDateString("en-US", {
