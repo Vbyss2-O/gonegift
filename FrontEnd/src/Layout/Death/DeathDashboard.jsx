@@ -125,7 +125,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (userData) {
-      console.log("access token ------------------------" + accessToken)
       fetch(
         `${import.meta.env.VITE_API_URL}/api/deathusers/beneficiarysize/${userData.userIdX}`,
         {
