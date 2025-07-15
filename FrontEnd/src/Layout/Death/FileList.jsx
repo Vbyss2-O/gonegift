@@ -72,8 +72,12 @@ const FileList = () => {
         });
 
         // Fetch files using the user ID
-        await fetchFiles(user.id);
-        await fetchSharedFiles(user.id);
+        // Ensure accessToken is available before fetching files
+        // The dependency array of this useEffect now includes accessToken to re-run when it's set
+        if (accessToken) {
+            await fetchFiles(user.id);
+            await fetchSharedFiles(user.id);
+        }
       } catch (error) {
         console.error("Error in fetchUserData:", error.message);
         navigate("/login");
@@ -83,7 +87,7 @@ const FileList = () => {
     };
 
     fetchUserData();
-  }, [navigate]);
+  }, [navigate, accessToken]); // Added accessToken to dependency array
 
   const fetchFiles = async (userId) => {
     try {
@@ -95,12 +99,36 @@ const FileList = () => {
           },
         }
       );
-      const data = await response.json();
 
-      if (Array.isArray(data)) {
-        setFiles(data);
+      // Check if response is OK (status 200-299)
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        // Attempt to read error message from body if available
+        const errorText = await response.text();
+        try {
+          const errorData = JSON.parse(errorText);
+          console.error("API Error Response:", errorData.error || errorText);
+        } catch (e) {
+          console.error("API Error Response (non-JSON):", errorText);
+        }
+        setFiles([]);
+        return; // Exit if response not OK
+      }
+
+      // Check if the response has content and is JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setFiles(data);
+        } else if (data) { // If it's a single object, wrap it in an array
+          setFiles([data]);
+        } else { // Handle empty but valid JSON response
+          console.warn("Received empty but valid JSON data for user files.");
+          setFiles([]);
+        }
       } else {
-        console.error("Received non-array data for user files:", data);
+        console.warn("Received non-JSON response for user files.");
         setFiles([]);
       }
     } catch (error) {
@@ -121,11 +149,36 @@ const FileList = () => {
           },
         }
       );
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setSharedFiles(data);
+
+      // Check if response is OK (status 200-299)
+      if (!response.ok) {
+        console.error(`HTTP error! status: ${response.status}`);
+        // Attempt to read error message from body if available
+        const errorText = await response.text();
+        try {
+          const errorData = JSON.parse(errorText);
+          console.error("API Error Response:", errorData.error || errorText);
+        } catch (e) {
+          console.error("API Error Response (non-JSON):", errorText);
+        }
+        setSharedFiles([]);
+        return; // Exit if response not OK
+      }
+
+      // Check if the response has content and is JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (Array.isArray(data)) {
+          setSharedFiles(data);
+        } else if (data) { // If it's a single object, wrap it in an array
+          setSharedFiles([data]);
+        } else { // Handle empty but valid JSON response
+          console.warn("Received empty but valid JSON data for shared files.");
+          setSharedFiles([]);
+        }
       } else {
-        console.error("Received non-array data for shared files:", data);
+        console.warn("Received non-JSON response for shared files.");
         setSharedFiles([]);
       }
     } catch (error) {
@@ -149,16 +202,28 @@ const FileList = () => {
       if (response.ok) {
         // Filter out the deleted file from both lists
         setFiles((prevFiles) => prevFiles.filter((file) => file.id !== fileId));
-        setSharedFiles((prevSharedFiles) =>
-          prevSharedFiles.filter((file) => file.id !== fileId)
-        );
+        // Also refresh the shared files list in case it was a shared file you owned
+        if (userData?.userIdX) {
+            await fetchSharedFiles(userData.userIdX);
+        }
       } else {
-        console.error("Failed to delete file");
+        const errorText = await response.text();
+        let errorMessage = "Failed to delete file";
+        try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+            errorMessage = errorText || errorMessage;
+        }
+        console.error("Failed to delete file:", errorMessage);
+        alert(`Failed to delete file: ${errorMessage}`);
       }
     } catch (error) {
       console.error("Error deleting file:", error);
+      alert(`Error deleting file: ${error.message}`);
     }
   };
+
   const delteSharedFile = async (fileId) => {
     try {
       const response = await fetch(
@@ -171,15 +236,25 @@ const FileList = () => {
         }
       );
       if (response.ok) {
-        // Filter out the deleted file from both lists
+        // Filter out the deleted file from shared files list
         setSharedFiles((prevSharedFiles) =>
           prevSharedFiles.filter((file) => file.id !== fileId)
         );
       } else {
-        console.error("Failed to delete shared file");
+        const errorText = await response.text();
+        let errorMessage = "Failed to delete shared file";
+        try {
+            const errorData = JSON.parse(errorText);
+            errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+            errorMessage = errorText || errorMessage;
+        }
+        console.error("Failed to delete shared file:", errorMessage);
+        alert(`Failed to delete shared file: ${errorMessage}`);
       }
     } catch (error) {
       console.error("Error deleting shared file:", error);
+      alert(`Error deleting shared file: ${error.message}`);
     }
   };
 
@@ -216,6 +291,7 @@ const FileList = () => {
 
   return (
     <>
+      <BackButton /> {/* Moved BackButton here to be outside the main div */}
       <div className="filelist-list-container">
         <h2 className="filelist-welcome-header">
           Welcome, {userData?.firstName} {userData?.lastname}

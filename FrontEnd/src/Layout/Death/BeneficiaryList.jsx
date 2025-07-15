@@ -83,7 +83,7 @@ const BeneficiaryList = () => {
     };
 
     fetchUserData();
-  }, [navigate]);
+  }, [navigate, accessToken]); // Added accessToken to dependency array
 
   const fetchBeneficiaries = async (userId) => {
     try {
@@ -104,20 +104,31 @@ const BeneficiaryList = () => {
           setBeneficiaries([]);
           return;
         }
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch beneficiaries");
+        // Attempt to parse error message if available, otherwise use status text
+        const errorText = await response.text(); // Get raw text to avoid JSON parsing errors
+        let errorMessage = `Failed to fetch beneficiaries: ${response.statusText}`;
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (parseError) {
+          // If parsing fails, the errorText itself might be the message or it's an unparseable format
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
-      const data = await response.json();
-      // Handle empty response
-      if (!data) {
+      // Check if the response has content before trying to parse as JSON
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        // Handle empty response or non-array response
+        const beneficiaryArray = Array.isArray(data) ? data : (data ? [data] : []);
+        setBeneficiaries(beneficiaryArray);
+      } else {
+        // If not JSON, assume no beneficiaries or an unexpected format
         setBeneficiaries([]);
-        return;
+        console.warn("Received non-JSON response for beneficiaries list.");
       }
-
-      // Ensure data is an array
-      const beneficiaryArray = Array.isArray(data) ? data : [data];
-      setBeneficiaries(beneficiaryArray);
     } catch (error) {
       console.error("Error fetching beneficiaries:", error);
       setError(error.message);
@@ -143,19 +154,25 @@ const BeneficiaryList = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete beneficiary");
+        // Attempt to parse error message if available
+        const errorText = await response.text();
+        let errorMessage = "Failed to delete beneficiary";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (parseError) {
+          errorMessage = errorText || errorMessage;
+        }
+        throw new Error(errorMessage);
       }
 
-      setBeneficiaries((prev) =>
-        prev.filter((ben) => ben.id !== beneficiaryId)
-      );
       // Refresh the list after deletion
       if (userData?.deathUserId) {
         await fetchBeneficiaries(userData.deathUserId);
       }
     } catch (error) {
       console.error("Error deleting beneficiary:", error);
-      alert("Failed to delete beneficiary. Try again.");
+      alert(`Failed to delete beneficiary: ${error.message}. Try again.`);
     }
   };
 

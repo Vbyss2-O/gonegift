@@ -36,7 +36,11 @@ const GoneGiftFeatures = () => {
         </li>
         <li>
           <strong>Timed Auto-Trigger Mechanism</strong><br />
-          If the user does not respond for a defined time period (e.g. every 30 days), the system rechecks periodically. If no activity is detected, it automatically triggers the secure claim process.
+          If the user does not respond for a defined time period , the system rechecks periodically. If no activity is detected, it automatically triggers the secure claim process.
+        </li>
+        <li>
+          <strong>Monitoring Toggle</strong><br />
+          At any time you can Toggle this button it will Pause or Restart the process of "Time Auto-Trigger"
         </li>
         <li>
           <strong>Secure Claim Portal with Countdown</strong><br />
