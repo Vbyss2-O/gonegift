@@ -16,6 +16,8 @@ const BeneficiaryList = () => {
       const { data, error } = await supabase.auth.getSession();
       if (error) {
         console.error("Error getting session:", error);
+        // Do not navigate to login here, as user might just not be logged in yet,
+        // and fetchUserData will handle the redirect.
         return;
       }
 
@@ -25,29 +27,32 @@ const BeneficiaryList = () => {
         setAccessToken(accessToken);
       } else {
         console.warn("No access token found—user probably signed out.");
+        // If no access token, and not loading, we might need to redirect to login
+        // but let fetchUserData handle this for consistency with user checks.
       }
     };
 
     initAuth();
-  }, []);
+  }, []); // This runs once on component mount to get the initial session
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserDataAndBeneficiaries = async () => {
+      setLoading(true); // Set loading true at the start of this main fetch operation
       try {
         const {
           data: { user },
-          error,
+          error: userError,
         } = await supabase.auth.getUser();
-        if (error || !user) {
+
+        if (userError || !user) {
           console.error(
             "Error fetching user:",
-            error?.message || "No user found"
+            userError?.message || "No user found"
           );
           navigate("/login");
           return;
         }
 
-        // Modified query to select the correct columns
         const { data: existingUser, error: fetchError } = await supabase
           .from("death_user")
           .select("first_name, lastname, user_role, user_idx")
@@ -57,8 +62,8 @@ const BeneficiaryList = () => {
 
         if (fetchError || !existingUser) {
           console.error(
-            "Error fetching user data:",
-            fetchError || "User not found in death_user table"
+            "Error fetching user data from death_user table:",
+            fetchError?.message || "User not found in death_user table"
           );
           navigate("/login");
           return;
@@ -72,22 +77,45 @@ const BeneficiaryList = () => {
           deathUserId: existingUser.user_idx, // Using user_idx instead of id
         });
 
-        // Use user_idx instead of id
-        await fetchBeneficiaries(existingUser.user_idx);
+        // ONLY call fetchBeneficiaries IF accessToken is available
+        // and if existingUser.user_idx is available
+        if (accessToken && existingUser.user_idx) {
+          await fetchBeneficiaries(existingUser.user_idx);
+        } else if (!accessToken) {
+            console.warn("Waiting for accessToken to be set before fetching beneficiaries.");
+            // We set loading to false here, but the user data is available.
+            // Beneficiaries will load when accessToken changes.
+            setLoading(false);
+            return;
+        }
+
+
       } catch (error) {
-        console.error("Error in fetchUserData:", error.message);
-        navigate("/login");
+        console.error("Error in fetchUserDataAndBeneficiaries:", error.message);
+        setError(error.message); // Set error state if something goes wrong here
+        navigate("/login"); // Redirect on critical errors
       } finally {
-        setLoading(false);
+        // Ensure loading is set to false only if we're not waiting for accessToken
+        if (accessToken) { // Only set false if accessToken is present (meaning fetchBeneficiaries was attempted or user is logged out)
+            setLoading(false);
+        }
       }
     };
 
-    fetchUserData();
-  }, [navigate, accessToken]); // Added accessToken to dependency array
+    // Call the combined function
+    fetchUserDataAndBeneficiaries();
+  }, [navigate, accessToken]); // Dependency on accessToken is crucial here
 
   const fetchBeneficiaries = async (userId) => {
     try {
-      setError(null);
+      setError(null); // Clear previous errors
+      if (!accessToken) {
+        console.warn("Attempted to fetch beneficiaries without an access token.");
+        setError("Authentication required. Please log in.");
+        setBeneficiaries([]);
+        return;
+      }
+
       const response = await fetch(
         `${
           import.meta.env.VITE_API_URL
@@ -104,28 +132,23 @@ const BeneficiaryList = () => {
           setBeneficiaries([]);
           return;
         }
-        // Attempt to parse error message if available, otherwise use status text
-        const errorText = await response.text(); // Get raw text to avoid JSON parsing errors
+        const errorText = await response.text();
         let errorMessage = `Failed to fetch beneficiaries: ${response.statusText}`;
         try {
           const errorData = JSON.parse(errorText);
           errorMessage = errorData.error || errorMessage;
         } catch (parseError) {
-          // If parsing fails, the errorText itself might be the message or it's an unparseable format
           errorMessage = errorText || errorMessage;
         }
         throw new Error(errorMessage);
       }
 
-      // Check if the response has content before trying to parse as JSON
       const contentType = response.headers.get("content-type");
       if (contentType && contentType.includes("application/json")) {
         const data = await response.json();
-        // Handle empty response or non-array response
         const beneficiaryArray = Array.isArray(data) ? data : (data ? [data] : []);
         setBeneficiaries(beneficiaryArray);
       } else {
-        // If not JSON, assume no beneficiaries or an unexpected format
         setBeneficiaries([]);
         console.warn("Received non-JSON response for beneficiaries list.");
       }
@@ -143,6 +166,11 @@ const BeneficiaryList = () => {
     if (!confirmDelete) return;
 
     try {
+        if (!accessToken) {
+            alert("Not authenticated. Please log in.");
+            navigate("/login"); // Or handle re-authentication
+            return;
+        }
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/beneficiaries/${beneficiaryId}`,
         {
@@ -154,7 +182,6 @@ const BeneficiaryList = () => {
       );
 
       if (!response.ok) {
-        // Attempt to parse error message if available
         const errorText = await response.text();
         let errorMessage = "Failed to delete beneficiary";
         try {
