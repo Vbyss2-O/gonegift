@@ -46,13 +46,10 @@ public class DeathFiles {
     @Column(nullable = false)
     private String fileName;
     
-    @Column(nullable = false)
     private String letterFileUrl;
 
-    @Column(nullable = false)
     private String mediaFileUrl;
 
-    @Column(nullable = false)
     private String voiceFileUrl;
 
     @ManyToOne
