@@ -35,11 +35,17 @@ public class SharedFile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private Long id;
+    @Column(nullable = false)
     private UUID authorId;
+    @Column(nullable = false)
     private UUID uploaderId;
+    @Column(nullable = false)
     private String token;
+    @Column(nullable = false)
     private String spaceHashPass;
+    @Column(nullable = false)
     private String uploadFileUrl;
+    @Column(nullable = false)
     private String fileName; 
 
     @ManyToOne

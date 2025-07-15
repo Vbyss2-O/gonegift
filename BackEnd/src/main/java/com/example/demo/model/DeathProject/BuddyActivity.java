@@ -20,7 +20,7 @@ public class BuddyActivity {
     @Column(nullable = false)
     private Long activityId;
 
-    
+    @Column(nullable = false)
     private String buddyStatus;
 
     @Column(nullable = false)

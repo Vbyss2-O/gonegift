@@ -16,6 +16,8 @@ const UserDetailsForm = () => {
   const [user, setUser] = useState(null);
   const [middleName , setMiddleName] = useState("");
   const [dateOfBirth, setDateOfBirth] = useState("");
+  const [accessToken , setAccessToken] = useState(null);
+  
 
 
   // Check if user is logged in, if not redirect to login
@@ -37,6 +39,26 @@ const UserDetailsForm = () => {
     };
     checkUser();
   }, [navigate]);
+
+   useEffect(() => {
+    const initAuth = async () => {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error("Error getting session:", error);
+        return;
+      }
+  
+      const accessToken = data.session?.access_token;
+  
+      if (accessToken) {
+        setAccessToken(accessToken);
+      } else {
+        console.warn("No access token found—user probably signed out.");
+      }
+    };
+  
+    initAuth();
+  }, []);
 
 
 
@@ -119,8 +141,7 @@ const UserDetailsForm = () => {
         userRole: "general",
         isdeceased: false,
         attemptCount: 0,
-        nextBuddyDate: null,
-        lastInteraction: null,
+        lastInteraction: new Date().toISOString(),
         buddyStatus: "CHILLING",
         hashuuid: hashedUuid,
         secretKey: encryptedKey, // Use the returned value directly
@@ -130,7 +151,9 @@ const UserDetailsForm = () => {
 
 
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/deathusers`, userDetails, {
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json" ,
+                    Authorization: `Bearer ${accessToken}`
+        },
       });
 
       // alert(`This is your most important key. Do not share it with anyone other than your beneficiary: Your Id: ${generatedUuid} Your Password: ${iv} `);

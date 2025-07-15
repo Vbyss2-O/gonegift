@@ -51,12 +51,13 @@ public class DeathUser {
     @Column(nullable = false)
     private String firstName;
 
-    // @Column(nullable = false)
+    @Column(nullable = false)
     private String middleName;
 
     @Column(nullable = false)
     private String lastname ;
 
+    @Column(nullable = false)
     private LocalDate dateOfBirth;
     
     @Column(nullable = false)
@@ -66,6 +67,7 @@ public class DeathUser {
     private Integer inactivityThresholdDays;
     
    //here i am going to store encrypted AES key at all
+   @Column(nullable = false)
     private String secretKey;
 
     @Column(nullable = false)
@@ -85,6 +87,7 @@ public class DeathUser {
     private Integer attemptCount;   
 
 //this is intraction of buddy with the user
+    @Column(nullable = false)
     private LocalDateTime lastInteraction;
 
     @Column(nullable = false)
@@ -105,4 +108,3 @@ public class DeathUser {
     @JsonManagedReference 
     private List<SharedFile> sharedfiles;
 }
-
