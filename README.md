@@ -1,11 +1,9 @@
 # GoneGift
 
-GoneGift is a digital legacy platform where users can save files, letters, and secrets to be delivered to their beneficiaries after their death. This project uses a **React** frontend and **Spring Boot** backend.
-and used Database Postgres(SQL Based
-
+GoneGift, a secure platform for users to schedule the posthumous delivery of messages, files, and digital assets to beneficiaries.
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 GoneGift/
@@ -15,13 +13,13 @@ GoneGift/
 
 ---
 
-## 🚀 Getting Started
+##Getting Started
 
 These instructions will help you set up the project locally on your system.
 
 ---
 
-## 📦 Prerequisites
+##Prerequisites
 
 Make sure you have the following installed:
 
@@ -34,7 +32,7 @@ Make sure you have the following installed:
 
 ---
 
-## 🖥️ Running the Frontend
+##Running the Frontend
 
 ```bash
 cd Frontend
@@ -46,7 +44,7 @@ This will start the React app on `http://localhost:5173`.
 
 ---
 
-## 🔧 Running the Backend
+##Running the Backend
 
 ```bash
 cd Backend/src/main/java/com/example/demo/DemoApplication.java
@@ -66,7 +64,7 @@ The backend will start on `http://localhost:8080`.
 
 
 
-## ✅ Features
+##Features
 
 - Upload letters and secrets
 - Assign beneficiaries
@@ -75,6 +73,6 @@ The backend will start on `http://localhost:8080`.
 
 ---
 
-## 📜 License
+##License
 
 This project is licensed under the AGPL-3.0 license.
