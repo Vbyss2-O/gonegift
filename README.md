@@ -1,4 +1,4 @@
-# 🎁 GoneGift
+# GoneGift
 
 GoneGift is a digital legacy platform where users can save files, letters, and secrets to be delivered to their beneficiaries after their death. This project uses a **React** frontend and **Spring Boot** backend.
 and used Database Postgres(SQL Based
