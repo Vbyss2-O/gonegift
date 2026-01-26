@@ -1,7 +1,31 @@
-# GoneGift
+<div align="center">
 
-GoneGift, a secure platform for users to schedule the posthumous delivery of messages, files, and digital assets to beneficiaries.
+<img src="https://img.icons8.com/fluency/96/gift.png" alt="GoneGift Logo" width="120"/>
+
+# 🎁 GoneGift
+
+### *Your legacy, delivered with care.*
+
+**A secure platform for scheduling the posthumous delivery of messages, files, and digital assets to your loved ones.**
+
+<br/>
+
+[![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL%20v3-blue.svg?style=for-the-badge)](https://www.gnu.org/licenses/agpl-3.0)
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+
+<br/>
+
+[**Explore Docs**](#-documentation) · [**Report Bug**](../../issues) · [**Request Feature**](../../issues)
+
 ---
+
+<img src="https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png" alt="line" width="100%"/>
+
+</div>
+
+<br/>
 
 ## Project Structure
 
