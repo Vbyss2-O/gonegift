@@ -17,7 +17,6 @@
 
 <br/>
 
-[**Explore Docs**](#-documentation) · [**Report Bug**](../../issues) · [**Request Feature**](../../issues)
 
 ---
 
@@ -27,17 +26,67 @@
 
 <br/>
 
-## Project Structure
+## ✨ Features
 
-```
-GoneGift/
-├── Backend/       # Spring Boot application
-└── Frontend/      # React application
-```
+<details>
+<summary>📬 <b>Posthumous Message Delivery</b></summary>
+<br/>
+
+Schedule the delivery of heartfelt messages, important files, and digital assets to your loved ones. Full automation ensures your final words reach the right people at the right time.
+
+</details>
+
+<details>
+<summary>🌳 <b>Family Tree Builder</b></summary>
+<br/>
+
+Maintain a complete historical family tree. Document your lineage, preserve relationships, and keep the story of your family alive for generations to come.
+
+</details>
+
+<details>
+<summary>💾 <b>Memory Vault</b></summary>
+<br/>
+
+Store all your precious memories in one secure place. Photos, videos, documents, and stories—everything that matters, preserved forever.
+
+</details>
+
+<details>
+<summary>💬 <b>Public Forum - Last Words</b></summary>
+<br/>
+
+A dedicated space where users can post their final messages and hidden emotions they want the world to see. Share your thoughts, confessions, or wisdom with the public.
+
+</details>
+
+<details>
+<summary>🗑️ <b>One-Click Digital Footprint Takedown</b></summary>
+<br/>
+
+Take control of your digital presence. With a single click, initiate the complete removal of your digital footprint across platforms when the time comes.
+
+</details>
+
+<details>
+<summary>🔐 <b>Secure Beneficiary Sharing</b></summary>
+<br/>
+
+All secret, hidden, or important memories are securely encrypted and shared only with designated beneficiaries. AES encryption and magic links ensure maximum security.
+
+</details>
+
+<details>
+<summary>🕊️ <b>Be Remembered</b></summary>
+<br/>
+
+A suite of features designed to help you be remembered even when you're no longer physically present. Your legacy, your way.
+
+</details>
 
 ---
 
-##Getting Started
+## Getting Started
 
 These instructions will help you set up the project locally on your system.
 
@@ -56,7 +105,7 @@ Make sure you have the following installed:
 
 ---
 
-##Running the Frontend
+## Running the Frontend
 
 ```bash
 cd Frontend
@@ -68,7 +117,7 @@ This will start the React app on `http://localhost:5173`.
 
 ---
 
-##Running the Backend
+## Running the Backend
 
 ```bash
 cd Backend/src/main/java/com/example/demo/DemoApplication.java
@@ -86,17 +135,8 @@ mvn spring-boot:run
 
 The backend will start on `http://localhost:8080`.
 
-
-
-##Features
-
-- Upload letters and secrets
-- Assign beneficiaries
-- Schedule delivery after death
-- Secure access with AES and magic links
-
 ---
 
-##License
+## License
 
 This project is licensed under the AGPL-3.0 license.
