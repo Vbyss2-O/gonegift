@@ -92,7 +92,7 @@ These instructions will help you set up the project locally on your system.
 
 ---
 
-##Prerequisites
+## Prerequisites
 
 Make sure you have the following installed:
 
