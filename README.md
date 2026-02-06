@@ -26,10 +26,10 @@
 
 <br/>
 
-## ✨ Features
+##  Features
 
 <details>
-<summary>📬 <b>Posthumous Message Delivery</b></summary>
+<summary><b>Posthumous Message Delivery</b></summary>
 <br/>
 
 Schedule the delivery of heartfelt messages, important files, and digital assets to your loved ones. Full automation ensures your final words reach the right people at the right time.
@@ -37,7 +37,7 @@ Schedule the delivery of heartfelt messages, important files, and digital assets
 </details>
 
 <details>
-<summary>🌳 <b>Family Tree Builder</b></summary>
+<summary> <b>Family Tree Builder</b></summary>
 <br/>
 
 Maintain a complete historical family tree. Document your lineage, preserve relationships, and keep the story of your family alive for generations to come.
@@ -45,7 +45,7 @@ Maintain a complete historical family tree. Document your lineage, preserve rela
 </details>
 
 <details>
-<summary>💾 <b>Memory Vault</b></summary>
+<summary> <b>Memory Vault</b></summary>
 <br/>
 
 Store all your precious memories in one secure place. Photos, videos, documents, and stories—everything that matters, preserved forever.
@@ -53,7 +53,7 @@ Store all your precious memories in one secure place. Photos, videos, documents,
 </details>
 
 <details>
-<summary>💬 <b>Public Forum - Last Words</b></summary>
+<summary> <b>Public Forum - Last Words</b></summary>
 <br/>
 
 A dedicated space where users can post their final messages and hidden emotions they want the world to see. Share your thoughts, confessions, or wisdom with the public.
@@ -61,7 +61,7 @@ A dedicated space where users can post their final messages and hidden emotions 
 </details>
 
 <details>
-<summary>🗑️ <b>One-Click Digital Footprint Takedown</b></summary>
+<summary> <b>One-Click Digital Footprint Takedown</b></summary>
 <br/>
 
 Take control of your digital presence. With a single click, initiate the complete removal of your digital footprint across platforms when the time comes.
@@ -69,7 +69,7 @@ Take control of your digital presence. With a single click, initiate the complet
 </details>
 
 <details>
-<summary>🔐 <b>Secure Beneficiary Sharing</b></summary>
+<summary> <b>Secure Beneficiary Sharing</b></summary>
 <br/>
 
 All secret, hidden, or important memories are securely encrypted and shared only with designated beneficiaries. AES encryption and magic links ensure maximum security.
@@ -77,7 +77,7 @@ All secret, hidden, or important memories are securely encrypted and shared only
 </details>
 
 <details>
-<summary>🕊️ <b>Be Remembered</b></summary>
+<summary> <b>Be Remembered</b></summary>
 <br/>
 
 A suite of features designed to help you be remembered even when you're no longer physically present. Your legacy, your way.
